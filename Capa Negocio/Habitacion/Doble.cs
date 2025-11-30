@@ -6,7 +6,12 @@ using System.Threading.Tasks;
 
 namespace Capa_Negocio.Habitacion
 {
-    internal class Doble
+    public class Doble : HabitacionBase
     {
+        public Doble()
+        {
+            Tipo = TipoHabitacion.Doble;
+            PrecioPorNoche = 2800m;
+        }
     }
 }

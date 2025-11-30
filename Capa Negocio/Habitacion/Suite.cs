@@ -6,7 +6,12 @@ using System.Threading.Tasks;
 
 namespace Capa_Negocio.Habitacion
 {
-    internal class Suite
+    public class Suite : HabitacionBase
     {
+        public Suite()
+        {
+            Tipo = TipoHabitacion.Suite;
+            PrecioPorNoche = 4500m;
+        }
     }
 }
