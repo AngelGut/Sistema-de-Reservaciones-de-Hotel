@@ -6,6 +6,12 @@ using System.Threading.Tasks;
 
 namespace Capa_Negocio.Habitacion
 {
+    //interfaz para habitaciones reservables
+    public interface IReservable
+    {
+        bool EstaDisponible();
+    }
+
     public abstract class HabitacionBase
     {
         // Corresponde a: IdHabitacion
@@ -29,5 +35,11 @@ namespace Capa_Negocio.Habitacion
 
         // Corresponde a: Descripcion
         public string Descripcion { get; set; }
+
+        public bool EstaDisponible()
+        {
+            return Estado == EstadoHabitacion.Disponible;
+        }
+
     }
 }

@@ -24,7 +24,7 @@ namespace Capa_Negocio.Habitacion.Servicios
         public async Task CrearHabitacionAsync(HabitacionBase habitacion, CancellationToken token)
         {
             // Simulación de procesamiento de servidor
-            await Task.Delay(800, token);
+            await Task.Delay(5000, token);
 
             using SqlConnection conn = _conexion.CrearConexion();
             await conn.OpenAsync(token);
@@ -57,7 +57,7 @@ namespace Capa_Negocio.Habitacion.Servicios
         public async Task<HabitacionBase?> ObtenerPorIdAsync(int idHabitacion, CancellationToken token)
         {
             // Simulación de espera de BD
-            await Task.Delay(300, token);
+            await Task.Delay(5000, token);
 
             using SqlConnection conn = _conexion.CrearConexion();
             await conn.OpenAsync(token);
@@ -96,7 +96,7 @@ namespace Capa_Negocio.Habitacion.Servicios
         public async Task<List<HabitacionBase>> ObtenerTodasAsync(CancellationToken token)
         {
             // Simulación de espera de BD
-            await Task.Delay(500, token);
+            await Task.Delay(5000, token);
 
             var lista = new List<HabitacionBase>();
 
@@ -137,7 +137,7 @@ namespace Capa_Negocio.Habitacion.Servicios
             var tareaBD = Task.Run(async () =>
             {
                 // Simulamos extra delay de BD
-                await Task.Delay(800, token);
+                await Task.Delay(5000, token);
 
                 var lista = await ObtenerTodasAsync(token);
 
@@ -169,7 +169,7 @@ namespace Capa_Negocio.Habitacion.Servicios
         // ---------------------------------------------------------
         public async Task ActualizarHabitacionAsync(HabitacionBase habitacion, CancellationToken token)
         {
-            await Task.Delay(600, token);
+            await Task.Delay(5000, token);
 
             using SqlConnection conn = _conexion.CrearConexion();
             await conn.OpenAsync(token);
@@ -203,7 +203,7 @@ namespace Capa_Negocio.Habitacion.Servicios
         // ---------------------------------------------------------
         public async Task EliminarHabitacionAsync(int idHabitacion, CancellationToken token)
         {
-            await Task.Delay(400, token);
+            await Task.Delay(5000, token);
 
             using SqlConnection conn = _conexion.CrearConexion();
             await conn.OpenAsync(token);
