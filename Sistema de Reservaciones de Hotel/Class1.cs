@@ -11,7 +11,7 @@ namespace Capa_datos
         public ConexionBD()
         {
             _connectionString =
-                "Server=.;Database=HotelCaribeDB;Trusted_Connection=True;";
+                "Server=.;Database=HotelCaribeDB;Trusted_Connection=True;TrustServerCertificate=True;";
         }
 
         public SqlConnection CrearConexion()
