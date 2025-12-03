@@ -18,7 +18,6 @@
 
   <ItemGroup>
     <Folder Include="Factura\" />
-    <Folder Include="Reserva\" />
   </ItemGroup>
 
 </Project>
