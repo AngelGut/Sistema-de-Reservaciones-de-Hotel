@@ -12,34 +12,36 @@ namespace Capa_Negocio.Habitacion
         bool EstaDisponible();
     }
 
-    public abstract class HabitacionBase
+    public abstract class HabitacionBase : IReservable
     {
-        // Corresponde a: IdHabitacion
         public int IdHabitacion { get; set; }
-
-        // Corresponde a: Numero
         public int Numero { get; set; }
-
-        // Corresponde a: Tipo
-        // En la BD es INT, en C# usamos enum para hacerlo más legible.
         public TipoHabitacion Tipo { get; protected set; }
-
-        // Corresponde a: Nombre
         public string Nombre { get; set; }
 
-        // Corresponde a: PrecioPorNoche
-        public decimal PrecioPorNoche { get; set; }
+        // ===========================
+        //  ENCAPSULAMIENTO, este es con motivo de tener una capa de seguridad adicional para el precio
+        // ===========================
+        private decimal _precioPorNoche;
 
-        // Corresponde a: Estado 
+        public decimal PrecioPorNoche
+        {
+            get => _precioPorNoche;
+            set
+            {
+                if (value <= 0)
+                    throw new ArgumentException("El precio por noche debe ser mayor que cero.");
+                _precioPorNoche = value;
+            }
+        }
+
         public EstadoHabitacion Estado { get; set; }
-
-        // Corresponde a: Descripcion
         public string Descripcion { get; set; }
 
         public bool EstaDisponible()
         {
             return Estado == EstadoHabitacion.Disponible;
         }
-
     }
+
 }
