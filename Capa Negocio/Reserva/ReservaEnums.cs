@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Capa_Negocio.Reserva
 {
-    enum EstadoReserva
+    public enum EstadoReserva
     {
         Reservada = 0,   // Reserva creada, pendiente de check-in
         CheckIn = 1,   // El huésped ya hizo check-in
