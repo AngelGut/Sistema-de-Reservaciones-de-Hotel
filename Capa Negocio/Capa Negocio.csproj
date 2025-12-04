@@ -16,8 +16,4 @@
     <ProjectReference Include="..\Sistema de Reservaciones de Hotel\Capa Datos.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Factura\" />
-  </ItemGroup>
-
 </Project>
