@@ -1,4 +1,4 @@
-using MaterialSkin.Controls;
+Ôªøusing MaterialSkin.Controls;
 using MaterialSkin;
 using System.Drawing;
 using Capa_Negocio.Cliente;
@@ -28,14 +28,14 @@ namespace Capa_Presentacion
             dgvClientes.ReadOnly = true;                 // No permitir editar celdas
             dgvClientes.AllowUserToAddRows = false;      // No permitir agregar filas
             dgvClientes.AllowUserToDeleteRows = false;   // No permitir eliminar filas
-            dgvClientes.AllowUserToResizeRows = false;   // No permitir cambiar tamaÒo de filas
-            dgvClientes.SelectionMode = DataGridViewSelectionMode.FullRowSelect; // SelecciÛn por fila
+            dgvClientes.AllowUserToResizeRows = false;   // No permitir cambiar tama√±o de filas
+            dgvClientes.SelectionMode = DataGridViewSelectionMode.FullRowSelect; // Selecci√≥n por fila
             dgvClientes.MultiSelect = false;             // Solo una fila a la vez
             dgvClientes.RowHeadersVisible = false;       // Quitar columna extra de la izquierda
 
 
 
-            // ConfiguraciÛn MaterialSkin
+            // Configuraci√≥n MaterialSkin
             var materialSkinManager = MaterialSkinManager.Instance;
             materialSkinManager.AddFormToManage(this);
 
@@ -51,11 +51,14 @@ namespace Capa_Presentacion
 
             lblNombreC.ForeColor = Color.White;
 
-            //Evento del botÛn registrar
+            //Evento del bot√≥n registrar
             btnRegistrar.Click += btnRegistrar_Click;
             btnBusqueda.Click += btnBusqueda_Click;
-            btnEditar.Click += btnEditar_Click;
+            
             dgvClientes.KeyDown += dgvClientes_KeyDown;
+            dgvClientes.CellDoubleClick += dgvClientes_CellDoubleClick;
+            dgvClientes.CellEndEdit += dgvClientes_CellEndEdit;
+
 
 
         }
@@ -69,7 +72,7 @@ namespace Capa_Presentacion
         }
 
         // ----------------------------------------------------------
-        // M…TODO PARA LIMPIAR LOS TEXTBOX
+        // M√âTODO PARA LIMPIAR LOS TEXTBOX
         // ----------------------------------------------------------
         private void LimpiarCampos()
         {
@@ -83,7 +86,7 @@ namespace Capa_Presentacion
         }
 
         // ----------------------------------------------------------
-        // M…TODO PARA CARGAR EL DGV
+        // M√âTODO PARA CARGAR EL DGV
         // ----------------------------------------------------------
         private async Task CargarClientesAsync()
         {
@@ -92,7 +95,7 @@ namespace Capa_Presentacion
         }
 
         // ----------------------------------------------------------
-        // EVENTO CLICK DEL BOT”N REGISTRAR
+        // EVENTO CLICK DEL BOT√ìN REGISTRAR
         // ----------------------------------------------------------
         private async void btnRegistrar_Click(object sender, EventArgs e)
         {
@@ -100,7 +103,7 @@ namespace Capa_Presentacion
             {
                 if (string.IsNullOrWhiteSpace(txtNombre.Text))
                 {
-                    MessageBox.Show("El nombre no puede estar vacÌo.");
+                    MessageBox.Show("El nombre no puede estar vac√≠o.");
                     return;
                 }
 
@@ -132,25 +135,30 @@ namespace Capa_Presentacion
 
         private async Task CargarCedulas()
         {
-            using (var conn = _conexion.CrearConexion())
+            cmbCedula.Items.Clear();   // Muy importante
 
+            using (var conn = _conexion.CrearConexion())
             {
                 await conn.OpenAsync();
 
-                string query = "SELECT Documento FROM Cliente";
+                string query = "SELECT Documento FROM Cliente ORDER BY Documento";
 
                 using (SqlCommand cmd = new SqlCommand(query, conn))
-                using (SqlDataReader reader = await cmd.ExecuteReaderAsync())
+                using (SqlDataReader dr = await cmd.ExecuteReaderAsync())
                 {
-                    cmbCedula.Items.Clear();
-
-                    while (await reader.ReadAsync())
+                    while (await dr.ReadAsync())
                     {
-                        cmbCedula.Items.Add(reader["Documento"].ToString());
+                        cmbCedula.Items.Add(dr["Documento"].ToString());
                     }
                 }
             }
+
+            // ‚úî Evita que quede mostrando un valor viejo
+            cmbCedula.SelectedIndex = -1;
+            cmbCedula.Text = "";
         }
+
+
         private async Task CargarIdsClientes()
         {
             using (var conn = _conexion.CrearConexion())
@@ -177,10 +185,10 @@ namespace Capa_Presentacion
             string cedula = cmbCedula.SelectedItem?.ToString();
             string idCliente = cmbID.SelectedItem?.ToString();
 
-            // ValidaciÛn
+            // Validaci√≥n
             if (cedula == null && idCliente == null)
             {
-                MessageBox.Show("Debes seleccionar una cÈdula o un ID.",
+                MessageBox.Show("Debes seleccionar una c√©dula o un ID.",
                                 "Aviso", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
@@ -217,7 +225,7 @@ namespace Capa_Presentacion
                         // Muestra solo el resultado filtrado
                         dgvClientes.DataSource = tabla;
 
-                        // TambiÈn rellenar los TextBox
+                        // Tambi√©n rellenar los TextBox
                         DataRow row = tabla.Rows[0];
                         txtNombre.Text = row["Nombre"].ToString();
                         txtTelefono.Text = row["Telefono"].ToString();
@@ -225,11 +233,11 @@ namespace Capa_Presentacion
                         txtNacionalidad.Text = row["Nacionalidad"].ToString();
 
                         MessageBox.Show("Cliente encontrado.",
-                                        "…xito", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                                        "√âxito", MessageBoxButtons.OK, MessageBoxIcon.Information);
                     }
                     else
                     {
-                        MessageBox.Show("No se encontrÛ ning˙n cliente.",
+                        MessageBox.Show("No se encontr√≥ ning√∫n cliente.",
                                         "Sin resultados",
                                         MessageBoxButtons.OK, MessageBoxIcon.Warning);
 
@@ -268,8 +276,8 @@ namespace Capa_Presentacion
         {
             if (!EsCorreoValido(txtCorreo.Text))
             {
-                MessageBox.Show("El correo no es v·lido. Ejemplo: usuario@dominio.com",
-                                "Correo inv·lido",
+                MessageBox.Show("El correo no es v√°lido. Ejemplo: usuario@dominio.com",
+                                "Correo inv√°lido",
                                 MessageBoxButtons.OK,
                                 MessageBoxIcon.Warning);
 
@@ -290,22 +298,22 @@ namespace Capa_Presentacion
         }
         private void BloquearControles(bool bloquear)
         {
-            // Usamos BloquearRecursivo, que ya tiene la lÛgica para NO bloquear 
+            // Usamos BloquearRecursivo, que ya tiene la l√≥gica para NO bloquear 
             // el panel que contiene al DataGridView
             BloquearRecursivo(this, bloquear);
 
-            // Aseguramos explÌcitamente el DGV y el botÛn
+            // Aseguramos expl√≠citamente el DGV y el bot√≥n
             dgvClientes.Enabled = true;
 
-            // El botÛn Editar se deshabilita si estamos bloqueando (modo ediciÛn)
-            btnEditar.Enabled = !bloquear;
+            // El bot√≥n Editar se deshabilita si estamos bloqueando (modo edici√≥n)
+            
         }
 
-        private void HabilitarControlesRecursivo(Control contenedor, bool estadoHabilitado)
+        /*private void HabilitarControlesRecursivo(Control contenedor, bool estadoHabilitado)
         {
             foreach (Control c in contenedor.Controls)
             {
-                // No tocamos el DataGridView aquÌ, se maneja en el mÈtodo padre
+                // No tocamos el DataGridView aqu√≠, se maneja en el m√©todo padre
                 if (c != dgvClientes)
                 {
                     c.Enabled = estadoHabilitado;
@@ -315,7 +323,7 @@ namespace Capa_Presentacion
                 if (c.HasChildren)
                     HabilitarControlesRecursivo(c, estadoHabilitado);
             }
-        }
+        }*/
 
 
 
@@ -354,17 +362,17 @@ namespace Capa_Presentacion
 
         private void btnEditar_Click(object sender, EventArgs e)
         {
-            // 1. Validar selecciÛn
+            // 1. Validar selecci√≥n
             if (dgvClientes.SelectedRows.Count == 0 && dgvClientes.CurrentRow == null)
             {
                 MessageBox.Show("Selecciona un cliente primero.");
                 return;
             }
 
-            // 2. Bloquear interfaz (Esto ahora usar· la lÛgica corregida del Paso 1)
+            // 2. Bloquear interfaz (Esto ahora usar√° la l√≥gica corregida del Paso 1)
             BloquearControles(true);
 
-            // 3. Configurar DGV para ediciÛn
+            // 3. Configurar DGV para edici√≥n
             dgvClientes.ReadOnly = false;
             dgvClientes.SelectionMode = DataGridViewSelectionMode.CellSelect;
             dgvClientes.EditMode = DataGridViewEditMode.EditOnKeystrokeOrF2;
@@ -376,114 +384,117 @@ namespace Capa_Presentacion
                 else col.ReadOnly = false;
             }
 
-            // 5. PONER EL FOCO Y ABRIR EDICI”N AUTOM¡TICAMENTE
+            // 5. PONER EL FOCO Y ABRIR EDICI√ìN AUTOM√ÅTICAMENTE
             dgvClientes.Focus();
 
-            // Identificamos la columna 'Nombre' (o la columna 1) para empezar a editar ahÌ
+            // Identificamos la columna 'Nombre' (o la columna 1) para empezar a editar ah√≠
             if (dgvClientes.CurrentRow != null)
             {
                 // Nos aseguramos de ir a la celda de Nombre
                 dgvClientes.CurrentCell = dgvClientes.CurrentRow.Cells["Nombre"];
 
-                // Esta lÌnea es m·gica: Fuerza al DGV a mostrar el cursor de texto
+                // Esta l√≠nea es m√°gica: Fuerza al DGV a mostrar el cursor de texto
                 dgvClientes.BeginEdit(true);
             }
 
             // Mensaje opcional (a veces es mejor quitarlo para que el usuario escriba directo)
-            // MessageBox.Show("Modo ediciÛn activado..."); 
+            // MessageBox.Show("Modo edici√≥n activado..."); 
         }
 
 
 
-        private async void dgvClientes_KeyDown(object sender, KeyEventArgs e)
+        private void dgvClientes_KeyDown(object sender, KeyEventArgs e)
         {
-            // Verificamos si es Enter y si el Grid est· en modo ediciÛn (ReadOnly = false)
-            if (e.KeyCode == Keys.Enter && dgvClientes.ReadOnly == false)
+            if (e.KeyCode == Keys.Enter && !dgvClientes.ReadOnly)
             {
-                e.SuppressKeyPress = true; // Evita que el Enter baje de renglÛn o haga "ding"
                 e.Handled = true;
+                e.SuppressKeyPress = true;
 
-                // IMPORTANTE: Confirma la ediciÛn de la celda actual antes de leer los datos
-                // Si no haces esto, el valor nuevo no pasa al Value de la celda.
-                dgvClientes.EndEdit();
-
-                if (dgvClientes.CurrentRow == null)
-                    return;
-
-                // Usamos CurrentRow que es m·s seguro al editar
-                var fila = dgvClientes.CurrentRow;
-
-                // ValidaciÛn extra para evitar errores de nulos si la celda est· vacÌa
-                if (fila.Cells["IdCliente"].Value == DBNull.Value) return;
-
-                // Obtener datos
-                int id = Convert.ToInt32(fila.Cells["IdCliente"].Value);
-                string nombre = fila.Cells["Nombre"].Value?.ToString() ?? "";
-                string documento = fila.Cells["Documento"].Value?.ToString() ?? "";
-                string telefono = fila.Cells["Telefono"].Value?.ToString() ?? "";
-                string correo = fila.Cells["Email"].Value?.ToString() ?? "";
-                string nacionalidad = fila.Cells["Nacionalidad"].Value?.ToString() ?? "";
-
-                try
-                {
-                    using (var conn = _conexion.CrearConexion())
-                    {
-                        await conn.OpenAsync();
-                        string query = @"UPDATE Cliente 
-                                 SET Nombre=@Nombre,
-                                     Documento=@Documento,
-                                     Telefono=@Telefono,
-                                     Email=@Email,
-                                     Nacionalidad=@Nacionalidad
-                                 WHERE IdCliente=@IdCliente";
-
-                        using (SqlCommand cmd = new SqlCommand(query, conn))
-                        {
-                            cmd.Parameters.AddWithValue("@IdCliente", id);
-                            cmd.Parameters.AddWithValue("@Nombre", nombre);
-                            cmd.Parameters.AddWithValue("@Documento", documento);
-                            cmd.Parameters.AddWithValue("@Telefono", telefono);
-                            cmd.Parameters.AddWithValue("@Email", correo);
-                            cmd.Parameters.AddWithValue("@Nacionalidad", nacionalidad);
-
-                            await cmd.ExecuteNonQueryAsync();
-                        }
-                    }
-
-                    MessageBox.Show("Cambios guardados correctamente.");
-
-                    // -----------------------------------------------------------
-                    // RESTAURACI”N DE LA INTERFAZ (VITAL)
-                    // -----------------------------------------------------------
-
-                    // 1. Bloquear el Grid nuevamente
-                    dgvClientes.ReadOnly = true;
-
-                    // 2. IMPORTANTE: Volver a seleccionar la fila completa visualmente
-                    dgvClientes.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
-
-                    // 3. Restaurar comportamiento de ediciÛn (opcional, pero recomendado)
-                    dgvClientes.EditMode = DataGridViewEditMode.EditProgrammatically;
-
-                    // 4. Desbloquear el resto de controles (pasamos false a bloquear)
-                    BloquearControles(false);
-
-                    // 5. Habilitar el botÛn editar
-                    btnEditar.Enabled = true;
-
-                    // -----------------------------------------------------------
-
-                    // REFRESCAR LISTAS Y COMBOS
-                    await CargarClientesAsync();
-                    await CargarCedulas();
-                    await CargarIdsClientes();
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show("Error al actualizar: " + ex.Message);
-                }
+                dgvClientes.EndEdit(); // <-- dispara CellEndEdit
             }
         }
+
+
+        private void dgvClientes_CellDoubleClick(object sender, DataGridViewCellEventArgs e)
+        {
+            if (e.RowIndex < 0) return; // Evita doble clic en headers
+
+            // 1. Habilitar edici√≥n SOLO en el DGV
+            dgvClientes.ReadOnly = false;
+            dgvClientes.EditMode = DataGridViewEditMode.EditOnKeystrokeOrF2;
+            dgvClientes.SelectionMode = DataGridViewSelectionMode.CellSelect;
+
+            // 2. Bloquear TODOS los controles excepto el DGV
+            BloquearControles(true);
+            
+
+            // 3. Activar edici√≥n inmediatamente
+            dgvClientes.CurrentCell = dgvClientes.Rows[e.RowIndex].Cells[e.ColumnIndex];
+            dgvClientes.BeginEdit(true);
+        }
+        private async void dgvClientes_CellEndEdit(object sender, DataGridViewCellEventArgs e)
+        {
+            if (dgvClientes.ReadOnly) return;
+
+            if (dgvClientes.CurrentRow == null) return;
+
+            int id = Convert.ToInt32(dgvClientes.CurrentRow.Cells["IdCliente"].Value);
+
+            string nombre = dgvClientes.CurrentRow.Cells["Nombre"].Value?.ToString() ?? "";
+            string documento = dgvClientes.CurrentRow.Cells["Documento"].Value?.ToString() ?? "";
+            string telefono = dgvClientes.CurrentRow.Cells["Telefono"].Value?.ToString() ?? "";
+            string correo = dgvClientes.CurrentRow.Cells["Email"].Value?.ToString() ?? "";
+            string nacionalidad = dgvClientes.CurrentRow.Cells["Nacionalidad"].Value?.ToString() ?? "";
+
+            try
+            {
+                using (var conn = _conexion.CrearConexion())
+                {
+                    await conn.OpenAsync();
+
+                    string query = @"UPDATE Cliente SET 
+                                Nombre=@Nombre,
+                                Documento=@Documento,
+                                Telefono=@Telefono,
+                                Email=@Email,
+                                Nacionalidad=@Nacionalidad
+                             WHERE IdCliente=@IdCliente";
+
+                    using (SqlCommand cmd = new SqlCommand(query, conn))
+                    {
+                        cmd.Parameters.AddWithValue("@IdCliente", id);
+                        cmd.Parameters.AddWithValue("@Nombre", nombre);
+                        cmd.Parameters.AddWithValue("@Documento", documento);
+                        cmd.Parameters.AddWithValue("@Telefono", telefono);
+                        cmd.Parameters.AddWithValue("@Email", correo);
+                        cmd.Parameters.AddWithValue("@Nacionalidad", nacionalidad);
+
+                        await cmd.ExecuteNonQueryAsync();
+                    }
+                }
+
+                // Refrescar UI
+                await CargarClientesAsync();
+                await CargarCedulas();
+                await CargarIdsClientes();
+
+                dgvClientes.ReadOnly = true;
+                dgvClientes.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
+                dgvClientes.EditMode = DataGridViewEditMode.EditProgrammatically;
+
+                BloquearControles(false);
+               
+
+                MessageBox.Show("Cambios guardados correctamente.");
+
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error al actualizar: " + ex.Message);
+            }
+        }
+
+
 
 
 

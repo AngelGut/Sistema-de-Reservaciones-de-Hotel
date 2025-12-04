@@ -60,7 +60,6 @@ namespace Capa_Presentacion
             tabPage1 = new TabPage();
             materialTabControl1 = new MaterialSkin.Controls.MaterialTabControl();
             fileSystemWatcher1 = new FileSystemWatcher();
-            btnEditar = new MaterialSkin.Controls.MaterialButton();
             tabPage3.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)dataGridView2).BeginInit();
             materialCard2.SuspendLayout();
@@ -271,7 +270,6 @@ namespace Capa_Presentacion
             // 
             // tabPage2
             // 
-            tabPage2.Controls.Add(btnEditar);
             tabPage2.Controls.Add(materialLabel2);
             tabPage2.Controls.Add(materialLabel1);
             tabPage2.Controls.Add(cmbCedula);
@@ -725,25 +723,6 @@ namespace Capa_Presentacion
             fileSystemWatcher1.EnableRaisingEvents = true;
             fileSystemWatcher1.SynchronizingObject = this;
             // 
-            // btnEditar
-            // 
-            btnEditar.AutoSizeMode = AutoSizeMode.GrowAndShrink;
-            btnEditar.Density = MaterialSkin.Controls.MaterialButton.MaterialButtonDensity.Default;
-            btnEditar.Depth = 0;
-            btnEditar.HighEmphasis = true;
-            btnEditar.Icon = null;
-            btnEditar.Location = new Point(908, 702);
-            btnEditar.Margin = new Padding(4, 6, 4, 6);
-            btnEditar.MouseState = MaterialSkin.MouseState.HOVER;
-            btnEditar.Name = "btnEditar";
-            btnEditar.NoAccentTextColor = Color.Empty;
-            btnEditar.Size = new Size(71, 36);
-            btnEditar.TabIndex = 20;
-            btnEditar.Text = "Editar";
-            btnEditar.Type = MaterialSkin.Controls.MaterialButton.MaterialButtonType.Contained;
-            btnEditar.UseAccentColor = false;
-            btnEditar.UseVisualStyleBackColor = true;
-            // 
             // menu
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
@@ -801,6 +780,5 @@ namespace Capa_Presentacion
         private MaterialSkin.Controls.MaterialComboBox cmbID;
         private MaterialSkin.Controls.MaterialLabel materialLabel2;
         private MaterialSkin.Controls.MaterialLabel materialLabel1;
-        private MaterialSkin.Controls.MaterialButton btnEditar;
     }
 }
