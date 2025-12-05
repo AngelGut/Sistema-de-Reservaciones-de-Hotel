@@ -32,6 +32,14 @@ namespace Capa_Presentacion
             dgvClientes.SelectionMode = DataGridViewSelectionMode.FullRowSelect; // Selección por fila
             dgvClientes.MultiSelect = false;             // Solo una fila a la vez
             dgvClientes.RowHeadersVisible = false;       // Quitar columna extra de la izquierda
+            cmbEstado.DropDownStyle = ComboBoxStyle.DropDownList;
+            cmbTipo.DropDownStyle = ComboBoxStyle.DropDownList;
+            cmbID.DropDownStyle = ComboBoxStyle.DropDownList;
+            cmbCedula.DropDownStyle = ComboBoxStyle.DropDownList;
+            txtNumeroHab.KeyPress += txtNumeroHab_KeyPress;
+            cmbIDH.DropDownStyle = ComboBoxStyle.DropDownList;
+            cmbEstadoH.DropDownStyle = ComboBoxStyle.DropDownList;
+
 
 
 
@@ -54,13 +62,27 @@ namespace Capa_Presentacion
             //Evento del botón registrar
             btnRegistrar.Click += btnRegistrar_Click;
             btnBusqueda.Click += btnBusqueda_Click;
-            
+
             dgvClientes.KeyDown += dgvClientes_KeyDown;
             dgvClientes.CellDoubleClick += dgvClientes_CellDoubleClick;
             dgvClientes.CellEndEdit += dgvClientes_CellEndEdit;
 
+            btnRegistrarH.Click += btnRegistrarH_Click;
+            BuscarH.Click += btnBuscarH_Click;
+            btnLimpiarH.Click += BtnLimpiarH_Click;
 
 
+
+        }
+
+        private void BtnLimpiarH_Click(object? sender, EventArgs e)
+        {
+            // Restaurar combos
+            cmbIDH.SelectedIndex = 0;     // "Todas"
+            cmbEstadoH.SelectedIndex = -1; // Nada seleccionado (o añade "Todos" si quieres)
+
+            // Recargar el DataGridView completo
+            CargarHabitaciones();
         }
 
         private async void menu_Load(object sender, EventArgs e)
@@ -69,6 +91,17 @@ namespace Capa_Presentacion
             await CargarClientesAsync();
             await CargarCedulas();
             await CargarIdsClientes();
+            CargarEstadosHabitacion();
+            CargarTiposHabitacion();
+            CargarIDs();
+            CargarEstados();
+            
+
+
+
+            // Cargar habitaciones desde la BD
+            CargarHabitaciones();
+
         }
 
         // ----------------------------------------------------------
@@ -306,7 +339,7 @@ namespace Capa_Presentacion
             dgvClientes.Enabled = true;
 
             // El botón Editar se deshabilita si estamos bloqueando (modo edición)
-            
+
         }
 
         /*private void HabilitarControlesRecursivo(Control contenedor, bool estadoHabilitado)
@@ -426,7 +459,7 @@ namespace Capa_Presentacion
 
             // 2. Bloquear TODOS los controles excepto el DGV
             BloquearControles(true);
-            
+
 
             // 3. Activar edición inmediatamente
             dgvClientes.CurrentCell = dgvClientes.Rows[e.RowIndex].Cells[e.ColumnIndex];
@@ -483,7 +516,7 @@ namespace Capa_Presentacion
                 dgvClientes.EditMode = DataGridViewEditMode.EditProgrammatically;
 
                 BloquearControles(false);
-               
+
 
                 MessageBox.Show("Cambios guardados correctamente.");
 
@@ -493,6 +526,337 @@ namespace Capa_Presentacion
                 MessageBox.Show("Error al actualizar: " + ex.Message);
             }
         }
+        private void CargarEstadosHabitacion()
+        {
+            cmbEstado.Items.Clear();
+
+            cmbEstado.Items.Add("Disponible");
+            cmbEstado.Items.Add("Ocupada");
+            cmbEstado.Items.Add("Mantenimiento");
+
+            cmbEstado.SelectedIndex = -1;
+        }
+        private void CargarTiposHabitacion()
+        {
+            cmbTipo.Items.Clear();
+
+            cmbTipo.Items.Add("Simple");
+            cmbTipo.Items.Add("Doble");
+            cmbTipo.Items.Add("Suite");
+            cmbTipo.Items.Add("Presidencial");
+
+            cmbTipo.SelectedIndex = -1;
+        }
+        private void CargarHabitaciones()
+        {
+            using (var conn = _conexion.CrearConexion())
+            {
+                conn.Open();
+
+                string query = "SELECT IdHabitacion, Numero, Nombre, Tipo, Estado FROM Habitacion";
+
+                using (SqlDataAdapter da = new SqlDataAdapter(query, conn))
+                {
+                    DataTable tabla = new DataTable();
+                    da.Fill(tabla);
+
+                    // --------------------------------------------
+                    // Convertir NUMEROS → TEXTO (Tipo y Estado)
+                    // --------------------------------------------
+                    tabla.Columns.Add("TipoTexto", typeof(string));
+                    tabla.Columns.Add("EstadoTexto", typeof(string));
+
+                    foreach (DataRow row in tabla.Rows)
+                    {
+                        // Tipo: 1-4
+                        int tipo = Convert.ToInt32(row["Tipo"]);
+                        row["TipoTexto"] = tipo switch
+                        {
+                            1 => "Simple",
+                            2 => "Doble",
+                            3 => "Suite",
+                            4 => "Presidencial",
+                            _ => "Desconocido"
+                        };
+
+                        // Estado: 0-2
+                        int estado = Convert.ToInt32(row["Estado"]);
+                        row["EstadoTexto"] = estado switch
+                        {
+                            0 => "Disponible",
+                            1 => "Ocupada",
+                            2 => "Mantenimiento",
+                            _ => "Desconocido"
+                        };
+                    }
+
+                    // Mostrar en el DGV
+                    dgvHabitaciones.DataSource = tabla;
+                    dgvHabitaciones.Columns["IdHabitacion"].HeaderText = "ID";
+                    dgvHabitaciones.Columns["Numero"].HeaderText = "Número";
+                    dgvHabitaciones.Columns["Nombre"].HeaderText = "Nombre";
+                    dgvHabitaciones.Columns["TipoTexto"].HeaderText = "Tipo";
+                    dgvHabitaciones.Columns["EstadoTexto"].HeaderText = "Estado";
+
+                    // Ocultar columnas numéricas
+                    dgvHabitaciones.Columns["Tipo"].Visible = false;
+                    dgvHabitaciones.Columns["Estado"].Visible = false;
+                }
+            }
+        }
+
+
+        private void btnRegistrarH_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                if (string.IsNullOrWhiteSpace(txtNumeroHab.Text) ||
+                    cmbEstado.SelectedIndex == -1 ||
+                    cmbTipo.SelectedIndex == -1)
+                {
+                    MessageBox.Show("Completa todos los campos.");
+                    return;
+                }
+
+                using (var conn = _conexion.CrearConexion())
+                {
+                    conn.Open();
+
+                    string query = @"INSERT INTO Habitacion
+                    (Numero, Tipo, Nombre, PrecioPorNoche, Estado, Descripcion)
+                    VALUES (@Numero, @Tipo, @Nombre, @Precio, @Estado, @Descripcion)";
+
+
+                    using (SqlCommand cmd = new SqlCommand(query, conn))
+                    {
+                        cmd.Parameters.AddWithValue("@Numero", int.Parse(txtNumeroHab.Text));
+                        cmd.Parameters.AddWithValue("@Tipo", cmbTipo.SelectedIndex + 1); // (1-4)
+                        cmd.Parameters.AddWithValue("@Nombre", txtNombreH.Text.Trim());
+                        cmd.Parameters.AddWithValue("@Precio", 0); // o un textbox
+                        cmd.Parameters.AddWithValue("@Estado", cmbEstado.SelectedIndex); // (0,1,2)
+                        cmd.Parameters.AddWithValue("@Descripcion", ""); // o un textbox
+
+
+                        cmd.ExecuteNonQuery();
+                    }
+                }
+
+                MessageBox.Show("Habitación registrada correctamente.");
+
+                // Limpiar campos
+                txtNumeroHab.Text = "";
+                cmbEstado.SelectedIndex = -1;
+                cmbTipo.SelectedIndex = -1;
+
+                // Recargar DGV
+                CargarHabitaciones();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error al registrar la habitación: " + ex.Message);
+            }
+        }
+        private void txtNumeroHab_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            // Permitir solo números y tecla de borrar
+            if (!char.IsDigit(e.KeyChar) && !char.IsControl(e.KeyChar))
+            {
+                e.Handled = true;
+            }
+        }
+        private void CargarIDs()
+        {
+            cmbIDH.Items.Clear();
+            cmbIDH.Items.Add("Todas");
+
+            using (SqlConnection cn = _conexion.CrearConexion())
+            {
+                string query = "SELECT IdHabitacion FROM Habitacion";
+                SqlCommand cmd = new SqlCommand(query, cn);
+                cn.Open();
+
+                SqlDataReader dr = cmd.ExecuteReader();
+                while (dr.Read())
+                {
+                    cmbIDH.Items.Add(dr["IdHabitacion"].ToString());
+                }
+            }
+            cmbIDH.SelectedIndex = 0;
+
+            cmbIDH.DropDownStyle = ComboBoxStyle.DropDownList;
+        }
+        private int EstadoTextoAInt(string estado)
+        {
+            return estado switch
+            {
+                "Disponible" => 0,
+                "Ocupada" => 1,
+                "Mantenimiento" => 2,
+                _ => -1
+            };
+        }
+        private int TipoTextoAInt(string tipo)
+        {
+            return tipo switch
+            {
+                "Simple" => 1,
+                "Doble" => 2,
+                "Suite" => 3,
+                "Presidencial" => 4,
+                _ => -1
+            };
+        }
+
+
+
+        private void CargarEstados()
+        {
+            cmbEstadoH.Items.Clear();
+
+            cmbEstadoH.Items.Add("Disponible");     // 0
+            cmbEstadoH.Items.Add("Ocupada");        // 1
+            cmbEstadoH.Items.Add("Mantenimiento");  // 2
+
+            cmbEstadoH.DropDownStyle = ComboBoxStyle.DropDownList;
+        }
+
+        private void cmbIDH_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (cmbIDH.SelectedIndex == -1) return;
+
+            using (SqlConnection cn = _conexion.CrearConexion())
+            {
+                string query = "SELECT * FROM Habitacion WHERE IdHabitacion = @id";
+                SqlDataAdapter da = new SqlDataAdapter(query, cn);
+                da.SelectCommand.Parameters.AddWithValue("@id", cmbIDH.Text);
+
+                DataTable dt = new DataTable();
+                da.Fill(dt);
+
+                dgvHabitaciones.DataSource = dt;
+                FormatearDgvHabitaciones();
+            }
+        }
+
+        private void cmbEstadoH_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (cmbEstadoH.SelectedIndex == -1) return;
+
+            int estadoInt = EstadoTextoAInt(cmbEstadoH.Text);
+
+            using (SqlConnection cn = _conexion.CrearConexion())
+            {
+                string query = "SELECT * FROM Habitacion WHERE Estado = @estado";
+                SqlDataAdapter da = new SqlDataAdapter(query, cn);
+                da.SelectCommand.Parameters.AddWithValue("@estado", estadoInt);
+
+                DataTable dt = new DataTable();
+                da.Fill(dt);
+
+                dgvHabitaciones.DataSource = dt;
+                FormatearDgvHabitaciones();
+            }
+        }
+
+        private void btnBuscarH_Click(object sender, EventArgs e)
+        {
+            using (SqlConnection cn = _conexion.CrearConexion())
+            {
+                cn.Open();
+
+                string query = "SELECT IdHabitacion, Numero, Nombre, Tipo, Estado FROM Habitacion WHERE 1=1";
+
+                // FILTRO POR ID (solo si NO es "Todas")
+                if (!string.IsNullOrWhiteSpace(cmbIDH.Text) && cmbIDH.Text != "Todas")
+                    query += " AND IdHabitacion = @Id";
+
+                // FILTRO POR ESTADO
+                if (!string.IsNullOrWhiteSpace(cmbEstadoH.Text))
+                    query += " AND Estado = @Estado";
+
+                using (SqlCommand cmd = new SqlCommand(query, cn))
+                {
+                    // PARÁMETRO DEL ID
+                    if (!string.IsNullOrWhiteSpace(cmbIDH.Text) && cmbIDH.Text != "Todas")
+                        cmd.Parameters.AddWithValue("@Id", cmbIDH.Text);
+
+                    // PARÁMETRO DEL ESTADO
+                    if (!string.IsNullOrWhiteSpace(cmbEstadoH.Text))
+                        cmd.Parameters.AddWithValue("@Estado", cmbEstadoH.SelectedIndex);
+
+                    DataTable tabla = new DataTable();
+                    new SqlDataAdapter(cmd).Fill(tabla);
+
+                    // VOLVER A CONVERTIR NÚMEROS A TEXTO
+                    tabla.Columns.Add("TipoTexto", typeof(string));
+                    tabla.Columns.Add("EstadoTexto", typeof(string));
+
+                    foreach (DataRow row in tabla.Rows)
+                    {
+                        int tipo = Convert.ToInt32(row["Tipo"]);
+                        row["TipoTexto"] = tipo switch
+                        {
+                            1 => "Simple",
+                            2 => "Doble",
+                            3 => "Suite",
+                            4 => "Presidencial",
+                            _ => "Desconocido"
+                        };
+
+                        int estado = Convert.ToInt32(row["Estado"]);
+                        row["EstadoTexto"] = estado switch
+                        {
+                            0 => "Disponible",
+                            1 => "Ocupada",
+                            2 => "Mantenimiento",
+                            _ => "Desconocido"
+                        };
+                    }
+
+                    dgvHabitaciones.DataSource = tabla;
+
+                    dgvHabitaciones.Columns["Tipo"].Visible = false;
+                    dgvHabitaciones.Columns["Estado"].Visible = false;
+                }
+            }
+        }
+
+
+
+        private void FormatearDgvHabitaciones()
+        {
+            if (dgvHabitaciones.Columns.Count == 0) return;
+
+            // Ocultar columnas que NO quieres
+            dgvHabitaciones.Columns["Descripcion"].Visible = false;
+
+            // Si no quieres IDHabitacion visible:
+            // dgvHabitaciones.Columns["IDHabitacion"].Visible = false;
+
+            // Renombrar cabeceras si quieres
+            dgvHabitaciones.Columns["Numero"].HeaderText = "Número";
+            dgvHabitaciones.Columns["Tipo"].HeaderText = "Tipo";
+            dgvHabitaciones.Columns["Nombre"].HeaderText = "Nombre";
+            dgvHabitaciones.Columns["PrecioPorNoche"].HeaderText = "Precio por noche";
+            dgvHabitaciones.Columns["Estado"].HeaderText = "Estado";
+
+            // Ajustar tamaño automático
+            dgvHabitaciones.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
+        }
+        
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

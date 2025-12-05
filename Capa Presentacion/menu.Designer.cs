@@ -30,11 +30,18 @@ namespace Capa_Presentacion
         private void InitializeComponent()
         {
             tabPage3 = new TabPage();
-            dataGridView2 = new DataGridView();
+            materialCard3 = new MaterialSkin.Controls.MaterialCard();
+            cmbIDH = new MaterialSkin.Controls.MaterialComboBox();
+            BuscarH = new MaterialSkin.Controls.MaterialButton();
+            cmbEstadoH = new MaterialSkin.Controls.MaterialComboBox();
+            dgvHabitaciones = new DataGridView();
             materialCard2 = new MaterialSkin.Controls.MaterialCard();
-            txtTipo = new MaterialSkin.Controls.MaterialMaskedTextBox();
+            materialLabel3 = new MaterialSkin.Controls.MaterialLabel();
+            txtNombreH = new MaterialSkin.Controls.MaterialMaskedTextBox();
+            cmbTipo = new MaterialSkin.Controls.MaterialComboBox();
+            cmbEstado = new MaterialSkin.Controls.MaterialComboBox();
+            btnRegistrarH = new MaterialSkin.Controls.MaterialButton();
             lblTpo = new MaterialSkin.Controls.MaterialLabel();
-            txtEstado = new MaterialSkin.Controls.MaterialMaskedTextBox();
             lblEstado = new MaterialSkin.Controls.MaterialLabel();
             txtNumeroHab = new MaterialSkin.Controls.MaterialMaskedTextBox();
             lblNumeroHab = new MaterialSkin.Controls.MaterialLabel();
@@ -59,9 +66,12 @@ namespace Capa_Presentacion
             dgvClientes = new DataGridView();
             tabPage1 = new TabPage();
             materialTabControl1 = new MaterialSkin.Controls.MaterialTabControl();
+            tabPage4 = new TabPage();
             fileSystemWatcher1 = new FileSystemWatcher();
+            btnLimpiarH = new MaterialSkin.Controls.MaterialButton();
             tabPage3.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)dataGridView2).BeginInit();
+            materialCard3.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)dgvHabitaciones).BeginInit();
             materialCard2.SuspendLayout();
             tabPage2.SuspendLayout();
             materialCard1.SuspendLayout();
@@ -72,7 +82,8 @@ namespace Capa_Presentacion
             // 
             // tabPage3
             // 
-            tabPage3.Controls.Add(dataGridView2);
+            tabPage3.Controls.Add(materialCard3);
+            tabPage3.Controls.Add(dgvHabitaciones);
             tabPage3.Controls.Add(materialCard2);
             tabPage3.Location = new Point(4, 24);
             tabPage3.Name = "tabPage3";
@@ -82,20 +93,103 @@ namespace Capa_Presentacion
             tabPage3.Text = "Habitaciones";
             tabPage3.UseVisualStyleBackColor = true;
             // 
-            // dataGridView2
+            // materialCard3
             // 
-            dataGridView2.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            dataGridView2.Location = new Point(604, 56);
-            dataGridView2.Name = "dataGridView2";
-            dataGridView2.Size = new Size(861, 461);
-            dataGridView2.TabIndex = 1;
+            materialCard3.BackColor = Color.FromArgb(255, 255, 255);
+            materialCard3.Controls.Add(btnLimpiarH);
+            materialCard3.Controls.Add(cmbIDH);
+            materialCard3.Controls.Add(BuscarH);
+            materialCard3.Controls.Add(cmbEstadoH);
+            materialCard3.Depth = 0;
+            materialCard3.ForeColor = Color.FromArgb(222, 0, 0, 0);
+            materialCard3.Location = new Point(446, 611);
+            materialCard3.Margin = new Padding(14);
+            materialCard3.MouseState = MaterialSkin.MouseState.HOVER;
+            materialCard3.Name = "materialCard3";
+            materialCard3.Padding = new Padding(14);
+            materialCard3.Size = new Size(420, 171);
+            materialCard3.TabIndex = 5;
+            // 
+            // cmbIDH
+            // 
+            cmbIDH.AutoResize = false;
+            cmbIDH.BackColor = Color.FromArgb(255, 255, 255);
+            cmbIDH.Depth = 0;
+            cmbIDH.DrawMode = DrawMode.OwnerDrawVariable;
+            cmbIDH.DropDownHeight = 174;
+            cmbIDH.DropDownStyle = ComboBoxStyle.DropDownList;
+            cmbIDH.DropDownWidth = 121;
+            cmbIDH.Font = new Font("Microsoft Sans Serif", 14F, FontStyle.Bold, GraphicsUnit.Pixel);
+            cmbIDH.ForeColor = Color.FromArgb(222, 0, 0, 0);
+            cmbIDH.FormattingEnabled = true;
+            cmbIDH.IntegralHeight = false;
+            cmbIDH.ItemHeight = 43;
+            cmbIDH.Location = new Point(43, 26);
+            cmbIDH.MaxDropDownItems = 4;
+            cmbIDH.MouseState = MaterialSkin.MouseState.OUT;
+            cmbIDH.Name = "cmbIDH";
+            cmbIDH.Size = new Size(121, 49);
+            cmbIDH.StartIndex = 0;
+            cmbIDH.TabIndex = 2;
+            // 
+            // BuscarH
+            // 
+            BuscarH.AutoSizeMode = AutoSizeMode.GrowAndShrink;
+            BuscarH.Density = MaterialSkin.Controls.MaterialButton.MaterialButtonDensity.Default;
+            BuscarH.Depth = 0;
+            BuscarH.HighEmphasis = true;
+            BuscarH.Icon = null;
+            BuscarH.Location = new Point(294, 112);
+            BuscarH.Margin = new Padding(4, 6, 4, 6);
+            BuscarH.MouseState = MaterialSkin.MouseState.HOVER;
+            BuscarH.Name = "BuscarH";
+            BuscarH.NoAccentTextColor = Color.Empty;
+            BuscarH.Size = new Size(77, 36);
+            BuscarH.TabIndex = 4;
+            BuscarH.Text = "BUSCAR";
+            BuscarH.Type = MaterialSkin.Controls.MaterialButton.MaterialButtonType.Contained;
+            BuscarH.UseAccentColor = false;
+            BuscarH.UseVisualStyleBackColor = true;
+            // 
+            // cmbEstadoH
+            // 
+            cmbEstadoH.AutoResize = false;
+            cmbEstadoH.BackColor = Color.FromArgb(255, 255, 255);
+            cmbEstadoH.Depth = 0;
+            cmbEstadoH.DrawMode = DrawMode.OwnerDrawVariable;
+            cmbEstadoH.DropDownHeight = 174;
+            cmbEstadoH.DropDownStyle = ComboBoxStyle.DropDownList;
+            cmbEstadoH.DropDownWidth = 121;
+            cmbEstadoH.Font = new Font("Microsoft Sans Serif", 14F, FontStyle.Bold, GraphicsUnit.Pixel);
+            cmbEstadoH.ForeColor = Color.FromArgb(222, 0, 0, 0);
+            cmbEstadoH.FormattingEnabled = true;
+            cmbEstadoH.IntegralHeight = false;
+            cmbEstadoH.ItemHeight = 43;
+            cmbEstadoH.Location = new Point(250, 26);
+            cmbEstadoH.MaxDropDownItems = 4;
+            cmbEstadoH.MouseState = MaterialSkin.MouseState.OUT;
+            cmbEstadoH.Name = "cmbEstadoH";
+            cmbEstadoH.Size = new Size(121, 49);
+            cmbEstadoH.StartIndex = 0;
+            cmbEstadoH.TabIndex = 3;
+            // 
+            // dgvHabitaciones
+            // 
+            dgvHabitaciones.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            dgvHabitaciones.Location = new Point(413, 20);
+            dgvHabitaciones.Name = "dgvHabitaciones";
+            dgvHabitaciones.Size = new Size(968, 445);
+            dgvHabitaciones.TabIndex = 1;
             // 
             // materialCard2
             // 
             materialCard2.BackColor = Color.FromArgb(255, 255, 255);
-            materialCard2.Controls.Add(txtTipo);
+            materialCard2.Controls.Add(materialLabel3);
+            materialCard2.Controls.Add(txtNombreH);
+            materialCard2.Controls.Add(cmbTipo);
+            materialCard2.Controls.Add(cmbEstado);
+            materialCard2.Controls.Add(btnRegistrarH);
             materialCard2.Controls.Add(lblTpo);
-            materialCard2.Controls.Add(txtEstado);
             materialCard2.Controls.Add(lblEstado);
             materialCard2.Controls.Add(txtNumeroHab);
             materialCard2.Controls.Add(lblNumeroHab);
@@ -109,106 +203,140 @@ namespace Capa_Presentacion
             materialCard2.Size = new Size(364, 857);
             materialCard2.TabIndex = 0;
             // 
-            // txtTipo
+            // materialLabel3
             // 
-            txtTipo.AllowPromptAsInput = true;
-            txtTipo.AnimateReadOnly = false;
-            txtTipo.AsciiOnly = false;
-            txtTipo.BackgroundImageLayout = ImageLayout.None;
-            txtTipo.BeepOnError = false;
-            txtTipo.CutCopyMaskFormat = MaskFormat.IncludeLiterals;
-            txtTipo.Depth = 0;
-            txtTipo.Font = new Font("Roboto", 16F, FontStyle.Regular, GraphicsUnit.Pixel);
-            txtTipo.HidePromptOnLeave = false;
-            txtTipo.HideSelection = true;
-            txtTipo.InsertKeyMode = InsertKeyMode.Default;
-            txtTipo.LeadingIcon = null;
-            txtTipo.Location = new Point(17, 410);
-            txtTipo.Mask = "";
-            txtTipo.MaxLength = 32767;
-            txtTipo.MouseState = MaterialSkin.MouseState.OUT;
-            txtTipo.Name = "txtTipo";
-            txtTipo.PasswordChar = '\0';
-            txtTipo.PrefixSuffixText = null;
-            txtTipo.PromptChar = '_';
-            txtTipo.ReadOnly = false;
-            txtTipo.RejectInputOnFirstFailure = false;
-            txtTipo.ResetOnPrompt = true;
-            txtTipo.ResetOnSpace = true;
-            txtTipo.RightToLeft = RightToLeft.No;
-            txtTipo.SelectedText = "";
-            txtTipo.SelectionLength = 0;
-            txtTipo.SelectionStart = 0;
-            txtTipo.ShortcutsEnabled = true;
-            txtTipo.Size = new Size(250, 48);
-            txtTipo.SkipLiterals = true;
-            txtTipo.TabIndex = 5;
-            txtTipo.TabStop = false;
-            txtTipo.TextAlign = HorizontalAlignment.Left;
-            txtTipo.TextMaskFormat = MaskFormat.IncludeLiterals;
-            txtTipo.TrailingIcon = null;
-            txtTipo.UseSystemPasswordChar = false;
-            txtTipo.ValidatingType = null;
+            materialLabel3.AutoSize = true;
+            materialLabel3.Depth = 0;
+            materialLabel3.Font = new Font("Roboto", 14F, FontStyle.Regular, GraphicsUnit.Pixel);
+            materialLabel3.Location = new Point(17, 74);
+            materialLabel3.MouseState = MaterialSkin.MouseState.HOVER;
+            materialLabel3.Name = "materialLabel3";
+            materialLabel3.Size = new Size(138, 19);
+            materialLabel3.TabIndex = 10;
+            materialLabel3.Text = "Nombre Habitacion";
+            // 
+            // txtNombreH
+            // 
+            txtNombreH.AllowPromptAsInput = true;
+            txtNombreH.AnimateReadOnly = false;
+            txtNombreH.AsciiOnly = false;
+            txtNombreH.BackgroundImageLayout = ImageLayout.None;
+            txtNombreH.BeepOnError = false;
+            txtNombreH.CutCopyMaskFormat = MaskFormat.IncludeLiterals;
+            txtNombreH.Depth = 0;
+            txtNombreH.Font = new Font("Roboto", 16F, FontStyle.Regular, GraphicsUnit.Pixel);
+            txtNombreH.HidePromptOnLeave = false;
+            txtNombreH.HideSelection = true;
+            txtNombreH.InsertKeyMode = InsertKeyMode.Default;
+            txtNombreH.LeadingIcon = null;
+            txtNombreH.Location = new Point(17, 112);
+            txtNombreH.Mask = "";
+            txtNombreH.MaxLength = 32767;
+            txtNombreH.MouseState = MaterialSkin.MouseState.OUT;
+            txtNombreH.Name = "txtNombreH";
+            txtNombreH.PasswordChar = '\0';
+            txtNombreH.PrefixSuffixText = null;
+            txtNombreH.PromptChar = '_';
+            txtNombreH.ReadOnly = false;
+            txtNombreH.RejectInputOnFirstFailure = false;
+            txtNombreH.ResetOnPrompt = true;
+            txtNombreH.ResetOnSpace = true;
+            txtNombreH.RightToLeft = RightToLeft.No;
+            txtNombreH.SelectedText = "";
+            txtNombreH.SelectionLength = 0;
+            txtNombreH.SelectionStart = 0;
+            txtNombreH.ShortcutsEnabled = true;
+            txtNombreH.Size = new Size(250, 48);
+            txtNombreH.SkipLiterals = true;
+            txtNombreH.TabIndex = 9;
+            txtNombreH.TabStop = false;
+            txtNombreH.TextAlign = HorizontalAlignment.Left;
+            txtNombreH.TextMaskFormat = MaskFormat.IncludeLiterals;
+            txtNombreH.TrailingIcon = null;
+            txtNombreH.UseSystemPasswordChar = false;
+            txtNombreH.ValidatingType = null;
+            // 
+            // cmbTipo
+            // 
+            cmbTipo.AutoResize = false;
+            cmbTipo.BackColor = Color.FromArgb(255, 255, 255);
+            cmbTipo.Depth = 0;
+            cmbTipo.DrawMode = DrawMode.OwnerDrawVariable;
+            cmbTipo.DropDownHeight = 174;
+            cmbTipo.DropDownStyle = ComboBoxStyle.DropDownList;
+            cmbTipo.DropDownWidth = 121;
+            cmbTipo.Font = new Font("Microsoft Sans Serif", 14F, FontStyle.Bold, GraphicsUnit.Pixel);
+            cmbTipo.ForeColor = Color.FromArgb(222, 0, 0, 0);
+            cmbTipo.FormattingEnabled = true;
+            cmbTipo.IntegralHeight = false;
+            cmbTipo.ItemHeight = 43;
+            cmbTipo.Location = new Point(17, 550);
+            cmbTipo.MaxDropDownItems = 4;
+            cmbTipo.MouseState = MaterialSkin.MouseState.OUT;
+            cmbTipo.Name = "cmbTipo";
+            cmbTipo.Size = new Size(121, 49);
+            cmbTipo.StartIndex = 0;
+            cmbTipo.TabIndex = 8;
+            // 
+            // cmbEstado
+            // 
+            cmbEstado.AutoResize = false;
+            cmbEstado.BackColor = Color.FromArgb(255, 255, 255);
+            cmbEstado.Depth = 0;
+            cmbEstado.DrawMode = DrawMode.OwnerDrawVariable;
+            cmbEstado.DropDownHeight = 174;
+            cmbEstado.DropDownStyle = ComboBoxStyle.DropDownList;
+            cmbEstado.DropDownWidth = 121;
+            cmbEstado.Font = new Font("Microsoft Sans Serif", 14F, FontStyle.Bold, GraphicsUnit.Pixel);
+            cmbEstado.ForeColor = Color.FromArgb(222, 0, 0, 0);
+            cmbEstado.FormattingEnabled = true;
+            cmbEstado.IntegralHeight = false;
+            cmbEstado.ItemHeight = 43;
+            cmbEstado.Location = new Point(17, 397);
+            cmbEstado.MaxDropDownItems = 4;
+            cmbEstado.MouseState = MaterialSkin.MouseState.OUT;
+            cmbEstado.Name = "cmbEstado";
+            cmbEstado.Size = new Size(121, 49);
+            cmbEstado.StartIndex = 0;
+            cmbEstado.TabIndex = 7;
+            // 
+            // btnRegistrarH
+            // 
+            btnRegistrarH.AutoSizeMode = AutoSizeMode.GrowAndShrink;
+            btnRegistrarH.Density = MaterialSkin.Controls.MaterialButton.MaterialButtonDensity.Default;
+            btnRegistrarH.Depth = 0;
+            btnRegistrarH.HighEmphasis = true;
+            btnRegistrarH.Icon = null;
+            btnRegistrarH.Location = new Point(11, 723);
+            btnRegistrarH.Margin = new Padding(4, 6, 4, 6);
+            btnRegistrarH.MouseState = MaterialSkin.MouseState.HOVER;
+            btnRegistrarH.Name = "btnRegistrarH";
+            btnRegistrarH.NoAccentTextColor = Color.Empty;
+            btnRegistrarH.Size = new Size(99, 36);
+            btnRegistrarH.TabIndex = 6;
+            btnRegistrarH.Text = "REGISTRAR";
+            btnRegistrarH.Type = MaterialSkin.Controls.MaterialButton.MaterialButtonType.Contained;
+            btnRegistrarH.UseAccentColor = false;
+            btnRegistrarH.UseVisualStyleBackColor = true;
             // 
             // lblTpo
             // 
             lblTpo.AutoSize = true;
             lblTpo.Depth = 0;
             lblTpo.Font = new Font("Roboto", 14F, FontStyle.Regular, GraphicsUnit.Pixel);
-            lblTpo.Location = new Point(17, 367);
+            lblTpo.Location = new Point(17, 514);
             lblTpo.MouseState = MaterialSkin.MouseState.HOVER;
             lblTpo.Name = "lblTpo";
             lblTpo.Size = new Size(33, 19);
             lblTpo.TabIndex = 4;
             lblTpo.Text = "Tipo";
             // 
-            // txtEstado
-            // 
-            txtEstado.AllowPromptAsInput = true;
-            txtEstado.AnimateReadOnly = false;
-            txtEstado.AsciiOnly = false;
-            txtEstado.BackgroundImageLayout = ImageLayout.None;
-            txtEstado.BeepOnError = false;
-            txtEstado.CutCopyMaskFormat = MaskFormat.IncludeLiterals;
-            txtEstado.Depth = 0;
-            txtEstado.Font = new Font("Roboto", 16F, FontStyle.Regular, GraphicsUnit.Pixel);
-            txtEstado.HidePromptOnLeave = false;
-            txtEstado.HideSelection = true;
-            txtEstado.InsertKeyMode = InsertKeyMode.Default;
-            txtEstado.LeadingIcon = null;
-            txtEstado.Location = new Point(10, 259);
-            txtEstado.Mask = "";
-            txtEstado.MaxLength = 32767;
-            txtEstado.MouseState = MaterialSkin.MouseState.OUT;
-            txtEstado.Name = "txtEstado";
-            txtEstado.PasswordChar = '\0';
-            txtEstado.PrefixSuffixText = null;
-            txtEstado.PromptChar = '_';
-            txtEstado.ReadOnly = false;
-            txtEstado.RejectInputOnFirstFailure = false;
-            txtEstado.ResetOnPrompt = true;
-            txtEstado.ResetOnSpace = true;
-            txtEstado.RightToLeft = RightToLeft.No;
-            txtEstado.SelectedText = "";
-            txtEstado.SelectionLength = 0;
-            txtEstado.SelectionStart = 0;
-            txtEstado.ShortcutsEnabled = true;
-            txtEstado.Size = new Size(250, 48);
-            txtEstado.SkipLiterals = true;
-            txtEstado.TabIndex = 3;
-            txtEstado.TabStop = false;
-            txtEstado.TextAlign = HorizontalAlignment.Left;
-            txtEstado.TextMaskFormat = MaskFormat.IncludeLiterals;
-            txtEstado.TrailingIcon = null;
-            txtEstado.UseSystemPasswordChar = false;
-            txtEstado.ValidatingType = null;
-            // 
             // lblEstado
             // 
             lblEstado.AutoSize = true;
             lblEstado.Depth = 0;
             lblEstado.Font = new Font("Roboto", 14F, FontStyle.Regular, GraphicsUnit.Pixel);
-            lblEstado.Location = new Point(10, 205);
+            lblEstado.Location = new Point(17, 356);
             lblEstado.MouseState = MaterialSkin.MouseState.HOVER;
             lblEstado.Name = "lblEstado";
             lblEstado.Size = new Size(50, 19);
@@ -229,7 +357,7 @@ namespace Capa_Presentacion
             txtNumeroHab.HideSelection = true;
             txtNumeroHab.InsertKeyMode = InsertKeyMode.Default;
             txtNumeroHab.LeadingIcon = null;
-            txtNumeroHab.Location = new Point(10, 98);
+            txtNumeroHab.Location = new Point(17, 241);
             txtNumeroHab.Mask = "";
             txtNumeroHab.MaxLength = 32767;
             txtNumeroHab.MouseState = MaterialSkin.MouseState.OUT;
@@ -261,7 +389,7 @@ namespace Capa_Presentacion
             lblNumeroHab.AutoSize = true;
             lblNumeroHab.Depth = 0;
             lblNumeroHab.Font = new Font("Roboto", 14F, FontStyle.Regular, GraphicsUnit.Pixel);
-            lblNumeroHab.Location = new Point(10, 56);
+            lblNumeroHab.Location = new Point(17, 205);
             lblNumeroHab.MouseState = MaterialSkin.MouseState.HOVER;
             lblNumeroHab.Name = "lblNumeroHab";
             lblNumeroHab.Size = new Size(159, 19);
@@ -708,6 +836,7 @@ namespace Capa_Presentacion
             materialTabControl1.Controls.Add(tabPage1);
             materialTabControl1.Controls.Add(tabPage2);
             materialTabControl1.Controls.Add(tabPage3);
+            materialTabControl1.Controls.Add(tabPage4);
             materialTabControl1.Depth = 0;
             materialTabControl1.Dock = DockStyle.Fill;
             materialTabControl1.Location = new Point(3, 64);
@@ -718,10 +847,39 @@ namespace Capa_Presentacion
             materialTabControl1.Size = new Size(1624, 885);
             materialTabControl1.TabIndex = 0;
             // 
+            // tabPage4
+            // 
+            tabPage4.Location = new Point(4, 24);
+            tabPage4.Name = "tabPage4";
+            tabPage4.Padding = new Padding(3);
+            tabPage4.Size = new Size(1616, 857);
+            tabPage4.TabIndex = 3;
+            tabPage4.Text = "tabPage4";
+            tabPage4.UseVisualStyleBackColor = true;
+            // 
             // fileSystemWatcher1
             // 
             fileSystemWatcher1.EnableRaisingEvents = true;
             fileSystemWatcher1.SynchronizingObject = this;
+            // 
+            // btnLimpiarH
+            // 
+            btnLimpiarH.AutoSizeMode = AutoSizeMode.GrowAndShrink;
+            btnLimpiarH.Density = MaterialSkin.Controls.MaterialButton.MaterialButtonDensity.Default;
+            btnLimpiarH.Depth = 0;
+            btnLimpiarH.HighEmphasis = true;
+            btnLimpiarH.Icon = null;
+            btnLimpiarH.Location = new Point(43, 112);
+            btnLimpiarH.Margin = new Padding(4, 6, 4, 6);
+            btnLimpiarH.MouseState = MaterialSkin.MouseState.HOVER;
+            btnLimpiarH.Name = "btnLimpiarH";
+            btnLimpiarH.NoAccentTextColor = Color.Empty;
+            btnLimpiarH.Size = new Size(158, 36);
+            btnLimpiarH.TabIndex = 5;
+            btnLimpiarH.Text = "LIMPIAR BUSQUEDA";
+            btnLimpiarH.Type = MaterialSkin.Controls.MaterialButton.MaterialButtonType.Contained;
+            btnLimpiarH.UseAccentColor = false;
+            btnLimpiarH.UseVisualStyleBackColor = true;
             // 
             // menu
             // 
@@ -734,7 +892,9 @@ namespace Capa_Presentacion
             Text = "Form1";
             Load += menu_Load;
             tabPage3.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)dataGridView2).EndInit();
+            materialCard3.ResumeLayout(false);
+            materialCard3.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)dgvHabitaciones).EndInit();
             materialCard2.ResumeLayout(false);
             materialCard2.PerformLayout();
             tabPage2.ResumeLayout(false);
@@ -768,17 +928,26 @@ namespace Capa_Presentacion
         private FileSystemWatcher fileSystemWatcher1;
         private MaterialSkin.Controls.MaterialCard materialCard2;
         private MaterialSkin.Controls.MaterialLabel lblTpo;
-        private MaterialSkin.Controls.MaterialMaskedTextBox txtEstado;
         private MaterialSkin.Controls.MaterialLabel lblEstado;
         private MaterialSkin.Controls.MaterialMaskedTextBox txtNumeroHab;
         private MaterialSkin.Controls.MaterialLabel lblNumeroHab;
-        private MaterialSkin.Controls.MaterialMaskedTextBox txtTipo;
-        private DataGridView dataGridView2;
+        private DataGridView dgvHabitaciones;
         private MaterialSkin.Controls.MaterialButton btnRegistrar;
         private MaterialSkin.Controls.MaterialButton btnBusqueda;
         private MaterialSkin.Controls.MaterialComboBox cmbCedula;
         private MaterialSkin.Controls.MaterialComboBox cmbID;
         private MaterialSkin.Controls.MaterialLabel materialLabel2;
         private MaterialSkin.Controls.MaterialLabel materialLabel1;
+        private MaterialSkin.Controls.MaterialButton btnRegistrarH;
+        private TabPage tabPage4;
+        private MaterialSkin.Controls.MaterialComboBox cmbTipo;
+        private MaterialSkin.Controls.MaterialComboBox cmbEstado;
+        private MaterialSkin.Controls.MaterialLabel materialLabel3;
+        private MaterialSkin.Controls.MaterialMaskedTextBox txtNombreH;
+        private MaterialSkin.Controls.MaterialButton BuscarH;
+        private MaterialSkin.Controls.MaterialComboBox cmbEstadoH;
+        private MaterialSkin.Controls.MaterialComboBox cmbIDH;
+        private MaterialSkin.Controls.MaterialCard materialCard3;
+        private MaterialSkin.Controls.MaterialButton btnLimpiarH;
     }
 }
