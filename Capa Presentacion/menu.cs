@@ -8,6 +8,9 @@ using System;
 using System.Windows.Forms;
 using Microsoft.Data.SqlClient;
 using System.Data;
+using Capa_Negocio.Habitacion.Servicios;
+using Capa_Negocio.Reserva.Servicios;
+using Capa_Negocio.Reserva;
 
 namespace Capa_Presentacion
 {
@@ -20,11 +23,17 @@ namespace Capa_Presentacion
         private readonly CancellationTokenSource _cts = new CancellationTokenSource();
 
         private readonly Capa_datos.ConexionBD _conexion = new Capa_datos.ConexionBD();
+        private readonly HabitacionService _habitacionService;
+        private readonly ReservaService _reservaService;
+
 
 
         public menu()
         {
             InitializeComponent();
+            _habitacionService = new HabitacionService();
+            _reservaService = new ReservaService(_habitacionService);
+            
             dgvClientes.ReadOnly = true;                 // No permitir editar celdas
             dgvClientes.AllowUserToAddRows = false;      // No permitir agregar filas
             dgvClientes.AllowUserToDeleteRows = false;   // No permitir eliminar filas
@@ -39,6 +48,11 @@ namespace Capa_Presentacion
             txtNumeroHab.KeyPress += txtNumeroHab_KeyPress;
             cmbIDH.DropDownStyle = ComboBoxStyle.DropDownList;
             cmbEstadoH.DropDownStyle = ComboBoxStyle.DropDownList;
+            
+
+
+
+
 
 
 
@@ -70,6 +84,7 @@ namespace Capa_Presentacion
             btnRegistrarH.Click += btnRegistrarH_Click;
             BuscarH.Click += btnBuscarH_Click;
             btnLimpiarH.Click += BtnLimpiarH_Click;
+            btnRegistrarR.Click += btnRegistrarR_Click;
 
 
 
@@ -95,13 +110,18 @@ namespace Capa_Presentacion
             CargarTiposHabitacion();
             CargarIDs();
             CargarEstados();
+            await CargarClientesReserva();
+            await CargarHabitacionesReserva();
+            CargarOpcionesCheckInOut();
+
             
+
 
 
 
             // Cargar habitaciones desde la BD
             CargarHabitaciones();
-
+            await CargarReservasEnDGVAsync();
         }
 
         // ----------------------------------------------------------
@@ -843,14 +863,138 @@ namespace Capa_Presentacion
             // Ajustar tamaño automático
             dgvHabitaciones.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
         }
-        
+
+        private void dataGridView1_CellContentClick(object sender, DataGridViewCellEventArgs e)
+        {
+
+        }
+
+        private async Task CargarClientesReserva()
+        {
+            using (var conn = _conexion.CrearConexion())
+            {
+                await conn.OpenAsync();
+
+                string query = "SELECT IdCliente, Nombre FROM Cliente";
+
+                using (SqlDataAdapter da = new SqlDataAdapter(query, conn))
+                {
+                    DataTable tabla = new DataTable();
+                    da.Fill(tabla);
+
+                    cbmElegirCliente.DataSource = tabla;
+                    cbmElegirCliente.DisplayMember = "Nombre";      // Lo que se muestra
+                    cbmElegirCliente.ValueMember = "IdCliente";      // Lo que se usa internamente
+                    cbmElegirCliente.SelectedIndex = -1;             // Ninguno seleccionado
+                }
+            }
+        }
+
+
+        private async Task CargarHabitacionesReserva()
+        {
+            using (var conn = _conexion.CrearConexion())
+            {
+                await conn.OpenAsync();
+
+                string sql = "SELECT IdHabitacion, Numero FROM Habitacion ORDER BY Numero";
+
+                using (SqlDataAdapter da = new SqlDataAdapter(sql, conn))
+                {
+                    DataTable tabla = new DataTable();
+                    da.Fill(tabla);
+
+                    cbmElegirHR.DataSource = tabla;
+                    cbmElegirHR.DisplayMember = "Numero";
+                    cbmElegirHR.ValueMember = "IdHabitacion";
+                }
+            }
+
+            cbmElegirHR.SelectedIndex = -1;
+        }
+
+        private void CargarOpcionesCheckInOut()
+        {
+            cbmCiO.Items.Clear();
+            cbmCiO.Items.Add("Check-In");
+            cbmCiO.Items.Add("Check-Out");
+            cbmCiO.SelectedIndex = -1;
+        }
+
+
+        private async void btnRegistrarR_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                if (cbmElegirCliente.SelectedValue == null)
+                {
+                    MessageBox.Show("Debe seleccionar un cliente.");
+                    return;
+                }
+
+                if (cbmElegirHR.SelectedValue == null)
+                {
+                    MessageBox.Show("Debe seleccionar una habitación.");
+                    return;
+                }
+
+                int idCliente = Convert.ToInt32(cbmElegirCliente.SelectedValue);
+                int idHabitacion = Convert.ToInt32(cbmElegirHR.SelectedValue);
+
+                DateTime fechaEntrada = DateTime.Now.Date;
+                DateTime fechaSalida = fechaEntrada.AddDays(1);
+
+                var reserva = new Reserva
+                {
+                    IdCliente = idCliente,
+                    IdHabitacion = idHabitacion,
+                    FechaEntrada = fechaEntrada,
+                    FechaSalida = fechaSalida,
+                    PrecioPorNoche = 0,
+                    Notas = ""
+                };
+
+                await _reservaService.CrearReservaAsync(reserva, CancellationToken.None);
+
+                MessageBox.Show("Reserva creada con éxito");
+
+                
+                await CargarReservasEnDGVAsync();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, "Error");
+            }
+        }
 
 
 
+     
 
+        private async Task CargarReservasEnDGVAsync()
+        {
+            try
+            {
+                var cts = new CancellationTokenSource();
+                var reservas = await _reservaService.ObtenerReservasActivasAsync(cts.Token);
 
+                dgvReserva.DataSource = reservas;
 
-
+                dgvReserva.Columns["IdReserva"].HeaderText = "Reserva";
+                dgvReserva.Columns["IdHabitacion"].HeaderText = "Habitación";
+                dgvReserva.Columns["IdCliente"].HeaderText = "Cliente";
+                dgvReserva.Columns["FechaEntrada"].HeaderText = "Entrada";
+                dgvReserva.Columns["FechaSalida"].HeaderText = "Salida";
+                dgvReserva.Columns["EstadoReserva"].HeaderText = "Estado";
+                dgvReserva.Columns["PrecioPorNoche"].HeaderText = "Precio/Noche";
+                dgvReserva.Columns["FechaCreacion"].HeaderText = "Creación";
+                dgvReserva.Columns["Notas"].HeaderText = "Notas";
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error al cargar reservas: " + ex.Message);
+            }
+        }
 
 
 

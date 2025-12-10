@@ -31,6 +31,7 @@ namespace Capa_Presentacion
         {
             tabPage3 = new TabPage();
             materialCard3 = new MaterialSkin.Controls.MaterialCard();
+            btnLimpiarH = new MaterialSkin.Controls.MaterialButton();
             cmbIDH = new MaterialSkin.Controls.MaterialComboBox();
             BuscarH = new MaterialSkin.Controls.MaterialButton();
             cmbEstadoH = new MaterialSkin.Controls.MaterialComboBox();
@@ -68,7 +69,21 @@ namespace Capa_Presentacion
             materialTabControl1 = new MaterialSkin.Controls.MaterialTabControl();
             tabPage4 = new TabPage();
             fileSystemWatcher1 = new FileSystemWatcher();
-            btnLimpiarH = new MaterialSkin.Controls.MaterialButton();
+            dgvReserva = new DataGridView();
+            materialCard4 = new MaterialSkin.Controls.MaterialCard();
+            cbmElegirHR = new MaterialSkin.Controls.MaterialComboBox();
+            cbmElegirCliente = new MaterialSkin.Controls.MaterialComboBox();
+            btnLimpiarR = new MaterialSkin.Controls.MaterialButton();
+            btnBuscarR = new MaterialSkin.Controls.MaterialButton();
+            cbmBuscarIDR = new MaterialSkin.Controls.MaterialComboBox();
+            materialCard5 = new MaterialSkin.Controls.MaterialCard();
+            cbmBuscarIDC = new MaterialSkin.Controls.MaterialComboBox();
+            cbmCiO = new MaterialSkin.Controls.MaterialComboBox();
+            materialLabel4 = new MaterialSkin.Controls.MaterialLabel();
+            materialLabel5 = new MaterialSkin.Controls.MaterialLabel();
+            materialLabel6 = new MaterialSkin.Controls.MaterialLabel();
+            dateTimePicker1 = new DateTimePicker();
+            btnRegistrarR = new MaterialSkin.Controls.MaterialButton();
             tabPage3.SuspendLayout();
             materialCard3.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)dgvHabitaciones).BeginInit();
@@ -77,7 +92,11 @@ namespace Capa_Presentacion
             materialCard1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)dgvClientes).BeginInit();
             materialTabControl1.SuspendLayout();
+            tabPage4.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)fileSystemWatcher1).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)dgvReserva).BeginInit();
+            materialCard4.SuspendLayout();
+            materialCard5.SuspendLayout();
             SuspendLayout();
             // 
             // tabPage3
@@ -109,6 +128,25 @@ namespace Capa_Presentacion
             materialCard3.Padding = new Padding(14);
             materialCard3.Size = new Size(420, 171);
             materialCard3.TabIndex = 5;
+            // 
+            // btnLimpiarH
+            // 
+            btnLimpiarH.AutoSizeMode = AutoSizeMode.GrowAndShrink;
+            btnLimpiarH.Density = MaterialSkin.Controls.MaterialButton.MaterialButtonDensity.Default;
+            btnLimpiarH.Depth = 0;
+            btnLimpiarH.HighEmphasis = true;
+            btnLimpiarH.Icon = null;
+            btnLimpiarH.Location = new Point(43, 112);
+            btnLimpiarH.Margin = new Padding(4, 6, 4, 6);
+            btnLimpiarH.MouseState = MaterialSkin.MouseState.HOVER;
+            btnLimpiarH.Name = "btnLimpiarH";
+            btnLimpiarH.NoAccentTextColor = Color.Empty;
+            btnLimpiarH.Size = new Size(158, 36);
+            btnLimpiarH.TabIndex = 5;
+            btnLimpiarH.Text = "LIMPIAR BUSQUEDA";
+            btnLimpiarH.Type = MaterialSkin.Controls.MaterialButton.MaterialButtonType.Contained;
+            btnLimpiarH.UseAccentColor = false;
+            btnLimpiarH.UseVisualStyleBackColor = true;
             // 
             // cmbIDH
             // 
@@ -849,12 +887,15 @@ namespace Capa_Presentacion
             // 
             // tabPage4
             // 
+            tabPage4.Controls.Add(materialCard5);
+            tabPage4.Controls.Add(materialCard4);
+            tabPage4.Controls.Add(dgvReserva);
             tabPage4.Location = new Point(4, 24);
             tabPage4.Name = "tabPage4";
             tabPage4.Padding = new Padding(3);
             tabPage4.Size = new Size(1616, 857);
             tabPage4.TabIndex = 3;
-            tabPage4.Text = "tabPage4";
+            tabPage4.Text = "Reservacion";
             tabPage4.UseVisualStyleBackColor = true;
             // 
             // fileSystemWatcher1
@@ -862,24 +903,262 @@ namespace Capa_Presentacion
             fileSystemWatcher1.EnableRaisingEvents = true;
             fileSystemWatcher1.SynchronizingObject = this;
             // 
-            // btnLimpiarH
+            // dgvReserva
             // 
-            btnLimpiarH.AutoSizeMode = AutoSizeMode.GrowAndShrink;
-            btnLimpiarH.Density = MaterialSkin.Controls.MaterialButton.MaterialButtonDensity.Default;
-            btnLimpiarH.Depth = 0;
-            btnLimpiarH.HighEmphasis = true;
-            btnLimpiarH.Icon = null;
-            btnLimpiarH.Location = new Point(43, 112);
-            btnLimpiarH.Margin = new Padding(4, 6, 4, 6);
-            btnLimpiarH.MouseState = MaterialSkin.MouseState.HOVER;
-            btnLimpiarH.Name = "btnLimpiarH";
-            btnLimpiarH.NoAccentTextColor = Color.Empty;
-            btnLimpiarH.Size = new Size(158, 36);
-            btnLimpiarH.TabIndex = 5;
-            btnLimpiarH.Text = "LIMPIAR BUSQUEDA";
-            btnLimpiarH.Type = MaterialSkin.Controls.MaterialButton.MaterialButtonType.Contained;
-            btnLimpiarH.UseAccentColor = false;
-            btnLimpiarH.UseVisualStyleBackColor = true;
+            dgvReserva.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            dgvReserva.Location = new Point(405, 84);
+            dgvReserva.Name = "dgvReserva";
+            dgvReserva.Size = new Size(738, 412);
+            dgvReserva.TabIndex = 0;
+            dgvReserva.CellContentClick += dataGridView1_CellContentClick;
+            // 
+            // materialCard4
+            // 
+            materialCard4.BackColor = Color.FromArgb(255, 255, 255);
+            materialCard4.Controls.Add(btnRegistrarR);
+            materialCard4.Controls.Add(materialLabel6);
+            materialCard4.Controls.Add(materialLabel5);
+            materialCard4.Controls.Add(materialLabel4);
+            materialCard4.Controls.Add(cbmCiO);
+            materialCard4.Controls.Add(cbmElegirCliente);
+            materialCard4.Controls.Add(cbmElegirHR);
+            materialCard4.Depth = 0;
+            materialCard4.ForeColor = Color.FromArgb(222, 0, 0, 0);
+            materialCard4.Location = new Point(0, 0);
+            materialCard4.Margin = new Padding(14);
+            materialCard4.MouseState = MaterialSkin.MouseState.HOVER;
+            materialCard4.Name = "materialCard4";
+            materialCard4.Padding = new Padding(14);
+            materialCard4.Size = new Size(339, 897);
+            materialCard4.TabIndex = 1;
+            // 
+            // cbmElegirHR
+            // 
+            cbmElegirHR.AutoResize = false;
+            cbmElegirHR.BackColor = Color.FromArgb(255, 255, 255);
+            cbmElegirHR.Depth = 0;
+            cbmElegirHR.DrawMode = DrawMode.OwnerDrawVariable;
+            cbmElegirHR.DropDownHeight = 174;
+            cbmElegirHR.DropDownStyle = ComboBoxStyle.DropDownList;
+            cbmElegirHR.DropDownWidth = 121;
+            cbmElegirHR.Font = new Font("Roboto Medium", 14F, FontStyle.Bold, GraphicsUnit.Pixel);
+            cbmElegirHR.ForeColor = Color.FromArgb(222, 0, 0, 0);
+            cbmElegirHR.FormattingEnabled = true;
+            cbmElegirHR.IntegralHeight = false;
+            cbmElegirHR.ItemHeight = 43;
+            cbmElegirHR.Location = new Point(17, 219);
+            cbmElegirHR.MaxDropDownItems = 4;
+            cbmElegirHR.MouseState = MaterialSkin.MouseState.OUT;
+            cbmElegirHR.Name = "cbmElegirHR";
+            cbmElegirHR.Size = new Size(121, 49);
+            cbmElegirHR.StartIndex = 0;
+            cbmElegirHR.TabIndex = 0;
+            // 
+            // cbmElegirCliente
+            // 
+            cbmElegirCliente.AutoResize = false;
+            cbmElegirCliente.BackColor = Color.FromArgb(255, 255, 255);
+            cbmElegirCliente.Depth = 0;
+            cbmElegirCliente.DrawMode = DrawMode.OwnerDrawVariable;
+            cbmElegirCliente.DropDownHeight = 174;
+            cbmElegirCliente.DropDownStyle = ComboBoxStyle.DropDownList;
+            cbmElegirCliente.DropDownWidth = 121;
+            cbmElegirCliente.Font = new Font("Roboto Medium", 14F, FontStyle.Bold, GraphicsUnit.Pixel);
+            cbmElegirCliente.ForeColor = Color.FromArgb(222, 0, 0, 0);
+            cbmElegirCliente.FormattingEnabled = true;
+            cbmElegirCliente.IntegralHeight = false;
+            cbmElegirCliente.ItemHeight = 43;
+            cbmElegirCliente.Location = new Point(17, 84);
+            cbmElegirCliente.MaxDropDownItems = 4;
+            cbmElegirCliente.MouseState = MaterialSkin.MouseState.OUT;
+            cbmElegirCliente.Name = "cbmElegirCliente";
+            cbmElegirCliente.Size = new Size(121, 49);
+            cbmElegirCliente.StartIndex = 0;
+            cbmElegirCliente.TabIndex = 1;
+            // 
+            // btnLimpiarR
+            // 
+            btnLimpiarR.AutoSizeMode = AutoSizeMode.GrowAndShrink;
+            btnLimpiarR.Density = MaterialSkin.Controls.MaterialButton.MaterialButtonDensity.Default;
+            btnLimpiarR.Depth = 0;
+            btnLimpiarR.HighEmphasis = true;
+            btnLimpiarR.Icon = null;
+            btnLimpiarR.Location = new Point(202, 134);
+            btnLimpiarR.Margin = new Padding(4, 6, 4, 6);
+            btnLimpiarR.MouseState = MaterialSkin.MouseState.HOVER;
+            btnLimpiarR.Name = "btnLimpiarR";
+            btnLimpiarR.NoAccentTextColor = Color.Empty;
+            btnLimpiarR.Size = new Size(158, 36);
+            btnLimpiarR.TabIndex = 2;
+            btnLimpiarR.Text = "LIMPIAR BUSQUEDA";
+            btnLimpiarR.Type = MaterialSkin.Controls.MaterialButton.MaterialButtonType.Contained;
+            btnLimpiarR.UseAccentColor = false;
+            btnLimpiarR.UseVisualStyleBackColor = true;
+            // 
+            // btnBuscarR
+            // 
+            btnBuscarR.AutoSizeMode = AutoSizeMode.GrowAndShrink;
+            btnBuscarR.Density = MaterialSkin.Controls.MaterialButton.MaterialButtonDensity.Default;
+            btnBuscarR.Depth = 0;
+            btnBuscarR.HighEmphasis = true;
+            btnBuscarR.Icon = null;
+            btnBuscarR.Location = new Point(45, 134);
+            btnBuscarR.Margin = new Padding(4, 6, 4, 6);
+            btnBuscarR.MouseState = MaterialSkin.MouseState.HOVER;
+            btnBuscarR.Name = "btnBuscarR";
+            btnBuscarR.NoAccentTextColor = Color.Empty;
+            btnBuscarR.Size = new Size(77, 36);
+            btnBuscarR.TabIndex = 3;
+            btnBuscarR.Text = "BUSCAR";
+            btnBuscarR.Type = MaterialSkin.Controls.MaterialButton.MaterialButtonType.Contained;
+            btnBuscarR.UseAccentColor = false;
+            btnBuscarR.UseVisualStyleBackColor = true;
+            // 
+            // cbmBuscarIDR
+            // 
+            cbmBuscarIDR.AutoResize = false;
+            cbmBuscarIDR.BackColor = Color.FromArgb(255, 255, 255);
+            cbmBuscarIDR.Depth = 0;
+            cbmBuscarIDR.DrawMode = DrawMode.OwnerDrawVariable;
+            cbmBuscarIDR.DropDownHeight = 174;
+            cbmBuscarIDR.DropDownStyle = ComboBoxStyle.DropDownList;
+            cbmBuscarIDR.DropDownWidth = 121;
+            cbmBuscarIDR.Font = new Font("Roboto Medium", 14F, FontStyle.Bold, GraphicsUnit.Pixel);
+            cbmBuscarIDR.ForeColor = Color.FromArgb(222, 0, 0, 0);
+            cbmBuscarIDR.FormattingEnabled = true;
+            cbmBuscarIDR.IntegralHeight = false;
+            cbmBuscarIDR.ItemHeight = 43;
+            cbmBuscarIDR.Location = new Point(27, 17);
+            cbmBuscarIDR.MaxDropDownItems = 4;
+            cbmBuscarIDR.MouseState = MaterialSkin.MouseState.OUT;
+            cbmBuscarIDR.Name = "cbmBuscarIDR";
+            cbmBuscarIDR.Size = new Size(121, 49);
+            cbmBuscarIDR.StartIndex = 0;
+            cbmBuscarIDR.TabIndex = 4;
+            // 
+            // materialCard5
+            // 
+            materialCard5.BackColor = Color.FromArgb(255, 255, 255);
+            materialCard5.Controls.Add(dateTimePicker1);
+            materialCard5.Controls.Add(cbmBuscarIDC);
+            materialCard5.Controls.Add(btnBuscarR);
+            materialCard5.Controls.Add(cbmBuscarIDR);
+            materialCard5.Controls.Add(btnLimpiarR);
+            materialCard5.Depth = 0;
+            materialCard5.ForeColor = Color.FromArgb(222, 0, 0, 0);
+            materialCard5.Location = new Point(429, 578);
+            materialCard5.Margin = new Padding(14);
+            materialCard5.MouseState = MaterialSkin.MouseState.HOVER;
+            materialCard5.Name = "materialCard5";
+            materialCard5.Padding = new Padding(14);
+            materialCard5.Size = new Size(764, 190);
+            materialCard5.TabIndex = 5;
+            // 
+            // cbmBuscarIDC
+            // 
+            cbmBuscarIDC.AutoResize = false;
+            cbmBuscarIDC.BackColor = Color.FromArgb(255, 255, 255);
+            cbmBuscarIDC.Depth = 0;
+            cbmBuscarIDC.DrawMode = DrawMode.OwnerDrawVariable;
+            cbmBuscarIDC.DropDownHeight = 174;
+            cbmBuscarIDC.DropDownStyle = ComboBoxStyle.DropDownList;
+            cbmBuscarIDC.DropDownWidth = 121;
+            cbmBuscarIDC.Font = new Font("Roboto Medium", 14F, FontStyle.Bold, GraphicsUnit.Pixel);
+            cbmBuscarIDC.ForeColor = Color.FromArgb(222, 0, 0, 0);
+            cbmBuscarIDC.FormattingEnabled = true;
+            cbmBuscarIDC.IntegralHeight = false;
+            cbmBuscarIDC.ItemHeight = 43;
+            cbmBuscarIDC.Location = new Point(228, 17);
+            cbmBuscarIDC.MaxDropDownItems = 4;
+            cbmBuscarIDC.MouseState = MaterialSkin.MouseState.OUT;
+            cbmBuscarIDC.Name = "cbmBuscarIDC";
+            cbmBuscarIDC.Size = new Size(121, 49);
+            cbmBuscarIDC.StartIndex = 0;
+            cbmBuscarIDC.TabIndex = 5;
+            // 
+            // cbmCiO
+            // 
+            cbmCiO.AutoResize = false;
+            cbmCiO.BackColor = Color.FromArgb(255, 255, 255);
+            cbmCiO.Depth = 0;
+            cbmCiO.DrawMode = DrawMode.OwnerDrawVariable;
+            cbmCiO.DropDownHeight = 174;
+            cbmCiO.DropDownStyle = ComboBoxStyle.DropDownList;
+            cbmCiO.DropDownWidth = 121;
+            cbmCiO.Font = new Font("Roboto Medium", 14F, FontStyle.Bold, GraphicsUnit.Pixel);
+            cbmCiO.ForeColor = Color.FromArgb(222, 0, 0, 0);
+            cbmCiO.FormattingEnabled = true;
+            cbmCiO.IntegralHeight = false;
+            cbmCiO.ItemHeight = 43;
+            cbmCiO.Location = new Point(17, 351);
+            cbmCiO.MaxDropDownItems = 4;
+            cbmCiO.MouseState = MaterialSkin.MouseState.OUT;
+            cbmCiO.Name = "cbmCiO";
+            cbmCiO.Size = new Size(121, 49);
+            cbmCiO.StartIndex = 0;
+            cbmCiO.TabIndex = 2;
+            // 
+            // materialLabel4
+            // 
+            materialLabel4.AutoSize = true;
+            materialLabel4.Depth = 0;
+            materialLabel4.Font = new Font("Roboto", 14F, FontStyle.Regular, GraphicsUnit.Pixel);
+            materialLabel4.Location = new Point(17, 164);
+            materialLabel4.MouseState = MaterialSkin.MouseState.HOVER;
+            materialLabel4.Name = "materialLabel4";
+            materialLabel4.Size = new Size(121, 19);
+            materialLabel4.TabIndex = 3;
+            materialLabel4.Text = "Elegir Habitacion";
+            // 
+            // materialLabel5
+            // 
+            materialLabel5.AutoSize = true;
+            materialLabel5.Depth = 0;
+            materialLabel5.Font = new Font("Roboto", 14F, FontStyle.Regular, GraphicsUnit.Pixel);
+            materialLabel5.Location = new Point(17, 33);
+            materialLabel5.MouseState = MaterialSkin.MouseState.HOVER;
+            materialLabel5.Name = "materialLabel5";
+            materialLabel5.Size = new Size(92, 19);
+            materialLabel5.TabIndex = 4;
+            materialLabel5.Text = "Elegir Cliente";
+            // 
+            // materialLabel6
+            // 
+            materialLabel6.AutoSize = true;
+            materialLabel6.Depth = 0;
+            materialLabel6.Font = new Font("Roboto", 14F, FontStyle.Regular, GraphicsUnit.Pixel);
+            materialLabel6.Location = new Point(17, 300);
+            materialLabel6.MouseState = MaterialSkin.MouseState.HOVER;
+            materialLabel6.Name = "materialLabel6";
+            materialLabel6.Size = new Size(144, 19);
+            materialLabel6.TabIndex = 5;
+            materialLabel6.Text = "Check In/ Check Out";
+            // 
+            // dateTimePicker1
+            // 
+            dateTimePicker1.Location = new Point(439, 17);
+            dateTimePicker1.Name = "dateTimePicker1";
+            dateTimePicker1.Size = new Size(200, 23);
+            dateTimePicker1.TabIndex = 6;
+            // 
+            // btnRegistrarR
+            // 
+            btnRegistrarR.AutoSizeMode = AutoSizeMode.GrowAndShrink;
+            btnRegistrarR.Density = MaterialSkin.Controls.MaterialButton.MaterialButtonDensity.Default;
+            btnRegistrarR.Depth = 0;
+            btnRegistrarR.HighEmphasis = true;
+            btnRegistrarR.Icon = null;
+            btnRegistrarR.Location = new Point(17, 475);
+            btnRegistrarR.Margin = new Padding(4, 6, 4, 6);
+            btnRegistrarR.MouseState = MaterialSkin.MouseState.HOVER;
+            btnRegistrarR.Name = "btnRegistrarR";
+            btnRegistrarR.NoAccentTextColor = Color.Empty;
+            btnRegistrarR.Size = new Size(158, 36);
+            btnRegistrarR.TabIndex = 6;
+            btnRegistrarR.Text = "REGISTRAR";
+            btnRegistrarR.Type = MaterialSkin.Controls.MaterialButton.MaterialButtonType.Contained;
+            btnRegistrarR.UseAccentColor = false;
+            btnRegistrarR.UseVisualStyleBackColor = true;
             // 
             // menu
             // 
@@ -903,7 +1182,13 @@ namespace Capa_Presentacion
             materialCard1.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)dgvClientes).EndInit();
             materialTabControl1.ResumeLayout(false);
+            tabPage4.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)fileSystemWatcher1).EndInit();
+            ((System.ComponentModel.ISupportInitialize)dgvReserva).EndInit();
+            materialCard4.ResumeLayout(false);
+            materialCard4.PerformLayout();
+            materialCard5.ResumeLayout(false);
+            materialCard5.PerformLayout();
             ResumeLayout(false);
         }
 
@@ -949,5 +1234,20 @@ namespace Capa_Presentacion
         private MaterialSkin.Controls.MaterialComboBox cmbIDH;
         private MaterialSkin.Controls.MaterialCard materialCard3;
         private MaterialSkin.Controls.MaterialButton btnLimpiarH;
+        private DataGridView dgvReserva;
+        private MaterialSkin.Controls.MaterialCard materialCard4;
+        private MaterialSkin.Controls.MaterialButton btnBuscarR;
+        private MaterialSkin.Controls.MaterialButton btnLimpiarR;
+        private MaterialSkin.Controls.MaterialComboBox cbmElegirCliente;
+        private MaterialSkin.Controls.MaterialComboBox cbmElegirHR;
+        private MaterialSkin.Controls.MaterialCard materialCard5;
+        private MaterialSkin.Controls.MaterialComboBox cbmBuscarIDC;
+        private MaterialSkin.Controls.MaterialComboBox cbmBuscarIDR;
+        private MaterialSkin.Controls.MaterialLabel materialLabel5;
+        private MaterialSkin.Controls.MaterialLabel materialLabel4;
+        private MaterialSkin.Controls.MaterialComboBox cbmCiO;
+        private MaterialSkin.Controls.MaterialLabel materialLabel6;
+        private DateTimePicker dateTimePicker1;
+        private MaterialSkin.Controls.MaterialButton btnRegistrarR;
     }
 }
