@@ -31,13 +31,14 @@ namespace Capa_Negocio.Habitacion.Servicios
 
             string sql = @"
                 INSERT INTO Habitacion
-                (Numero, Tipo, PrecioPorNoche, Estado, Descripcion)
-                VALUES (@Numero, @Tipo, @Precio, @Estado, @Desc);";
+                (Numero, Tipo, Nombre, PrecioPorNoche, Estado, Descripcion)
+                VALUES (@Numero, @Tipo, @Nombre, @Precio, @Estado, @Desc);";
 
             using SqlCommand cmd = new SqlCommand(sql, conn);
 
             cmd.Parameters.AddWithValue("@Numero", habitacion.Numero);
             cmd.Parameters.AddWithValue("@Tipo", (int)habitacion.Tipo);
+            cmd.Parameters.AddWithValue("@Nombre", habitacion.Nombre);
             cmd.Parameters.AddWithValue("@Precio", habitacion.PrecioPorNoche);
             cmd.Parameters.AddWithValue("@Estado", (int)habitacion.Estado);
 
@@ -54,38 +55,54 @@ namespace Capa_Negocio.Habitacion.Servicios
         // ---------------------------------------------------------
         // 2. OBTENER 1 HABITACIÓN POR ID (BD REAL)
         // ---------------------------------------------------------
+        
+
         public async Task<HabitacionBase?> ObtenerPorIdAsync(int idHabitacion, CancellationToken token)
         {
-            // Simulación de espera de BD
-            await Task.Delay(5000, token);
+            await Task.Delay(5000, token); // Simulación de espera
 
             using SqlConnection conn = _conexion.CrearConexion();
             await conn.OpenAsync(token);
 
             string sql = @"
-                SELECT IdHabitacion, Numero, Tipo, PrecioPorNoche, Estado, Descripcion
-                FROM Habitacion
-                WHERE IdHabitacion = @Id;";
+        SELECT IdHabitacion, Numero, Tipo, Nombre, PrecioPorNoche, Estado, Descripcion
+        FROM Habitacion
+        WHERE IdHabitacion = @Id;"; // La consulta trae 7 columnas
 
             using SqlCommand cmd = new SqlCommand(sql, conn);
             cmd.Parameters.AddWithValue("@Id", idHabitacion);
 
             using SqlDataReader reader = await cmd.ExecuteReaderAsync(token);
 
-            // Si no encontró filas, devolvemos null
             if (!await reader.ReadAsync(token))
                 return null;
 
-            var tipo = (TipoHabitacion)reader.GetInt32(2);
+            // --- Lectura segura y asignación usando GetOrdinal ---
+
+            // 1. Obtener tipo e instancia
+            int tipoIndex = reader.GetOrdinal("Tipo");
+            var tipo = (TipoHabitacion)reader.GetInt32(tipoIndex);
             HabitacionBase hab = CrearInstanciaHabitacion(tipo);
 
-            hab.IdHabitacion = reader.GetInt32(0);
-            hab.Numero = reader.GetInt32(1);
-            hab.PrecioPorNoche = reader.GetDecimal(3);
-            hab.Estado = (EstadoHabitacion)reader.GetInt32(4);
+            // 2. Asignar propiedades (usando GetOrdinal para seguridad)
+            hab.IdHabitacion = reader.GetInt32(reader.GetOrdinal("IdHabitacion"));
+            hab.Numero = reader.GetInt32(reader.GetOrdinal("Numero"));
 
-            // Aunque la columna es NOT NULL, este código es seguro si el esquema cambia
-            hab.Descripcion = reader.IsDBNull(5) ? string.Empty : reader.GetString(5);
+            // Asumiendo NOT NULL en SQL:
+            hab.PrecioPorNoche = reader.GetDecimal(reader.GetOrdinal("PrecioPorNoche"));
+            hab.Estado = (EstadoHabitacion)reader.GetInt32(reader.GetOrdinal("Estado"));
+
+            // ASIGNACIÓN SEGURA de Nombre (NVARCHAR(100))
+            int nombreIndex = reader.GetOrdinal("Nombre");
+            hab.Nombre = reader.IsDBNull(nombreIndex)
+                         ? string.Empty
+                         : reader.GetString(nombreIndex);
+
+            // ASIGNACIÓN SEGURA de Descripción (NVARCHAR(200))
+            int descIndex = reader.GetOrdinal("Descripcion");
+            hab.Descripcion = reader.IsDBNull(descIndex)
+                              ? string.Empty
+                              : reader.GetString(descIndex);
 
             return hab;
         }
@@ -93,37 +110,56 @@ namespace Capa_Negocio.Habitacion.Servicios
         // ---------------------------------------------------------
         // 3. OBTENER TODAS LAS HABITACIONES (BD REAL)
         // ---------------------------------------------------------
+       
         public async Task<List<HabitacionBase>> ObtenerTodasAsync(CancellationToken token)
         {
             // Simulación de espera de BD
             await Task.Delay(5000, token);
 
+            // ********** CÓDIGO FALTANTE: INICIALIZACIÓN **********
             var lista = new List<HabitacionBase>();
 
             using SqlConnection conn = _conexion.CrearConexion();
             await conn.OpenAsync(token);
 
             string sql = @"
-                SELECT IdHabitacion, Numero, Tipo, PrecioPorNoche, Estado, Descripcion
-                FROM Habitacion;";
+        SELECT IdHabitacion, Numero, Tipo, Nombre, PrecioPorNoche, Estado, Descripcion
+        FROM Habitacion;";
+            // *******************************************************
 
+            // EL ERROR ESTABA AQUÍ: cmd, reader, y lista se usan sin estar completamente definidos
             using SqlCommand cmd = new SqlCommand(sql, conn);
             using SqlDataReader reader = await cmd.ExecuteReaderAsync(token);
 
+            // Obtenemos índices solo una vez fuera del bucle
+            // Esto es crucial para la robustez
+            int idHabIndex = reader.GetOrdinal("IdHabitacion");
+            int numIndex = reader.GetOrdinal("Numero");
+            int tipoIndex = reader.GetOrdinal("Tipo");
+            int precioIndex = reader.GetOrdinal("PrecioPorNoche");
+            int estadoIndex = reader.GetOrdinal("Estado");
+            int nombreIndex = reader.GetOrdinal("Nombre");
+            int descIndex = reader.GetOrdinal("Descripcion");
+
             while (await reader.ReadAsync(token))
             {
-                var tipo = (TipoHabitacion)reader.GetInt32(2);
+                var tipo = (TipoHabitacion)reader.GetInt32(tipoIndex);
                 HabitacionBase hab = CrearInstanciaHabitacion(tipo);
 
-                hab.IdHabitacion = reader.GetInt32(0);
-                hab.Numero = reader.GetInt32(1);
-                hab.PrecioPorNoche = reader.GetDecimal(3);
-                hab.Estado = (EstadoHabitacion)reader.GetInt32(4);
-                hab.Descripcion = reader.IsDBNull(5) ? string.Empty : reader.GetString(5);
+                hab.IdHabitacion = reader.GetInt32(idHabIndex);
+                hab.Numero = reader.GetInt32(numIndex);
+                hab.PrecioPorNoche = reader.GetDecimal(precioIndex);
+                hab.Estado = (EstadoHabitacion)reader.GetInt32(estadoIndex);
 
+                // Lectura segura de Nombre y Descripción (manejo de NULLs)
+                hab.Nombre = reader.IsDBNull(nombreIndex) ? string.Empty : reader.GetString(nombreIndex);
+                hab.Descripcion = reader.IsDBNull(descIndex) ? string.Empty : reader.GetString(descIndex);
+
+                // EL ERROR ESTABA AQUÍ: lista estaba fuera de alcance o no inicializada.
                 lista.Add(hab);
             }
 
+            // EL ERROR ESTABA AQUÍ: lista estaba fuera de alcance o no inicializada.
             return lista;
         }
 
@@ -177,7 +213,8 @@ namespace Capa_Negocio.Habitacion.Servicios
             string sql = @"
                 UPDATE Habitacion
                 SET Numero = @Numero,
-                    Tipo = @Tipo,
+                    Tipo = @Tipo, 
+                    Nombre = @Nombre,
                     PrecioPorNoche = @Precio,
                     Estado = @Estado,
                     Descripcion = @Desc
@@ -187,6 +224,7 @@ namespace Capa_Negocio.Habitacion.Servicios
 
             cmd.Parameters.AddWithValue("@Numero", habitacion.Numero);
             cmd.Parameters.AddWithValue("@Tipo", (int)habitacion.Tipo);
+            cmd.Parameters.AddWithValue("@Nombre", habitacion.Nombre);
             cmd.Parameters.AddWithValue("@Precio", habitacion.PrecioPorNoche);
             cmd.Parameters.AddWithValue("@Estado", (int)habitacion.Estado);
             cmd.Parameters.AddWithValue("@Desc",
@@ -229,6 +267,20 @@ namespace Capa_Negocio.Habitacion.Servicios
                 TipoHabitacion.Presidencial => new Presidencial(),
                 _ => new Simple()
             };
+        }
+        // Capa_Negocio.Habitacion.Servicios.HabitacionService.cs
+
+        // ... (después de EliminarHabitacionAsync o donde prefieras)
+
+        // ---------------------------------------------------------
+        // 6. OBTENER TODAS LAS HABITACIONES (CACHE)
+        // ---------------------------------------------------------
+        /// <summary>
+        /// Devuelve la lista de habitaciones desde la caché en memoria.
+        /// </summary>
+        public List<HabitacionBase> ObtenerTodasLasHabitacionesCache()
+        {
+            return _cache.Habitaciones;
         }
     }
 }

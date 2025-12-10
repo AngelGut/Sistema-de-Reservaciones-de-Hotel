@@ -37,6 +37,8 @@ namespace Capa_Presentacion
             cmbEstadoH = new MaterialSkin.Controls.MaterialComboBox();
             dgvHabitaciones = new DataGridView();
             materialCard2 = new MaterialSkin.Controls.MaterialCard();
+            txtPrecioN = new MaterialSkin.Controls.MaterialMaskedTextBox();
+            materialLabel7 = new MaterialSkin.Controls.MaterialLabel();
             materialLabel3 = new MaterialSkin.Controls.MaterialLabel();
             txtNombreH = new MaterialSkin.Controls.MaterialMaskedTextBox();
             cmbTipo = new MaterialSkin.Controls.MaterialComboBox();
@@ -68,22 +70,26 @@ namespace Capa_Presentacion
             tabPage1 = new TabPage();
             materialTabControl1 = new MaterialSkin.Controls.MaterialTabControl();
             tabPage4 = new TabPage();
-            fileSystemWatcher1 = new FileSystemWatcher();
-            dgvReserva = new DataGridView();
-            materialCard4 = new MaterialSkin.Controls.MaterialCard();
-            cbmElegirHR = new MaterialSkin.Controls.MaterialComboBox();
-            cbmElegirCliente = new MaterialSkin.Controls.MaterialComboBox();
-            btnLimpiarR = new MaterialSkin.Controls.MaterialButton();
-            btnBuscarR = new MaterialSkin.Controls.MaterialButton();
-            cbmBuscarIDR = new MaterialSkin.Controls.MaterialComboBox();
             materialCard5 = new MaterialSkin.Controls.MaterialCard();
             cbmBuscarIDC = new MaterialSkin.Controls.MaterialComboBox();
-            cbmCiO = new MaterialSkin.Controls.MaterialComboBox();
-            materialLabel4 = new MaterialSkin.Controls.MaterialLabel();
-            materialLabel5 = new MaterialSkin.Controls.MaterialLabel();
-            materialLabel6 = new MaterialSkin.Controls.MaterialLabel();
-            dateTimePicker1 = new DateTimePicker();
+            btnBuscarR = new MaterialSkin.Controls.MaterialButton();
+            cbmBuscarIDR = new MaterialSkin.Controls.MaterialComboBox();
+            btnLimpiarR = new MaterialSkin.Controls.MaterialButton();
+            materialCard4 = new MaterialSkin.Controls.MaterialCard();
+            dateSalida = new DateTimePicker();
+            dateEntrada = new DateTimePicker();
             btnRegistrarR = new MaterialSkin.Controls.MaterialButton();
+            materialLabel6 = new MaterialSkin.Controls.MaterialLabel();
+            materialLabel5 = new MaterialSkin.Controls.MaterialLabel();
+            materialLabel4 = new MaterialSkin.Controls.MaterialLabel();
+            cbmCiO = new MaterialSkin.Controls.MaterialComboBox();
+            cbmElegirCliente = new MaterialSkin.Controls.MaterialComboBox();
+            cbmElegirHR = new MaterialSkin.Controls.MaterialComboBox();
+            dgvReserva = new DataGridView();
+            fileSystemWatcher1 = new FileSystemWatcher();
+            materialCard6 = new MaterialSkin.Controls.MaterialCard();
+            btnEliminarCliente = new MaterialSkin.Controls.MaterialButton();
+            btnEliminarHab = new MaterialSkin.Controls.MaterialButton();
             tabPage3.SuspendLayout();
             materialCard3.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)dgvHabitaciones).BeginInit();
@@ -93,14 +99,16 @@ namespace Capa_Presentacion
             ((System.ComponentModel.ISupportInitialize)dgvClientes).BeginInit();
             materialTabControl1.SuspendLayout();
             tabPage4.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)fileSystemWatcher1).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)dgvReserva).BeginInit();
-            materialCard4.SuspendLayout();
             materialCard5.SuspendLayout();
+            materialCard4.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)dgvReserva).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)fileSystemWatcher1).BeginInit();
+            materialCard6.SuspendLayout();
             SuspendLayout();
             // 
             // tabPage3
             // 
+            tabPage3.Controls.Add(btnEliminarHab);
             tabPage3.Controls.Add(materialCard3);
             tabPage3.Controls.Add(dgvHabitaciones);
             tabPage3.Controls.Add(materialCard2);
@@ -222,6 +230,8 @@ namespace Capa_Presentacion
             // materialCard2
             // 
             materialCard2.BackColor = Color.FromArgb(255, 255, 255);
+            materialCard2.Controls.Add(txtPrecioN);
+            materialCard2.Controls.Add(materialLabel7);
             materialCard2.Controls.Add(materialLabel3);
             materialCard2.Controls.Add(txtNombreH);
             materialCard2.Controls.Add(cmbTipo);
@@ -241,12 +251,65 @@ namespace Capa_Presentacion
             materialCard2.Size = new Size(364, 857);
             materialCard2.TabIndex = 0;
             // 
+            // txtPrecioN
+            // 
+            txtPrecioN.AllowPromptAsInput = true;
+            txtPrecioN.AnimateReadOnly = false;
+            txtPrecioN.AsciiOnly = false;
+            txtPrecioN.BackgroundImageLayout = ImageLayout.None;
+            txtPrecioN.BeepOnError = false;
+            txtPrecioN.CutCopyMaskFormat = MaskFormat.IncludeLiterals;
+            txtPrecioN.Depth = 0;
+            txtPrecioN.Font = new Font("Roboto", 16F, FontStyle.Regular, GraphicsUnit.Pixel);
+            txtPrecioN.HidePromptOnLeave = false;
+            txtPrecioN.HideSelection = true;
+            txtPrecioN.InsertKeyMode = InsertKeyMode.Default;
+            txtPrecioN.LeadingIcon = null;
+            txtPrecioN.Location = new Point(10, 309);
+            txtPrecioN.Mask = "";
+            txtPrecioN.MaxLength = 32767;
+            txtPrecioN.MouseState = MaterialSkin.MouseState.OUT;
+            txtPrecioN.Name = "txtPrecioN";
+            txtPrecioN.PasswordChar = '\0';
+            txtPrecioN.PrefixSuffixText = null;
+            txtPrecioN.PromptChar = '_';
+            txtPrecioN.ReadOnly = false;
+            txtPrecioN.RejectInputOnFirstFailure = false;
+            txtPrecioN.ResetOnPrompt = true;
+            txtPrecioN.ResetOnSpace = true;
+            txtPrecioN.RightToLeft = RightToLeft.No;
+            txtPrecioN.SelectedText = "";
+            txtPrecioN.SelectionLength = 0;
+            txtPrecioN.SelectionStart = 0;
+            txtPrecioN.ShortcutsEnabled = true;
+            txtPrecioN.Size = new Size(250, 48);
+            txtPrecioN.SkipLiterals = true;
+            txtPrecioN.TabIndex = 12;
+            txtPrecioN.TabStop = false;
+            txtPrecioN.TextAlign = HorizontalAlignment.Left;
+            txtPrecioN.TextMaskFormat = MaskFormat.IncludeLiterals;
+            txtPrecioN.TrailingIcon = null;
+            txtPrecioN.UseSystemPasswordChar = false;
+            txtPrecioN.ValidatingType = null;
+            // 
+            // materialLabel7
+            // 
+            materialLabel7.AutoSize = true;
+            materialLabel7.Depth = 0;
+            materialLabel7.Font = new Font("Roboto", 14F, FontStyle.Regular, GraphicsUnit.Pixel);
+            materialLabel7.Location = new Point(17, 266);
+            materialLabel7.MouseState = MaterialSkin.MouseState.HOVER;
+            materialLabel7.Name = "materialLabel7";
+            materialLabel7.Size = new Size(97, 19);
+            materialLabel7.TabIndex = 11;
+            materialLabel7.Text = "Precio/Noche";
+            // 
             // materialLabel3
             // 
             materialLabel3.AutoSize = true;
             materialLabel3.Depth = 0;
             materialLabel3.Font = new Font("Roboto", 14F, FontStyle.Regular, GraphicsUnit.Pixel);
-            materialLabel3.Location = new Point(17, 74);
+            materialLabel3.Location = new Point(11, 35);
             materialLabel3.MouseState = MaterialSkin.MouseState.HOVER;
             materialLabel3.Name = "materialLabel3";
             materialLabel3.Size = new Size(138, 19);
@@ -267,7 +330,7 @@ namespace Capa_Presentacion
             txtNombreH.HideSelection = true;
             txtNombreH.InsertKeyMode = InsertKeyMode.Default;
             txtNombreH.LeadingIcon = null;
-            txtNombreH.Location = new Point(17, 112);
+            txtNombreH.Location = new Point(11, 72);
             txtNombreH.Mask = "";
             txtNombreH.MaxLength = 32767;
             txtNombreH.MouseState = MaterialSkin.MouseState.OUT;
@@ -308,7 +371,7 @@ namespace Capa_Presentacion
             cmbTipo.FormattingEnabled = true;
             cmbTipo.IntegralHeight = false;
             cmbTipo.ItemHeight = 43;
-            cmbTipo.Location = new Point(17, 550);
+            cmbTipo.Location = new Point(17, 589);
             cmbTipo.MaxDropDownItems = 4;
             cmbTipo.MouseState = MaterialSkin.MouseState.OUT;
             cmbTipo.Name = "cmbTipo";
@@ -330,7 +393,7 @@ namespace Capa_Presentacion
             cmbEstado.FormattingEnabled = true;
             cmbEstado.IntegralHeight = false;
             cmbEstado.ItemHeight = 43;
-            cmbEstado.Location = new Point(17, 397);
+            cmbEstado.Location = new Point(17, 450);
             cmbEstado.MaxDropDownItems = 4;
             cmbEstado.MouseState = MaterialSkin.MouseState.OUT;
             cmbEstado.Name = "cmbEstado";
@@ -362,7 +425,7 @@ namespace Capa_Presentacion
             lblTpo.AutoSize = true;
             lblTpo.Depth = 0;
             lblTpo.Font = new Font("Roboto", 14F, FontStyle.Regular, GraphicsUnit.Pixel);
-            lblTpo.Location = new Point(17, 514);
+            lblTpo.Location = new Point(17, 543);
             lblTpo.MouseState = MaterialSkin.MouseState.HOVER;
             lblTpo.Name = "lblTpo";
             lblTpo.Size = new Size(33, 19);
@@ -374,7 +437,7 @@ namespace Capa_Presentacion
             lblEstado.AutoSize = true;
             lblEstado.Depth = 0;
             lblEstado.Font = new Font("Roboto", 14F, FontStyle.Regular, GraphicsUnit.Pixel);
-            lblEstado.Location = new Point(17, 356);
+            lblEstado.Location = new Point(17, 404);
             lblEstado.MouseState = MaterialSkin.MouseState.HOVER;
             lblEstado.Name = "lblEstado";
             lblEstado.Size = new Size(50, 19);
@@ -395,7 +458,7 @@ namespace Capa_Presentacion
             txtNumeroHab.HideSelection = true;
             txtNumeroHab.InsertKeyMode = InsertKeyMode.Default;
             txtNumeroHab.LeadingIcon = null;
-            txtNumeroHab.Location = new Point(17, 241);
+            txtNumeroHab.Location = new Point(17, 182);
             txtNumeroHab.Mask = "";
             txtNumeroHab.MaxLength = 32767;
             txtNumeroHab.MouseState = MaterialSkin.MouseState.OUT;
@@ -427,7 +490,7 @@ namespace Capa_Presentacion
             lblNumeroHab.AutoSize = true;
             lblNumeroHab.Depth = 0;
             lblNumeroHab.Font = new Font("Roboto", 14F, FontStyle.Regular, GraphicsUnit.Pixel);
-            lblNumeroHab.Location = new Point(17, 205);
+            lblNumeroHab.Location = new Point(17, 140);
             lblNumeroHab.MouseState = MaterialSkin.MouseState.HOVER;
             lblNumeroHab.Name = "lblNumeroHab";
             lblNumeroHab.Size = new Size(159, 19);
@@ -436,11 +499,8 @@ namespace Capa_Presentacion
             // 
             // tabPage2
             // 
-            tabPage2.Controls.Add(materialLabel2);
-            tabPage2.Controls.Add(materialLabel1);
-            tabPage2.Controls.Add(cmbCedula);
-            tabPage2.Controls.Add(cmbID);
-            tabPage2.Controls.Add(btnBusqueda);
+            tabPage2.Controls.Add(btnEliminarCliente);
+            tabPage2.Controls.Add(materialCard6);
             tabPage2.Controls.Add(materialCard1);
             tabPage2.Controls.Add(dgvClientes);
             tabPage2.Location = new Point(4, 24);
@@ -456,7 +516,7 @@ namespace Capa_Presentacion
             materialLabel2.AutoSize = true;
             materialLabel2.Depth = 0;
             materialLabel2.Font = new Font("Roboto", 14F, FontStyle.Regular, GraphicsUnit.Pixel);
-            materialLabel2.Location = new Point(565, 550);
+            materialLabel2.Location = new Point(225, 27);
             materialLabel2.MouseState = MaterialSkin.MouseState.HOVER;
             materialLabel2.Name = "materialLabel2";
             materialLabel2.Size = new Size(83, 19);
@@ -468,7 +528,7 @@ namespace Capa_Presentacion
             materialLabel1.AutoSize = true;
             materialLabel1.Depth = 0;
             materialLabel1.Font = new Font("Roboto", 14F, FontStyle.Regular, GraphicsUnit.Pixel);
-            materialLabel1.Location = new Point(367, 550);
+            materialLabel1.Location = new Point(17, 27);
             materialLabel1.MouseState = MaterialSkin.MouseState.HOVER;
             materialLabel1.Name = "materialLabel1";
             materialLabel1.Size = new Size(62, 19);
@@ -489,7 +549,7 @@ namespace Capa_Presentacion
             cmbCedula.FormattingEnabled = true;
             cmbCedula.IntegralHeight = false;
             cmbCedula.ItemHeight = 43;
-            cmbCedula.Location = new Point(565, 593);
+            cmbCedula.Location = new Point(225, 60);
             cmbCedula.MaxDropDownItems = 4;
             cmbCedula.MouseState = MaterialSkin.MouseState.OUT;
             cmbCedula.Name = "cmbCedula";
@@ -511,7 +571,7 @@ namespace Capa_Presentacion
             cmbID.FormattingEnabled = true;
             cmbID.IntegralHeight = false;
             cmbID.ItemHeight = 43;
-            cmbID.Location = new Point(367, 593);
+            cmbID.Location = new Point(17, 60);
             cmbID.MaxDropDownItems = 4;
             cmbID.MouseState = MaterialSkin.MouseState.OUT;
             cmbID.Name = "cmbID";
@@ -526,7 +586,7 @@ namespace Capa_Presentacion
             btnBusqueda.Depth = 0;
             btnBusqueda.HighEmphasis = true;
             btnBusqueda.Icon = null;
-            btnBusqueda.Location = new Point(367, 702);
+            btnBusqueda.Location = new Point(18, 149);
             btnBusqueda.Margin = new Padding(4, 6, 4, 6);
             btnBusqueda.MouseState = MaterialSkin.MouseState.HOVER;
             btnBusqueda.Name = "btnBusqueda";
@@ -898,102 +958,44 @@ namespace Capa_Presentacion
             tabPage4.Text = "Reservacion";
             tabPage4.UseVisualStyleBackColor = true;
             // 
-            // fileSystemWatcher1
+            // materialCard5
             // 
-            fileSystemWatcher1.EnableRaisingEvents = true;
-            fileSystemWatcher1.SynchronizingObject = this;
+            materialCard5.BackColor = Color.FromArgb(255, 255, 255);
+            materialCard5.Controls.Add(cbmBuscarIDC);
+            materialCard5.Controls.Add(btnBuscarR);
+            materialCard5.Controls.Add(cbmBuscarIDR);
+            materialCard5.Controls.Add(btnLimpiarR);
+            materialCard5.Depth = 0;
+            materialCard5.ForeColor = Color.FromArgb(222, 0, 0, 0);
+            materialCard5.Location = new Point(688, 571);
+            materialCard5.Margin = new Padding(14);
+            materialCard5.MouseState = MaterialSkin.MouseState.HOVER;
+            materialCard5.Name = "materialCard5";
+            materialCard5.Padding = new Padding(14);
+            materialCard5.Size = new Size(764, 190);
+            materialCard5.TabIndex = 5;
             // 
-            // dgvReserva
+            // cbmBuscarIDC
             // 
-            dgvReserva.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            dgvReserva.Location = new Point(405, 84);
-            dgvReserva.Name = "dgvReserva";
-            dgvReserva.Size = new Size(738, 412);
-            dgvReserva.TabIndex = 0;
-            dgvReserva.CellContentClick += dataGridView1_CellContentClick;
-            // 
-            // materialCard4
-            // 
-            materialCard4.BackColor = Color.FromArgb(255, 255, 255);
-            materialCard4.Controls.Add(btnRegistrarR);
-            materialCard4.Controls.Add(materialLabel6);
-            materialCard4.Controls.Add(materialLabel5);
-            materialCard4.Controls.Add(materialLabel4);
-            materialCard4.Controls.Add(cbmCiO);
-            materialCard4.Controls.Add(cbmElegirCliente);
-            materialCard4.Controls.Add(cbmElegirHR);
-            materialCard4.Depth = 0;
-            materialCard4.ForeColor = Color.FromArgb(222, 0, 0, 0);
-            materialCard4.Location = new Point(0, 0);
-            materialCard4.Margin = new Padding(14);
-            materialCard4.MouseState = MaterialSkin.MouseState.HOVER;
-            materialCard4.Name = "materialCard4";
-            materialCard4.Padding = new Padding(14);
-            materialCard4.Size = new Size(339, 897);
-            materialCard4.TabIndex = 1;
-            // 
-            // cbmElegirHR
-            // 
-            cbmElegirHR.AutoResize = false;
-            cbmElegirHR.BackColor = Color.FromArgb(255, 255, 255);
-            cbmElegirHR.Depth = 0;
-            cbmElegirHR.DrawMode = DrawMode.OwnerDrawVariable;
-            cbmElegirHR.DropDownHeight = 174;
-            cbmElegirHR.DropDownStyle = ComboBoxStyle.DropDownList;
-            cbmElegirHR.DropDownWidth = 121;
-            cbmElegirHR.Font = new Font("Roboto Medium", 14F, FontStyle.Bold, GraphicsUnit.Pixel);
-            cbmElegirHR.ForeColor = Color.FromArgb(222, 0, 0, 0);
-            cbmElegirHR.FormattingEnabled = true;
-            cbmElegirHR.IntegralHeight = false;
-            cbmElegirHR.ItemHeight = 43;
-            cbmElegirHR.Location = new Point(17, 219);
-            cbmElegirHR.MaxDropDownItems = 4;
-            cbmElegirHR.MouseState = MaterialSkin.MouseState.OUT;
-            cbmElegirHR.Name = "cbmElegirHR";
-            cbmElegirHR.Size = new Size(121, 49);
-            cbmElegirHR.StartIndex = 0;
-            cbmElegirHR.TabIndex = 0;
-            // 
-            // cbmElegirCliente
-            // 
-            cbmElegirCliente.AutoResize = false;
-            cbmElegirCliente.BackColor = Color.FromArgb(255, 255, 255);
-            cbmElegirCliente.Depth = 0;
-            cbmElegirCliente.DrawMode = DrawMode.OwnerDrawVariable;
-            cbmElegirCliente.DropDownHeight = 174;
-            cbmElegirCliente.DropDownStyle = ComboBoxStyle.DropDownList;
-            cbmElegirCliente.DropDownWidth = 121;
-            cbmElegirCliente.Font = new Font("Roboto Medium", 14F, FontStyle.Bold, GraphicsUnit.Pixel);
-            cbmElegirCliente.ForeColor = Color.FromArgb(222, 0, 0, 0);
-            cbmElegirCliente.FormattingEnabled = true;
-            cbmElegirCliente.IntegralHeight = false;
-            cbmElegirCliente.ItemHeight = 43;
-            cbmElegirCliente.Location = new Point(17, 84);
-            cbmElegirCliente.MaxDropDownItems = 4;
-            cbmElegirCliente.MouseState = MaterialSkin.MouseState.OUT;
-            cbmElegirCliente.Name = "cbmElegirCliente";
-            cbmElegirCliente.Size = new Size(121, 49);
-            cbmElegirCliente.StartIndex = 0;
-            cbmElegirCliente.TabIndex = 1;
-            // 
-            // btnLimpiarR
-            // 
-            btnLimpiarR.AutoSizeMode = AutoSizeMode.GrowAndShrink;
-            btnLimpiarR.Density = MaterialSkin.Controls.MaterialButton.MaterialButtonDensity.Default;
-            btnLimpiarR.Depth = 0;
-            btnLimpiarR.HighEmphasis = true;
-            btnLimpiarR.Icon = null;
-            btnLimpiarR.Location = new Point(202, 134);
-            btnLimpiarR.Margin = new Padding(4, 6, 4, 6);
-            btnLimpiarR.MouseState = MaterialSkin.MouseState.HOVER;
-            btnLimpiarR.Name = "btnLimpiarR";
-            btnLimpiarR.NoAccentTextColor = Color.Empty;
-            btnLimpiarR.Size = new Size(158, 36);
-            btnLimpiarR.TabIndex = 2;
-            btnLimpiarR.Text = "LIMPIAR BUSQUEDA";
-            btnLimpiarR.Type = MaterialSkin.Controls.MaterialButton.MaterialButtonType.Contained;
-            btnLimpiarR.UseAccentColor = false;
-            btnLimpiarR.UseVisualStyleBackColor = true;
+            cbmBuscarIDC.AutoResize = false;
+            cbmBuscarIDC.BackColor = Color.FromArgb(255, 255, 255);
+            cbmBuscarIDC.Depth = 0;
+            cbmBuscarIDC.DrawMode = DrawMode.OwnerDrawVariable;
+            cbmBuscarIDC.DropDownHeight = 174;
+            cbmBuscarIDC.DropDownStyle = ComboBoxStyle.DropDownList;
+            cbmBuscarIDC.DropDownWidth = 121;
+            cbmBuscarIDC.Font = new Font("Microsoft Sans Serif", 14F, FontStyle.Bold, GraphicsUnit.Pixel);
+            cbmBuscarIDC.ForeColor = Color.FromArgb(222, 0, 0, 0);
+            cbmBuscarIDC.FormattingEnabled = true;
+            cbmBuscarIDC.IntegralHeight = false;
+            cbmBuscarIDC.ItemHeight = 43;
+            cbmBuscarIDC.Location = new Point(228, 17);
+            cbmBuscarIDC.MaxDropDownItems = 4;
+            cbmBuscarIDC.MouseState = MaterialSkin.MouseState.OUT;
+            cbmBuscarIDC.Name = "cbmBuscarIDC";
+            cbmBuscarIDC.Size = new Size(121, 49);
+            cbmBuscarIDC.StartIndex = 0;
+            cbmBuscarIDC.TabIndex = 5;
             // 
             // btnBuscarR
             // 
@@ -1023,7 +1025,7 @@ namespace Capa_Presentacion
             cbmBuscarIDR.DropDownHeight = 174;
             cbmBuscarIDR.DropDownStyle = ComboBoxStyle.DropDownList;
             cbmBuscarIDR.DropDownWidth = 121;
-            cbmBuscarIDR.Font = new Font("Roboto Medium", 14F, FontStyle.Bold, GraphicsUnit.Pixel);
+            cbmBuscarIDR.Font = new Font("Microsoft Sans Serif", 14F, FontStyle.Bold, GraphicsUnit.Pixel);
             cbmBuscarIDR.ForeColor = Color.FromArgb(222, 0, 0, 0);
             cbmBuscarIDR.FormattingEnabled = true;
             cbmBuscarIDR.IntegralHeight = false;
@@ -1036,91 +1038,79 @@ namespace Capa_Presentacion
             cbmBuscarIDR.StartIndex = 0;
             cbmBuscarIDR.TabIndex = 4;
             // 
-            // materialCard5
+            // btnLimpiarR
             // 
-            materialCard5.BackColor = Color.FromArgb(255, 255, 255);
-            materialCard5.Controls.Add(dateTimePicker1);
-            materialCard5.Controls.Add(cbmBuscarIDC);
-            materialCard5.Controls.Add(btnBuscarR);
-            materialCard5.Controls.Add(cbmBuscarIDR);
-            materialCard5.Controls.Add(btnLimpiarR);
-            materialCard5.Depth = 0;
-            materialCard5.ForeColor = Color.FromArgb(222, 0, 0, 0);
-            materialCard5.Location = new Point(429, 578);
-            materialCard5.Margin = new Padding(14);
-            materialCard5.MouseState = MaterialSkin.MouseState.HOVER;
-            materialCard5.Name = "materialCard5";
-            materialCard5.Padding = new Padding(14);
-            materialCard5.Size = new Size(764, 190);
-            materialCard5.TabIndex = 5;
+            btnLimpiarR.AutoSizeMode = AutoSizeMode.GrowAndShrink;
+            btnLimpiarR.Density = MaterialSkin.Controls.MaterialButton.MaterialButtonDensity.Default;
+            btnLimpiarR.Depth = 0;
+            btnLimpiarR.HighEmphasis = true;
+            btnLimpiarR.Icon = null;
+            btnLimpiarR.Location = new Point(202, 134);
+            btnLimpiarR.Margin = new Padding(4, 6, 4, 6);
+            btnLimpiarR.MouseState = MaterialSkin.MouseState.HOVER;
+            btnLimpiarR.Name = "btnLimpiarR";
+            btnLimpiarR.NoAccentTextColor = Color.Empty;
+            btnLimpiarR.Size = new Size(158, 36);
+            btnLimpiarR.TabIndex = 2;
+            btnLimpiarR.Text = "LIMPIAR BUSQUEDA";
+            btnLimpiarR.Type = MaterialSkin.Controls.MaterialButton.MaterialButtonType.Contained;
+            btnLimpiarR.UseAccentColor = false;
+            btnLimpiarR.UseVisualStyleBackColor = true;
             // 
-            // cbmBuscarIDC
+            // materialCard4
             // 
-            cbmBuscarIDC.AutoResize = false;
-            cbmBuscarIDC.BackColor = Color.FromArgb(255, 255, 255);
-            cbmBuscarIDC.Depth = 0;
-            cbmBuscarIDC.DrawMode = DrawMode.OwnerDrawVariable;
-            cbmBuscarIDC.DropDownHeight = 174;
-            cbmBuscarIDC.DropDownStyle = ComboBoxStyle.DropDownList;
-            cbmBuscarIDC.DropDownWidth = 121;
-            cbmBuscarIDC.Font = new Font("Roboto Medium", 14F, FontStyle.Bold, GraphicsUnit.Pixel);
-            cbmBuscarIDC.ForeColor = Color.FromArgb(222, 0, 0, 0);
-            cbmBuscarIDC.FormattingEnabled = true;
-            cbmBuscarIDC.IntegralHeight = false;
-            cbmBuscarIDC.ItemHeight = 43;
-            cbmBuscarIDC.Location = new Point(228, 17);
-            cbmBuscarIDC.MaxDropDownItems = 4;
-            cbmBuscarIDC.MouseState = MaterialSkin.MouseState.OUT;
-            cbmBuscarIDC.Name = "cbmBuscarIDC";
-            cbmBuscarIDC.Size = new Size(121, 49);
-            cbmBuscarIDC.StartIndex = 0;
-            cbmBuscarIDC.TabIndex = 5;
+            materialCard4.BackColor = Color.FromArgb(255, 255, 255);
+            materialCard4.Controls.Add(dateSalida);
+            materialCard4.Controls.Add(dateEntrada);
+            materialCard4.Controls.Add(btnRegistrarR);
+            materialCard4.Controls.Add(materialLabel6);
+            materialCard4.Controls.Add(materialLabel5);
+            materialCard4.Controls.Add(materialLabel4);
+            materialCard4.Controls.Add(cbmCiO);
+            materialCard4.Controls.Add(cbmElegirCliente);
+            materialCard4.Controls.Add(cbmElegirHR);
+            materialCard4.Depth = 0;
+            materialCard4.ForeColor = Color.FromArgb(222, 0, 0, 0);
+            materialCard4.Location = new Point(0, 0);
+            materialCard4.Margin = new Padding(14);
+            materialCard4.MouseState = MaterialSkin.MouseState.HOVER;
+            materialCard4.Name = "materialCard4";
+            materialCard4.Padding = new Padding(14);
+            materialCard4.Size = new Size(605, 897);
+            materialCard4.TabIndex = 1;
             // 
-            // cbmCiO
+            // dateSalida
             // 
-            cbmCiO.AutoResize = false;
-            cbmCiO.BackColor = Color.FromArgb(255, 255, 255);
-            cbmCiO.Depth = 0;
-            cbmCiO.DrawMode = DrawMode.OwnerDrawVariable;
-            cbmCiO.DropDownHeight = 174;
-            cbmCiO.DropDownStyle = ComboBoxStyle.DropDownList;
-            cbmCiO.DropDownWidth = 121;
-            cbmCiO.Font = new Font("Roboto Medium", 14F, FontStyle.Bold, GraphicsUnit.Pixel);
-            cbmCiO.ForeColor = Color.FromArgb(222, 0, 0, 0);
-            cbmCiO.FormattingEnabled = true;
-            cbmCiO.IntegralHeight = false;
-            cbmCiO.ItemHeight = 43;
-            cbmCiO.Location = new Point(17, 351);
-            cbmCiO.MaxDropDownItems = 4;
-            cbmCiO.MouseState = MaterialSkin.MouseState.OUT;
-            cbmCiO.Name = "cbmCiO";
-            cbmCiO.Size = new Size(121, 49);
-            cbmCiO.StartIndex = 0;
-            cbmCiO.TabIndex = 2;
+            dateSalida.Location = new Point(272, 144);
+            dateSalida.Name = "dateSalida";
+            dateSalida.Size = new Size(200, 23);
+            dateSalida.TabIndex = 7;
             // 
-            // materialLabel4
+            // dateEntrada
             // 
-            materialLabel4.AutoSize = true;
-            materialLabel4.Depth = 0;
-            materialLabel4.Font = new Font("Roboto", 14F, FontStyle.Regular, GraphicsUnit.Pixel);
-            materialLabel4.Location = new Point(17, 164);
-            materialLabel4.MouseState = MaterialSkin.MouseState.HOVER;
-            materialLabel4.Name = "materialLabel4";
-            materialLabel4.Size = new Size(121, 19);
-            materialLabel4.TabIndex = 3;
-            materialLabel4.Text = "Elegir Habitacion";
+            dateEntrada.Location = new Point(272, 33);
+            dateEntrada.Name = "dateEntrada";
+            dateEntrada.Size = new Size(200, 23);
+            dateEntrada.TabIndex = 6;
             // 
-            // materialLabel5
+            // btnRegistrarR
             // 
-            materialLabel5.AutoSize = true;
-            materialLabel5.Depth = 0;
-            materialLabel5.Font = new Font("Roboto", 14F, FontStyle.Regular, GraphicsUnit.Pixel);
-            materialLabel5.Location = new Point(17, 33);
-            materialLabel5.MouseState = MaterialSkin.MouseState.HOVER;
-            materialLabel5.Name = "materialLabel5";
-            materialLabel5.Size = new Size(92, 19);
-            materialLabel5.TabIndex = 4;
-            materialLabel5.Text = "Elegir Cliente";
+            btnRegistrarR.AutoSizeMode = AutoSizeMode.GrowAndShrink;
+            btnRegistrarR.Density = MaterialSkin.Controls.MaterialButton.MaterialButtonDensity.Default;
+            btnRegistrarR.Depth = 0;
+            btnRegistrarR.HighEmphasis = true;
+            btnRegistrarR.Icon = null;
+            btnRegistrarR.Location = new Point(17, 746);
+            btnRegistrarR.Margin = new Padding(4, 6, 4, 6);
+            btnRegistrarR.MouseState = MaterialSkin.MouseState.HOVER;
+            btnRegistrarR.Name = "btnRegistrarR";
+            btnRegistrarR.NoAccentTextColor = Color.Empty;
+            btnRegistrarR.Size = new Size(99, 36);
+            btnRegistrarR.TabIndex = 6;
+            btnRegistrarR.Text = "REGISTRAR";
+            btnRegistrarR.Type = MaterialSkin.Controls.MaterialButton.MaterialButtonType.Contained;
+            btnRegistrarR.UseAccentColor = false;
+            btnRegistrarR.UseVisualStyleBackColor = true;
             // 
             // materialLabel6
             // 
@@ -1134,31 +1124,165 @@ namespace Capa_Presentacion
             materialLabel6.TabIndex = 5;
             materialLabel6.Text = "Check In/ Check Out";
             // 
-            // dateTimePicker1
+            // materialLabel5
             // 
-            dateTimePicker1.Location = new Point(439, 17);
-            dateTimePicker1.Name = "dateTimePicker1";
-            dateTimePicker1.Size = new Size(200, 23);
-            dateTimePicker1.TabIndex = 6;
+            materialLabel5.AutoSize = true;
+            materialLabel5.Depth = 0;
+            materialLabel5.Font = new Font("Roboto", 14F, FontStyle.Regular, GraphicsUnit.Pixel);
+            materialLabel5.Location = new Point(17, 33);
+            materialLabel5.MouseState = MaterialSkin.MouseState.HOVER;
+            materialLabel5.Name = "materialLabel5";
+            materialLabel5.Size = new Size(92, 19);
+            materialLabel5.TabIndex = 4;
+            materialLabel5.Text = "Elegir Cliente";
             // 
-            // btnRegistrarR
+            // materialLabel4
             // 
-            btnRegistrarR.AutoSizeMode = AutoSizeMode.GrowAndShrink;
-            btnRegistrarR.Density = MaterialSkin.Controls.MaterialButton.MaterialButtonDensity.Default;
-            btnRegistrarR.Depth = 0;
-            btnRegistrarR.HighEmphasis = true;
-            btnRegistrarR.Icon = null;
-            btnRegistrarR.Location = new Point(17, 475);
-            btnRegistrarR.Margin = new Padding(4, 6, 4, 6);
-            btnRegistrarR.MouseState = MaterialSkin.MouseState.HOVER;
-            btnRegistrarR.Name = "btnRegistrarR";
-            btnRegistrarR.NoAccentTextColor = Color.Empty;
-            btnRegistrarR.Size = new Size(158, 36);
-            btnRegistrarR.TabIndex = 6;
-            btnRegistrarR.Text = "REGISTRAR";
-            btnRegistrarR.Type = MaterialSkin.Controls.MaterialButton.MaterialButtonType.Contained;
-            btnRegistrarR.UseAccentColor = false;
-            btnRegistrarR.UseVisualStyleBackColor = true;
+            materialLabel4.AutoSize = true;
+            materialLabel4.Depth = 0;
+            materialLabel4.Font = new Font("Roboto", 14F, FontStyle.Regular, GraphicsUnit.Pixel);
+            materialLabel4.Location = new Point(17, 164);
+            materialLabel4.MouseState = MaterialSkin.MouseState.HOVER;
+            materialLabel4.Name = "materialLabel4";
+            materialLabel4.Size = new Size(121, 19);
+            materialLabel4.TabIndex = 3;
+            materialLabel4.Text = "Elegir Habitacion";
+            // 
+            // cbmCiO
+            // 
+            cbmCiO.AutoResize = false;
+            cbmCiO.BackColor = Color.FromArgb(255, 255, 255);
+            cbmCiO.Depth = 0;
+            cbmCiO.DrawMode = DrawMode.OwnerDrawVariable;
+            cbmCiO.DropDownHeight = 174;
+            cbmCiO.DropDownStyle = ComboBoxStyle.DropDownList;
+            cbmCiO.DropDownWidth = 121;
+            cbmCiO.Font = new Font("Microsoft Sans Serif", 14F, FontStyle.Bold, GraphicsUnit.Pixel);
+            cbmCiO.ForeColor = Color.FromArgb(222, 0, 0, 0);
+            cbmCiO.FormattingEnabled = true;
+            cbmCiO.IntegralHeight = false;
+            cbmCiO.ItemHeight = 43;
+            cbmCiO.Location = new Point(17, 351);
+            cbmCiO.MaxDropDownItems = 4;
+            cbmCiO.MouseState = MaterialSkin.MouseState.OUT;
+            cbmCiO.Name = "cbmCiO";
+            cbmCiO.Size = new Size(121, 49);
+            cbmCiO.StartIndex = 0;
+            cbmCiO.TabIndex = 2;
+            // 
+            // cbmElegirCliente
+            // 
+            cbmElegirCliente.AutoResize = false;
+            cbmElegirCliente.BackColor = Color.FromArgb(255, 255, 255);
+            cbmElegirCliente.Depth = 0;
+            cbmElegirCliente.DrawMode = DrawMode.OwnerDrawVariable;
+            cbmElegirCliente.DropDownHeight = 174;
+            cbmElegirCliente.DropDownStyle = ComboBoxStyle.DropDownList;
+            cbmElegirCliente.DropDownWidth = 121;
+            cbmElegirCliente.Font = new Font("Microsoft Sans Serif", 14F, FontStyle.Bold, GraphicsUnit.Pixel);
+            cbmElegirCliente.ForeColor = Color.FromArgb(222, 0, 0, 0);
+            cbmElegirCliente.FormattingEnabled = true;
+            cbmElegirCliente.IntegralHeight = false;
+            cbmElegirCliente.ItemHeight = 43;
+            cbmElegirCliente.Location = new Point(17, 84);
+            cbmElegirCliente.MaxDropDownItems = 4;
+            cbmElegirCliente.MouseState = MaterialSkin.MouseState.OUT;
+            cbmElegirCliente.Name = "cbmElegirCliente";
+            cbmElegirCliente.Size = new Size(121, 49);
+            cbmElegirCliente.StartIndex = 0;
+            cbmElegirCliente.TabIndex = 1;
+            // 
+            // cbmElegirHR
+            // 
+            cbmElegirHR.AutoResize = false;
+            cbmElegirHR.BackColor = Color.FromArgb(255, 255, 255);
+            cbmElegirHR.Depth = 0;
+            cbmElegirHR.DrawMode = DrawMode.OwnerDrawVariable;
+            cbmElegirHR.DropDownHeight = 174;
+            cbmElegirHR.DropDownStyle = ComboBoxStyle.DropDownList;
+            cbmElegirHR.DropDownWidth = 121;
+            cbmElegirHR.Font = new Font("Microsoft Sans Serif", 14F, FontStyle.Bold, GraphicsUnit.Pixel);
+            cbmElegirHR.ForeColor = Color.FromArgb(222, 0, 0, 0);
+            cbmElegirHR.FormattingEnabled = true;
+            cbmElegirHR.IntegralHeight = false;
+            cbmElegirHR.ItemHeight = 43;
+            cbmElegirHR.Location = new Point(17, 219);
+            cbmElegirHR.MaxDropDownItems = 4;
+            cbmElegirHR.MouseState = MaterialSkin.MouseState.OUT;
+            cbmElegirHR.Name = "cbmElegirHR";
+            cbmElegirHR.Size = new Size(121, 49);
+            cbmElegirHR.StartIndex = 0;
+            cbmElegirHR.TabIndex = 0;
+            // 
+            // dgvReserva
+            // 
+            dgvReserva.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            dgvReserva.Location = new Point(688, 84);
+            dgvReserva.Name = "dgvReserva";
+            dgvReserva.Size = new Size(738, 412);
+            dgvReserva.TabIndex = 0;
+            dgvReserva.CellContentClick += dataGridView1_CellContentClick;
+            // 
+            // fileSystemWatcher1
+            // 
+            fileSystemWatcher1.EnableRaisingEvents = true;
+            fileSystemWatcher1.SynchronizingObject = this;
+            // 
+            // materialCard6
+            // 
+            materialCard6.BackColor = Color.FromArgb(255, 255, 255);
+            materialCard6.Controls.Add(cmbID);
+            materialCard6.Controls.Add(btnBusqueda);
+            materialCard6.Controls.Add(materialLabel2);
+            materialCard6.Controls.Add(materialLabel1);
+            materialCard6.Controls.Add(cmbCedula);
+            materialCard6.Depth = 0;
+            materialCard6.ForeColor = Color.FromArgb(222, 0, 0, 0);
+            materialCard6.Location = new Point(385, 498);
+            materialCard6.Margin = new Padding(14);
+            materialCard6.MouseState = MaterialSkin.MouseState.HOVER;
+            materialCard6.Name = "materialCard6";
+            materialCard6.Padding = new Padding(14);
+            materialCard6.Size = new Size(415, 205);
+            materialCard6.TabIndex = 20;
+            // 
+            // btnEliminarCliente
+            // 
+            btnEliminarCliente.AutoSizeMode = AutoSizeMode.GrowAndShrink;
+            btnEliminarCliente.Density = MaterialSkin.Controls.MaterialButton.MaterialButtonDensity.Default;
+            btnEliminarCliente.Depth = 0;
+            btnEliminarCliente.HighEmphasis = true;
+            btnEliminarCliente.Icon = null;
+            btnEliminarCliente.Location = new Point(979, 410);
+            btnEliminarCliente.Margin = new Padding(4, 6, 4, 6);
+            btnEliminarCliente.MouseState = MaterialSkin.MouseState.HOVER;
+            btnEliminarCliente.Name = "btnEliminarCliente";
+            btnEliminarCliente.NoAccentTextColor = Color.Empty;
+            btnEliminarCliente.Size = new Size(158, 36);
+            btnEliminarCliente.TabIndex = 21;
+            btnEliminarCliente.Text = "ELIMINAR";
+            btnEliminarCliente.Type = MaterialSkin.Controls.MaterialButton.MaterialButtonType.Contained;
+            btnEliminarCliente.UseAccentColor = false;
+            btnEliminarCliente.UseVisualStyleBackColor = true;
+            // 
+            // btnEliminarHab
+            // 
+            btnEliminarHab.AutoSizeMode = AutoSizeMode.GrowAndShrink;
+            btnEliminarHab.Density = MaterialSkin.Controls.MaterialButton.MaterialButtonDensity.Default;
+            btnEliminarHab.Depth = 0;
+            btnEliminarHab.HighEmphasis = true;
+            btnEliminarHab.Icon = null;
+            btnEliminarHab.Location = new Point(1388, 429);
+            btnEliminarHab.Margin = new Padding(4, 6, 4, 6);
+            btnEliminarHab.MouseState = MaterialSkin.MouseState.HOVER;
+            btnEliminarHab.Name = "btnEliminarHab";
+            btnEliminarHab.NoAccentTextColor = Color.Empty;
+            btnEliminarHab.Size = new Size(158, 36);
+            btnEliminarHab.TabIndex = 6;
+            btnEliminarHab.Text = "ELIMINAR";
+            btnEliminarHab.Type = MaterialSkin.Controls.MaterialButton.MaterialButtonType.Contained;
+            btnEliminarHab.UseAccentColor = false;
+            btnEliminarHab.UseVisualStyleBackColor = true;
             // 
             // menu
             // 
@@ -1171,6 +1295,7 @@ namespace Capa_Presentacion
             Text = "Form1";
             Load += menu_Load;
             tabPage3.ResumeLayout(false);
+            tabPage3.PerformLayout();
             materialCard3.ResumeLayout(false);
             materialCard3.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)dgvHabitaciones).EndInit();
@@ -1183,12 +1308,14 @@ namespace Capa_Presentacion
             ((System.ComponentModel.ISupportInitialize)dgvClientes).EndInit();
             materialTabControl1.ResumeLayout(false);
             tabPage4.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)fileSystemWatcher1).EndInit();
-            ((System.ComponentModel.ISupportInitialize)dgvReserva).EndInit();
-            materialCard4.ResumeLayout(false);
-            materialCard4.PerformLayout();
             materialCard5.ResumeLayout(false);
             materialCard5.PerformLayout();
+            materialCard4.ResumeLayout(false);
+            materialCard4.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)dgvReserva).EndInit();
+            ((System.ComponentModel.ISupportInitialize)fileSystemWatcher1).EndInit();
+            materialCard6.ResumeLayout(false);
+            materialCard6.PerformLayout();
             ResumeLayout(false);
         }
 
@@ -1247,7 +1374,13 @@ namespace Capa_Presentacion
         private MaterialSkin.Controls.MaterialLabel materialLabel4;
         private MaterialSkin.Controls.MaterialComboBox cbmCiO;
         private MaterialSkin.Controls.MaterialLabel materialLabel6;
-        private DateTimePicker dateTimePicker1;
+        private DateTimePicker dateEntrada;
         private MaterialSkin.Controls.MaterialButton btnRegistrarR;
+        private MaterialSkin.Controls.MaterialMaskedTextBox txtPrecioN;
+        private MaterialSkin.Controls.MaterialLabel materialLabel7;
+        private DateTimePicker dateSalida;
+        private MaterialSkin.Controls.MaterialButton btnEliminarHab;
+        private MaterialSkin.Controls.MaterialButton btnEliminarCliente;
+        private MaterialSkin.Controls.MaterialCard materialCard6;
     }
 }

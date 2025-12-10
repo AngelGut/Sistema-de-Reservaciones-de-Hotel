@@ -11,6 +11,7 @@ using System.Data;
 using Capa_Negocio.Habitacion.Servicios;
 using Capa_Negocio.Reserva.Servicios;
 using Capa_Negocio.Reserva;
+using Capa_Negocio.Habitacion;
 
 namespace Capa_Presentacion
 {
@@ -41,6 +42,13 @@ namespace Capa_Presentacion
             dgvClientes.SelectionMode = DataGridViewSelectionMode.FullRowSelect; // Selección por fila
             dgvClientes.MultiSelect = false;             // Solo una fila a la vez
             dgvClientes.RowHeadersVisible = false;       // Quitar columna extra de la izquierda
+            dgvHabitaciones.ReadOnly = true;
+            dgvHabitaciones.AllowUserToAddRows = false;
+            dgvHabitaciones.AllowUserToDeleteRows = false;
+            dgvHabitaciones.AllowUserToResizeRows = false;
+            dgvHabitaciones.SelectionMode = DataGridViewSelectionMode.FullRowSelect; // Permite seleccionar toda la fila (necesario para eliminar con un solo clic)
+            dgvHabitaciones.MultiSelect = false;
+            dgvHabitaciones.RowHeadersVisible = false;
             cmbEstado.DropDownStyle = ComboBoxStyle.DropDownList;
             cmbTipo.DropDownStyle = ComboBoxStyle.DropDownList;
             cmbID.DropDownStyle = ComboBoxStyle.DropDownList;
@@ -48,7 +56,9 @@ namespace Capa_Presentacion
             txtNumeroHab.KeyPress += txtNumeroHab_KeyPress;
             cmbIDH.DropDownStyle = ComboBoxStyle.DropDownList;
             cmbEstadoH.DropDownStyle = ComboBoxStyle.DropDownList;
+            txtPrecioN.KeyPress += txtPrecioN_KeyPress;
             
+
 
 
 
@@ -85,7 +95,8 @@ namespace Capa_Presentacion
             BuscarH.Click += btnBuscarH_Click;
             btnLimpiarH.Click += BtnLimpiarH_Click;
             btnRegistrarR.Click += btnRegistrarR_Click;
-
+            btnEliminarCliente.Click += btnEliminarCliente_Click;
+            btnEliminarHab.Click += btnEliminarHab_Click;
 
 
         }
@@ -179,6 +190,7 @@ namespace Capa_Presentacion
                 await CargarClientesAsync();
                 await CargarCedulas();     // <<========= ComboBox se actualiza
                 await CargarIdsClientes(); // <<========= ComboBox se actualiza
+                await CargarClientesReserva();
             }
             catch (Exception ex)
             {
@@ -569,104 +581,178 @@ namespace Capa_Presentacion
         }
         private void CargarHabitaciones()
         {
-            using (var conn = _conexion.CrearConexion())
+            try // Añadimos try-catch por si la conexión falla.
             {
-                conn.Open();
-
-                string query = "SELECT IdHabitacion, Numero, Nombre, Tipo, Estado FROM Habitacion";
-
-                using (SqlDataAdapter da = new SqlDataAdapter(query, conn))
-                {
-                    DataTable tabla = new DataTable();
-                    da.Fill(tabla);
-
-                    // --------------------------------------------
-                    // Convertir NUMEROS → TEXTO (Tipo y Estado)
-                    // --------------------------------------------
-                    tabla.Columns.Add("TipoTexto", typeof(string));
-                    tabla.Columns.Add("EstadoTexto", typeof(string));
-
-                    foreach (DataRow row in tabla.Rows)
-                    {
-                        // Tipo: 1-4
-                        int tipo = Convert.ToInt32(row["Tipo"]);
-                        row["TipoTexto"] = tipo switch
-                        {
-                            1 => "Simple",
-                            2 => "Doble",
-                            3 => "Suite",
-                            4 => "Presidencial",
-                            _ => "Desconocido"
-                        };
-
-                        // Estado: 0-2
-                        int estado = Convert.ToInt32(row["Estado"]);
-                        row["EstadoTexto"] = estado switch
-                        {
-                            0 => "Disponible",
-                            1 => "Ocupada",
-                            2 => "Mantenimiento",
-                            _ => "Desconocido"
-                        };
-                    }
-
-                    // Mostrar en el DGV
-                    dgvHabitaciones.DataSource = tabla;
-                    dgvHabitaciones.Columns["IdHabitacion"].HeaderText = "ID";
-                    dgvHabitaciones.Columns["Numero"].HeaderText = "Número";
-                    dgvHabitaciones.Columns["Nombre"].HeaderText = "Nombre";
-                    dgvHabitaciones.Columns["TipoTexto"].HeaderText = "Tipo";
-                    dgvHabitaciones.Columns["EstadoTexto"].HeaderText = "Estado";
-
-                    // Ocultar columnas numéricas
-                    dgvHabitaciones.Columns["Tipo"].Visible = false;
-                    dgvHabitaciones.Columns["Estado"].Visible = false;
-                }
-            }
-        }
-
-
-        private void btnRegistrarH_Click(object sender, EventArgs e)
-        {
-            try
-            {
-                if (string.IsNullOrWhiteSpace(txtNumeroHab.Text) ||
-                    cmbEstado.SelectedIndex == -1 ||
-                    cmbTipo.SelectedIndex == -1)
-                {
-                    MessageBox.Show("Completa todos los campos.");
-                    return;
-                }
-
                 using (var conn = _conexion.CrearConexion())
                 {
                     conn.Open();
 
-                    string query = @"INSERT INTO Habitacion
-                    (Numero, Tipo, Nombre, PrecioPorNoche, Estado, Descripcion)
-                    VALUES (@Numero, @Tipo, @Nombre, @Precio, @Estado, @Descripcion)";
+                    // Incluimos PrecioPorNoche como acordamos
+                    string query = "SELECT IdHabitacion, Numero, Nombre, Tipo, PrecioPorNoche, Estado FROM Habitacion";
 
-
-                    using (SqlCommand cmd = new SqlCommand(query, conn))
+                    using (SqlDataAdapter da = new SqlDataAdapter(query, conn))
                     {
-                        cmd.Parameters.AddWithValue("@Numero", int.Parse(txtNumeroHab.Text));
-                        cmd.Parameters.AddWithValue("@Tipo", cmbTipo.SelectedIndex + 1); // (1-4)
-                        cmd.Parameters.AddWithValue("@Nombre", txtNombreH.Text.Trim());
-                        cmd.Parameters.AddWithValue("@Precio", 0); // o un textbox
-                        cmd.Parameters.AddWithValue("@Estado", cmbEstado.SelectedIndex); // (0,1,2)
-                        cmd.Parameters.AddWithValue("@Descripcion", ""); // o un textbox
+                        DataTable tabla = new DataTable();
+                        da.Fill(tabla);
+
+                        // --------------------------------------------
+                        // Convertir NUMEROS → TEXTO (Tipo y Estado)
+                        // --------------------------------------------
+                        tabla.Columns.Add("TipoTexto", typeof(string));
+                        tabla.Columns.Add("EstadoTexto", typeof(string));
+
+                        foreach (DataRow row in tabla.Rows)
+                        {
+                            // Tipo: 1-4
+                            int tipo = Convert.ToInt32(row["Tipo"]);
+                            row["TipoTexto"] = tipo switch
+                            {
+                                1 => "Simple",
+                                2 => "Doble",
+                                3 => "Suite",
+                                4 => "Presidencial",
+                                _ => "Desconocido"
+                            };
+
+                            // Estado: 0-2
+                            int estado = Convert.ToInt32(row["Estado"]);
+                            row["EstadoTexto"] = estado switch
+                            {
+                                0 => "Disponible",
+                                1 => "Ocupada",
+                                2 => "Mantenimiento",
+                                _ => "Desconocido"
+                            };
+                        }
+
+                        // Mostrar en el DGV
+                        dgvHabitaciones.DataSource = tabla;
+
+                        // --------------------------------------------
+                        // RENOMBRAR Y OCULTAR COLUMNAS (Añadir comprobación)
+                        // --------------------------------------------
+
+                        // dgvHabitaciones.Columns.Contains("NombreDeColumna") es la clave
+
+                        if (dgvHabitaciones.Columns.Contains("IdHabitacion"))
+                            dgvHabitaciones.Columns["IdHabitacion"].HeaderText = "ID";
+
+                        if (dgvHabitaciones.Columns.Contains("Numero"))
+                            dgvHabitaciones.Columns["Numero"].HeaderText = "Número";
+
+                        if (dgvHabitaciones.Columns.Contains("Nombre"))
+                            dgvHabitaciones.Columns["Nombre"].HeaderText = "Nombre";
+
+                        // Las columnas que causaron el error:
+                        if (dgvHabitaciones.Columns.Contains("TipoTexto"))
+                            dgvHabitaciones.Columns["TipoTexto"].HeaderText = "Tipo";
+
+                        if (dgvHabitaciones.Columns.Contains("EstadoTexto"))
+                            dgvHabitaciones.Columns["EstadoTexto"].HeaderText = "Estado";
+
+                        if (dgvHabitaciones.Columns.Contains("PrecioPorNoche"))
+                            dgvHabitaciones.Columns["PrecioPorNoche"].HeaderText = "Precio/Noche";
 
 
-                        cmd.ExecuteNonQuery();
+                        // Ocultar columnas numéricas (si existen)
+                        if (dgvHabitaciones.Columns.Contains("Tipo"))
+                            dgvHabitaciones.Columns["Tipo"].Visible = false;
+
+                        if (dgvHabitaciones.Columns.Contains("Estado"))
+                            dgvHabitaciones.Columns["Estado"].Visible = false;
+
+                        // Ocultamos la descripción (si no queremos verla)
+                        if (dgvHabitaciones.Columns.Contains("Descripcion"))
+                            dgvHabitaciones.Columns["Descripcion"].Visible = false;
+
+                        // Asegurar que el DGV se ajuste al contenido
+                        dgvHabitaciones.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
                     }
                 }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error al cargar las habitaciones: {ex.Message}", "Error de Base de Datos/UI");
+            }
+        }
+
+
+        // Capa_Presentacion.menu.cs
+
+        // Capa_Presentacion.menu.cs
+
+        private async void btnRegistrarH_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                // Usamos una variable local para el Nombre, que usaremos si el control existe:
+                // Si el control está declarado, esto funcionará. 
+                string nombreHabitacion = txtNombreH.Text.Trim(); // Si txtNombreH existe, obtiene su valor.
+
+                if (string.IsNullOrWhiteSpace(txtNumeroHab.Text) ||
+                    cmbEstado.SelectedIndex == -1 ||
+                    cmbTipo.SelectedIndex == -1 ||
+                    string.IsNullOrWhiteSpace(txtPrecioN.Text) ||
+                    string.IsNullOrWhiteSpace(nombreHabitacion)) // <<--- Validación con la variable local
+                {
+                    MessageBox.Show("Completa todos los campos obligatorios (Número, Tipo, Estado, Nombre y Precio por Noche).");
+                    return;
+                }
+
+                // Validación de precio (se mantiene)
+                if (!decimal.TryParse(txtPrecioN.Text.Trim(), out decimal precio))
+                {
+                    MessageBox.Show("El precio por noche debe ser un valor numérico válido.");
+                    return;
+                }
+                if (precio <= 0)
+                {
+                    MessageBox.Show("El precio por noche debe ser mayor a cero.");
+                    return;
+                }
+
+                // 1. Obtener valores y mapear al objeto de negocio
+                int numero = int.Parse(txtNumeroHab.Text);
+                int tipoInt = cmbTipo.SelectedIndex + 1;
+                int estadoInt = cmbEstado.SelectedIndex;
+
+                var tipoEnum = (TipoHabitacion)tipoInt;
+                HabitacionBase habitacion;
+
+                // Crear la instancia de la subclase correcta (se mantiene)
+                switch (tipoEnum)
+                {
+                    case TipoHabitacion.Simple:
+                        habitacion = new Simple(); break;
+                    case TipoHabitacion.Doble:
+                        habitacion = new Doble(); break;
+                    case TipoHabitacion.Suite:
+                        habitacion = new Suite(); break;
+                    case TipoHabitacion.Presidencial:
+                        habitacion = new Presidencial(); break;
+                    default:
+                        throw new Exception("Tipo de habitación no válido.");
+                }
+
+                habitacion.Numero = numero;
+                // ASIGNACIÓN CLAVE: Usamos el nombre local
+                habitacion.Nombre = nombreHabitacion;
+
+                habitacion.Estado = (EstadoHabitacion)estadoInt;
+                habitacion.Descripcion = nombreHabitacion; // Usamos Nombre como descripción
+                habitacion.PrecioPorNoche = precio;
+
+                // 2. Llamar al servicio de negocio (se mantiene)
+                await _habitacionService.CrearHabitacionAsync(habitacion, _cts.Token);
 
                 MessageBox.Show("Habitación registrada correctamente.");
 
-                // Limpiar campos
+                // 3. Limpiar campos y recargar DGV
                 txtNumeroHab.Text = "";
                 cmbEstado.SelectedIndex = -1;
                 cmbTipo.SelectedIndex = -1;
+                txtPrecioN.Text = "";
+                txtNombreH.Text = ""; // <--- Esta línea requiere que txtNombreH exista
 
                 // Recargar DGV
                 CargarHabitaciones();
@@ -674,6 +760,25 @@ namespace Capa_Presentacion
             catch (Exception ex)
             {
                 MessageBox.Show("Error al registrar la habitación: " + ex.Message);
+            }
+        }
+        
+
+        private void txtPrecioN_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            // Permitir dígitos, la tecla de control (borrar, etc.) y un solo separador decimal (punto o coma)
+            if (!char.IsDigit(e.KeyChar) && !char.IsControl(e.KeyChar) && (e.KeyChar != '.') && (e.KeyChar != ','))
+            {
+                e.Handled = true; // Bloquea otros caracteres
+            }
+
+            // Asegura que solo se puede ingresar un punto/coma decimal
+            if ((e.KeyChar == '.') || (e.KeyChar == ','))
+            {
+                if (((TextBox)sender).Text.Contains(".") || ((TextBox)sender).Text.Contains(","))
+                {
+                    e.Handled = true; // Bloquea si ya hay un separador decimal
+                }
             }
         }
         private void txtNumeroHab_KeyPress(object sender, KeyPressEventArgs e)
@@ -715,17 +820,7 @@ namespace Capa_Presentacion
                 _ => -1
             };
         }
-        private int TipoTextoAInt(string tipo)
-        {
-            return tipo switch
-            {
-                "Simple" => 1,
-                "Doble" => 2,
-                "Suite" => 3,
-                "Presidencial" => 4,
-                _ => -1
-            };
-        }
+        
 
 
 
@@ -778,65 +873,106 @@ namespace Capa_Presentacion
             }
         }
 
+        // ...
+        // Capa_Presentacion.menu.cs
+
         private void btnBuscarH_Click(object sender, EventArgs e)
         {
             using (SqlConnection cn = _conexion.CrearConexion())
             {
-                cn.Open();
-
-                string query = "SELECT IdHabitacion, Numero, Nombre, Tipo, Estado FROM Habitacion WHERE 1=1";
-
-                // FILTRO POR ID (solo si NO es "Todas")
-                if (!string.IsNullOrWhiteSpace(cmbIDH.Text) && cmbIDH.Text != "Todas")
-                    query += " AND IdHabitacion = @Id";
-
-                // FILTRO POR ESTADO
-                if (!string.IsNullOrWhiteSpace(cmbEstadoH.Text))
-                    query += " AND Estado = @Estado";
-
-                using (SqlCommand cmd = new SqlCommand(query, cn))
+                try
                 {
-                    // PARÁMETRO DEL ID
+                    cn.Open();
+
+                    // 1. Construir la consulta base (incluyendo PrecioPorNoche)
+                    string query = "SELECT IdHabitacion, Numero, Nombre, Tipo, PrecioPorNoche, Estado, Descripcion FROM Habitacion WHERE 1=1";
+
+                    // 2. Aplicar filtros (ID y Estado)
                     if (!string.IsNullOrWhiteSpace(cmbIDH.Text) && cmbIDH.Text != "Todas")
-                        cmd.Parameters.AddWithValue("@Id", cmbIDH.Text);
+                        query += " AND IdHabitacion = @Id";
 
-                    // PARÁMETRO DEL ESTADO
                     if (!string.IsNullOrWhiteSpace(cmbEstadoH.Text))
-                        cmd.Parameters.AddWithValue("@Estado", cmbEstadoH.SelectedIndex);
+                        query += " AND Estado = @Estado";
 
-                    DataTable tabla = new DataTable();
-                    new SqlDataAdapter(cmd).Fill(tabla);
-
-                    // VOLVER A CONVERTIR NÚMEROS A TEXTO
-                    tabla.Columns.Add("TipoTexto", typeof(string));
-                    tabla.Columns.Add("EstadoTexto", typeof(string));
-
-                    foreach (DataRow row in tabla.Rows)
+                    using (SqlCommand cmd = new SqlCommand(query, cn))
                     {
-                        int tipo = Convert.ToInt32(row["Tipo"]);
-                        row["TipoTexto"] = tipo switch
-                        {
-                            1 => "Simple",
-                            2 => "Doble",
-                            3 => "Suite",
-                            4 => "Presidencial",
-                            _ => "Desconocido"
-                        };
+                        // 3. Asignar parámetros
+                        if (!string.IsNullOrWhiteSpace(cmbIDH.Text) && cmbIDH.Text != "Todas")
+                            cmd.Parameters.AddWithValue("@Id", cmbIDH.Text);
 
-                        int estado = Convert.ToInt32(row["Estado"]);
-                        row["EstadoTexto"] = estado switch
+                        if (!string.IsNullOrWhiteSpace(cmbEstadoH.Text))
+                            // IMPORTANTE: cmbEstadoH.SelectedIndex devuelve 0, 1, 2 que coinciden con los valores de la BD.
+                            cmd.Parameters.AddWithValue("@Estado", cmbEstadoH.SelectedIndex);
+
+                        // 4. Llenar el DataTable
+                        DataTable tabla = new DataTable();
+                        new SqlDataAdapter(cmd).Fill(tabla);
+
+                        // 5. CONVERTIR NÚMEROS A TEXTO (Lógica copiada de CargarHabitaciones)
+                        tabla.Columns.Add("TipoTexto", typeof(string));
+                        tabla.Columns.Add("EstadoTexto", typeof(string));
+
+                        foreach (DataRow row in tabla.Rows)
                         {
-                            0 => "Disponible",
-                            1 => "Ocupada",
-                            2 => "Mantenimiento",
-                            _ => "Desconocido"
-                        };
+                            int tipo = Convert.ToInt32(row["Tipo"]);
+                            row["TipoTexto"] = tipo switch
+                            {
+                                1 => "Simple",
+                                2 => "Doble",
+                                3 => "Suite",
+                                4 => "Presidencial",
+                                _ => "Desconocido"
+                            };
+
+                            int estado = Convert.ToInt32(row["Estado"]);
+                            row["EstadoTexto"] = estado switch
+                            {
+                                0 => "Disponible",
+                                1 => "Ocupada",
+                                2 => "Mantenimiento",
+                                _ => "Desconocido"
+                            };
+                        }
+
+                        // 6. Asignar y Formatear DGV
+                        dgvHabitaciones.DataSource = tabla;
+
+                        // Aplicar formato de columnas:
+                        if (dgvHabitaciones.Columns.Contains("IdHabitacion"))
+                            dgvHabitaciones.Columns["IdHabitacion"].HeaderText = "ID";
+
+                        if (dgvHabitaciones.Columns.Contains("Numero"))
+                            dgvHabitaciones.Columns["Numero"].HeaderText = "Número";
+
+                        if (dgvHabitaciones.Columns.Contains("Nombre"))
+                            dgvHabitaciones.Columns["Nombre"].HeaderText = "Nombre";
+
+                        // Columnas de texto (visible y con header)
+                        if (dgvHabitaciones.Columns.Contains("TipoTexto"))
+                            dgvHabitaciones.Columns["TipoTexto"].HeaderText = "Tipo";
+
+                        if (dgvHabitaciones.Columns.Contains("EstadoTexto"))
+                            dgvHabitaciones.Columns["EstadoTexto"].HeaderText = "Estado";
+
+                        if (dgvHabitaciones.Columns.Contains("PrecioPorNoche"))
+                            dgvHabitaciones.Columns["PrecioPorNoche"].HeaderText = "Precio/Noche";
+
+                        // Ocultar las columnas originales y Descripción
+                        if (dgvHabitaciones.Columns.Contains("Tipo"))
+                            dgvHabitaciones.Columns["Tipo"].Visible = false;
+
+                        if (dgvHabitaciones.Columns.Contains("Estado"))
+                            dgvHabitaciones.Columns["Estado"].Visible = false;
+
+                        if (dgvHabitaciones.Columns.Contains("Descripcion"))
+                            dgvHabitaciones.Columns["Descripcion"].Visible = false;
+
+                        dgvHabitaciones.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
                     }
-
-                    dgvHabitaciones.DataSource = tabla;
-
-                    dgvHabitaciones.Columns["Tipo"].Visible = false;
-                    dgvHabitaciones.Columns["Estado"].Visible = false;
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Error en la búsqueda de habitaciones: {ex.Message}", "Error de Búsqueda");
                 }
             }
         }
@@ -847,18 +983,30 @@ namespace Capa_Presentacion
         {
             if (dgvHabitaciones.Columns.Count == 0) return;
 
-            // Ocultar columnas que NO quieres
-            dgvHabitaciones.Columns["Descripcion"].Visible = false;
+            // Si se cargó con SELECT *, puede que no existan las columnas de texto, 
+            // pero sí la columna de la BD. 
 
-            // Si no quieres IDHabitacion visible:
-            // dgvHabitaciones.Columns["IDHabitacion"].Visible = false;
+            // Ocultar columnas que NO quieres (si existen)
+            if (dgvHabitaciones.Columns.Contains("Descripcion"))
+                dgvHabitaciones.Columns["Descripcion"].Visible = false;
 
-            // Renombrar cabeceras si quieres
-            dgvHabitaciones.Columns["Numero"].HeaderText = "Número";
-            dgvHabitaciones.Columns["Tipo"].HeaderText = "Tipo";
-            dgvHabitaciones.Columns["Nombre"].HeaderText = "Nombre";
-            dgvHabitaciones.Columns["PrecioPorNoche"].HeaderText = "Precio por noche";
-            dgvHabitaciones.Columns["Estado"].HeaderText = "Estado";
+            if (dgvHabitaciones.Columns.Contains("IdHabitacion"))
+                dgvHabitaciones.Columns["IdHabitacion"].HeaderText = "ID";
+
+            if (dgvHabitaciones.Columns.Contains("Numero"))
+                dgvHabitaciones.Columns["Numero"].HeaderText = "Número";
+
+            if (dgvHabitaciones.Columns.Contains("Tipo"))
+                dgvHabitaciones.Columns["Tipo"].HeaderText = "Tipo";
+
+            if (dgvHabitaciones.Columns.Contains("Nombre"))
+                dgvHabitaciones.Columns["Nombre"].HeaderText = "Nombre";
+
+            if (dgvHabitaciones.Columns.Contains("PrecioPorNoche"))
+                dgvHabitaciones.Columns["PrecioPorNoche"].HeaderText = "Precio por noche";
+
+            if (dgvHabitaciones.Columns.Contains("Estado"))
+                dgvHabitaciones.Columns["Estado"].HeaderText = "Estado";
 
             // Ajustar tamaño automático
             dgvHabitaciones.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
@@ -922,54 +1070,85 @@ namespace Capa_Presentacion
         }
 
 
+        // Capa_Presentacion.menu.cs
+
         private async void btnRegistrarR_Click(object sender, EventArgs e)
         {
             try
             {
-                if (cbmElegirCliente.SelectedValue == null)
+                // 1. Validaciones
+                if (cbmElegirCliente.SelectedValue == null || cbmElegirHR.SelectedValue == null)
                 {
-                    MessageBox.Show("Debe seleccionar un cliente.");
+                    MessageBox.Show("Debe seleccionar un Cliente y una Habitación.");
                     return;
                 }
 
-                if (cbmElegirHR.SelectedValue == null)
+                // Asumiendo que DateEntrada y DateSalida existen:
+                DateTime fechaEntrada = dateEntrada.Value.Date; // Solo la fecha
+                DateTime fechaSalida = dateSalida.Value.Date;   // Solo la fecha
+
+                if (fechaSalida <= fechaEntrada)
                 {
-                    MessageBox.Show("Debe seleccionar una habitación.");
+                    MessageBox.Show("La fecha de salida debe ser posterior a la fecha de entrada.");
                     return;
                 }
 
-                int idCliente = Convert.ToInt32(cbmElegirCliente.SelectedValue);
-                int idHabitacion = Convert.ToInt32(cbmElegirHR.SelectedValue);
+                // El ComboBox cbmCiO (Check In/Out) no se usa para la creación inicial, 
+                // ya que la reserva siempre se crea como 'Reservada' (0) por el Servicio.
 
-                DateTime fechaEntrada = DateTime.Now.Date;
-                DateTime fechaSalida = fechaEntrada.AddDays(1);
-
+                // 2. Mapeo del objeto Reserva
                 var reserva = new Reserva
                 {
-                    IdCliente = idCliente,
-                    IdHabitacion = idHabitacion,
+                    IdCliente = Convert.ToInt32(cbmElegirCliente.SelectedValue),
+                    IdHabitacion = Convert.ToInt32(cbmElegirHR.SelectedValue),
                     FechaEntrada = fechaEntrada,
                     FechaSalida = fechaSalida,
-                    PrecioPorNoche = 0,
-                    Notas = ""
+
+                    // Enviamos 0.0m. El ReservaService se encarga de buscar el precio 
+                    // de la habitación en la BD antes de guardar (ver lógica en el servicio).
+                    PrecioPorNoche = 0m,
+
+                    // El campo FechaCreacion es manejado automáticamente por la BD o por el constructor de Reserva.
+                    // El EstadoReserva se establece en 0 (Reservada) en la Capa de Negocio.
+
+                    // Si tienes un TextBox para notas (ej: txtNotasR):
+                    // Notas = txtNotasR.Text.Trim()
+                    Notas = "" // O usa un TextBox si existe
                 };
 
+                // 3. Registrar
                 await _reservaService.CrearReservaAsync(reserva, CancellationToken.None);
 
-                MessageBox.Show("Reserva creada con éxito");
+                MessageBox.Show($"Reserva #{reserva.IdReserva} creada con éxito para la Habitación {reserva.IdHabitacion}.");
 
-                
+                // Limpiar Controles de Reserva
+                cbmElegirCliente.SelectedIndex = -1;
+                cbmElegirHR.SelectedIndex = -1;
+                // Asumiendo que DateEntrada/Salida se reinician o mantienen la fecha actual
+
+                // 4. Recargar DGV
                 await CargarReservasEnDGVAsync();
+
+                // 5. Opcional: Recargar habitaciones para ver el estado 'Ocupada'
+                CargarHabitaciones();
+            }
+            catch (HabitacionNoDisponibleException ex)
+            {
+                MessageBox.Show("Error de Disponibilidad: " + ex.Message, "Error");
+            }
+            catch (FechaInvalidaException ex)
+            {
+                MessageBox.Show("Error de Fechas: " + ex.Message, "Error");
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message, "Error");
+                MessageBox.Show($"Error al registrar la reserva: {ex.Message}", "Error General");
             }
         }
 
 
 
-     
+
 
         private async Task CargarReservasEnDGVAsync()
         {
@@ -993,6 +1172,154 @@ namespace Capa_Presentacion
             catch (Exception ex)
             {
                 MessageBox.Show("Error al cargar reservas: " + ex.Message);
+            }
+        }
+
+        // Capa_Presentacion.menu.cs
+
+        private async void CbmElegirHR_SelectedIndexChanged(object? sender, EventArgs e)
+        {
+            if (cbmElegirHR.SelectedValue == null) return;
+
+            // Obtenemos el IdHabitacion seleccionado
+            if (int.TryParse(cbmElegirHR.SelectedValue.ToString(), out int idHabitacion))
+            {
+                try
+                {
+                    // Usamos el servicio para obtener los detalles de la habitación (incluyendo el precio)
+                    var habitacion = await _habitacionService.ObtenerPorIdAsync(idHabitacion, _cts.Token);
+
+                    if (habitacion != null)
+                    {
+                        
+                    }
+                }
+                catch (Exception ex)
+                {
+                    // Manejo de errores de conexión o servicio
+                    MessageBox.Show($"Error al cargar el precio de la habitación: {ex.Message}", "Error");
+                }
+            }
+        }
+       
+
+        private async void btnEliminarCliente_Click(object sender, EventArgs e)
+        {
+            // 1. Verificar selección
+            if (dgvClientes.SelectedRows.Count == 0)
+            {
+                MessageBox.Show("Por favor, selecciona el cliente que deseas eliminar.", "Advertencia", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            // 2. Obtener el ID
+            // Se asume que la columna 'IdCliente' existe y es donde se extrae el valor.
+            int idCliente = Convert.ToInt32(dgvClientes.SelectedRows[0].Cells["IdCliente"].Value);
+
+            // 3. Confirmación
+            DialogResult confirmacion = MessageBox.Show(
+                $"¿Estás seguro de que deseas eliminar el cliente con ID {idCliente}? Esto puede fallar si tiene reservas o facturas asociadas.",
+                "Confirmar Eliminación",
+                MessageBoxButtons.YesNo,
+                MessageBoxIcon.Question);
+
+            if (confirmacion == DialogResult.Yes)
+            {
+                try
+                {
+                    // 4. Llamar al servicio de negocio para eliminar
+                    // Usamos _clienteServicios que contiene el método EliminarClienteAsync
+                    await _clienteServicios.EliminarClienteAsync(idCliente, _cts.Token);
+
+                    MessageBox.Show($"Cliente ID {idCliente} eliminado correctamente.", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information);
+
+                    // 5. Actualizar la interfaz (DGV y todos los ComboBoxes de cliente/reserva)
+                    await CargarClientesAsync();
+                    await CargarCedulas();
+                    await CargarIdsClientes();
+                    await CargarClientesReserva(); // Actualiza el ComboBox de reserva (cbmElegirCliente)
+
+                    // Recargar reservas, ya que las reservas sin cliente pueden causar problemas, 
+                    // pero la BD debería haberlo bloqueado (Foreign Key Constraint).
+                    await CargarReservasEnDGVAsync();
+
+                }
+                catch (Microsoft.Data.SqlClient.SqlException sqlEx)
+                {
+                    // Manejar error de llave foránea (Error 547)
+                    if (sqlEx.Number == 547)
+                    {
+                        MessageBox.Show("No se puede eliminar el cliente porque tiene reservas o facturas activas/asociadas.", "Error de Integridad", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    }
+                    else
+                    {
+                        MessageBox.Show($"Error de SQL al eliminar: {sqlEx.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Error inesperado al eliminar el cliente: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+            }
+        }
+
+
+
+        private async void btnEliminarHab_Click(object sender, EventArgs e)
+        {
+            // 1. Verificar selección
+            if (dgvHabitaciones.SelectedRows.Count == 0)
+            {
+                MessageBox.Show("Por favor, selecciona la habitación que deseas eliminar.", "Advertencia", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            // 2. Obtener el ID (y el Número para el mensaje)
+            int idHabitacion = Convert.ToInt32(dgvHabitaciones.SelectedRows[0].Cells["IdHabitacion"].Value);
+            // Usamos 'Numero' para el mensaje, asumiendo que es una columna visible:
+            string numeroHab = dgvHabitaciones.SelectedRows[0].Cells["Numero"].Value.ToString();
+
+
+            // 3. Confirmación
+            DialogResult confirmacion = MessageBox.Show(
+                $"¿Estás seguro de que deseas eliminar la habitación {numeroHab} (ID: {idHabitacion})? Esto puede fallar si tiene reservas o facturas asociadas.",
+                "Confirmar Eliminación",
+                MessageBoxButtons.YesNo,
+                MessageBoxIcon.Question);
+
+            if (confirmacion == DialogResult.Yes)
+            {
+                try
+                {
+                    // 4. Llamar al servicio de negocio para eliminar
+                    // Usamos _habitacionService que contiene el método EliminarHabitacionAsync
+                    await _habitacionService.EliminarHabitacionAsync(idHabitacion, _cts.Token);
+
+                    MessageBox.Show($"Habitación {numeroHab} eliminada correctamente.", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information);
+
+                    // 5. Actualizar la interfaz (DGV, ComboBoxes de habitaciones y reserva)
+                    CargarHabitaciones();          // Recargar el DGV de Habitaciones
+                    CargarIDs();                   // Recargar los ComboBoxes de búsqueda (cmbIDH)
+                    await CargarHabitacionesReserva(); // Recargar el ComboBox de reserva (cbmElegirHR)
+                    await CargarReservasEnDGVAsync(); // Recargar las reservas para actualizar la vista
+
+                }
+                catch (Microsoft.Data.SqlClient.SqlException sqlEx)
+                {
+                    // Manejar error de llave foránea (Error 547)
+                    if (sqlEx.Number == 547)
+                    {
+                        MessageBox.Show("No se puede eliminar la habitación porque está asociada a reservas o facturas. Elimine primero las dependencias.", "Error de Integridad", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    }
+                    else
+                    {
+                        MessageBox.Show($"Error de SQL al eliminar: {sqlEx.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Error inesperado al eliminar la habitación: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
             }
         }
 
