@@ -49,6 +49,13 @@ namespace Capa_Presentacion
             dgvHabitaciones.SelectionMode = DataGridViewSelectionMode.FullRowSelect; // Permite seleccionar toda la fila (necesario para eliminar con un solo clic)
             dgvHabitaciones.MultiSelect = false;
             dgvHabitaciones.RowHeadersVisible = false;
+            dgvReserva.ReadOnly = true; // No se puede editar
+            dgvReserva.AllowUserToAddRows = false; // No permite agregar filas
+            dgvReserva.AllowUserToDeleteRows = false; // No permite eliminar con Suprimir
+            dgvReserva.AllowUserToResizeRows = false; // No permite redimensionar filas
+            dgvReserva.SelectionMode = DataGridViewSelectionMode.FullRowSelect; // Esencial: Selecciona toda la fila con un clic
+            dgvReserva.MultiSelect = false; // Solo una fila a la vez
+            dgvReserva.RowHeadersVisible = false; // Quitar la columna izquierda
             cmbEstado.DropDownStyle = ComboBoxStyle.DropDownList;
             cmbTipo.DropDownStyle = ComboBoxStyle.DropDownList;
             cmbID.DropDownStyle = ComboBoxStyle.DropDownList;
@@ -97,7 +104,12 @@ namespace Capa_Presentacion
             btnRegistrarR.Click += btnRegistrarR_Click;
             btnEliminarCliente.Click += btnEliminarCliente_Click;
             btnEliminarHab.Click += btnEliminarHab_Click;
-
+            btnReservada.Click += btnReservada_Click;
+            btnCheckI.Click += btnCheckI_Click;
+            btnCheckO.Click += btnCheckO_Click;
+            btnCancelada.Click += btnCancelada_Click;
+            btnBuscarR.Click += btnBuscarR_Click;
+            dgvHabitaciones.CellFormatting += DgvHabitaciones_CellFormatting;
 
         }
 
@@ -123,9 +135,10 @@ namespace Capa_Presentacion
             CargarEstados();
             await CargarClientesReserva();
             await CargarHabitacionesReserva();
-            CargarOpcionesCheckInOut();
+            await CargarIdsReservas();
+            await CargarIdsClientesBusqueda();
 
-            
+
 
 
 
@@ -191,6 +204,7 @@ namespace Capa_Presentacion
                 await CargarCedulas();     // <<========= ComboBox se actualiza
                 await CargarIdsClientes(); // <<========= ComboBox se actualiza
                 await CargarClientesReserva();
+                await CargarIdsClientesBusqueda();
             }
             catch (Exception ex)
             {
@@ -374,22 +388,7 @@ namespace Capa_Presentacion
 
         }
 
-        /*private void HabilitarControlesRecursivo(Control contenedor, bool estadoHabilitado)
-        {
-            foreach (Control c in contenedor.Controls)
-            {
-                // No tocamos el DataGridView aquí, se maneja en el método padre
-                if (c != dgvClientes)
-                {
-                    c.Enabled = estadoHabilitado;
-                }
-
-                // Si el control contiene otros controles
-                if (c.HasChildren)
-                    HabilitarControlesRecursivo(c, estadoHabilitado);
-            }
-        }*/
-
+        
 
 
         private void BloquearRecursivo(Control parent, bool bloquear)
@@ -675,11 +674,45 @@ namespace Capa_Presentacion
                 MessageBox.Show($"Error al cargar las habitaciones: {ex.Message}", "Error de Base de Datos/UI");
             }
         }
+        // Capa_Presentacion.menu.cs (Añade este método a la clase menu)
+
+        private void DgvHabitaciones_CellFormatting(object sender, DataGridViewCellFormattingEventArgs e)
+        {
+            // Aseguramos que solo trabajamos con la columna que muestra el estado de texto.
+            // Usamos "EstadoTexto" que es la columna legible que creamos.
+            if (dgvHabitaciones.Columns[e.ColumnIndex].Name == "EstadoTexto")
+            {
+                string estado = e.Value?.ToString();
+                Color colorDeFondo = Color.White;
+                Color colorDeFuente = Color.Black;
+
+                switch (estado)
+                {
+                    case "Disponible":
+                        colorDeFondo = Color.LightGreen;
+                        break;
+                    case "Ocupada":
+                        colorDeFondo = Color.LightCoral; // Rojo claro
+                        colorDeFuente = Color.White; // Para mejor contraste
+                        break;
+                    case "Mantenimiento":
+                        colorDeFondo = Color.Yellow;
+                        break;
+                    default:
+                        // Usar color por defecto si no coincide
+                        break;
+                }
+
+                e.CellStyle.BackColor = colorDeFondo;
+                e.CellStyle.ForeColor = colorDeFuente;
+
+                // Esto indica que el valor ha sido formateado, por lo que el DGV debe usar estos estilos.
+                e.FormattingApplied = true;
+            }
+        }
 
 
-        // Capa_Presentacion.menu.cs
 
-        // Capa_Presentacion.menu.cs
 
         private async void btnRegistrarH_Click(object sender, EventArgs e)
         {
@@ -1061,13 +1094,7 @@ namespace Capa_Presentacion
             cbmElegirHR.SelectedIndex = -1;
         }
 
-        private void CargarOpcionesCheckInOut()
-        {
-            cbmCiO.Items.Clear();
-            cbmCiO.Items.Add("Check-In");
-            cbmCiO.Items.Add("Check-Out");
-            cbmCiO.SelectedIndex = -1;
-        }
+       
 
 
         // Capa_Presentacion.menu.cs
@@ -1129,8 +1156,10 @@ namespace Capa_Presentacion
                 // 4. Recargar DGV
                 await CargarReservasEnDGVAsync();
 
+
                 // 5. Opcional: Recargar habitaciones para ver el estado 'Ocupada'
                 CargarHabitaciones();
+                await CargarIdsReservas();
             }
             catch (HabitacionNoDisponibleException ex)
             {
@@ -1175,7 +1204,7 @@ namespace Capa_Presentacion
             }
         }
 
-        // Capa_Presentacion.menu.cs
+        
 
         private async void CbmElegirHR_SelectedIndexChanged(object? sender, EventArgs e)
         {
@@ -1241,6 +1270,8 @@ namespace Capa_Presentacion
 
                     // Recargar reservas, ya que las reservas sin cliente pueden causar problemas, 
                     // pero la BD debería haberlo bloqueado (Foreign Key Constraint).
+                    await CargarReservasEnDGVAsync();
+                    await CargarIdsClientesBusqueda();
                     await CargarReservasEnDGVAsync();
 
                 }
@@ -1321,6 +1352,289 @@ namespace Capa_Presentacion
                     MessageBox.Show($"Error inesperado al eliminar la habitación: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
             }
+        }
+
+        
+
+        /// <summary>
+        /// Obtiene el IdReserva de la fila seleccionada, o lanza una excepción si no hay selección.
+        /// </summary>
+        private int GetSelectedReservaId()
+        {
+            if (dgvReserva.SelectedRows.Count == 0)
+            {
+                throw new InvalidOperationException("Debes seleccionar una reserva primero.");
+            }
+            // Asumimos que la columna 'IdReserva' existe y es donde se toma el valor.
+            return Convert.ToInt32(dgvReserva.SelectedRows[0].Cells["IdReserva"].Value);
+        }
+
+        /// <summary>
+        /// Método genérico para ejecutar acciones en el servicio de reserva y actualizar la UI.
+        /// </summary>
+        private async Task ExecuteReservaActionAsync(Func<int, CancellationToken, Task> action, string successMessage)
+        {
+            try
+            {
+                int idReserva = GetSelectedReservaId();
+
+                // Ejecuta la función del servicio (CheckInAsync, CancelarReservaAsync, etc.)
+                await action(idReserva, _cts.Token);
+
+                MessageBox.Show(successMessage, "Éxito");
+
+                // Actualizar UI
+                await CargarReservasEnDGVAsync();
+                CargarHabitaciones(); // Actualizar el estado de la habitación
+
+            }
+            catch (InvalidOperationException ex)
+            {
+                // Se lanza si no hay selección (GetSelectedReservaId) o si la lógica de negocio lo impide
+                MessageBox.Show(ex.Message, "Advertencia", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            }
+            catch (ReservacionNoEncontradaException ex)
+            {
+                MessageBox.Show(ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error durante la operación: {ex.Message}", "Error General", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+        // Capa_Presentacion.menu.cs
+
+        private async void btnCheckI_Click(object? sender, EventArgs e)
+        {
+            await ExecuteReservaActionAsync(_reservaService.CheckInAsync, "Check-In realizado con éxito. La habitación está ahora Ocupada.");
+        }
+
+        private async void btnCheckO_Click(object? sender, EventArgs e)
+        {
+            await ExecuteReservaActionAsync(_reservaService.CheckOutAsync, "Check-Out realizado con éxito. La habitación está ahora Disponible.");
+        }
+
+        private async void btnCancelada_Click(object? sender, EventArgs e)
+        {
+            await ExecuteReservaActionAsync(_reservaService.CancelarReservaAsync, "Reserva cancelada con éxito. La habitación ha sido liberada.");
+        }
+
+        private async void btnReservada_Click(object? sender, EventArgs e)
+        {
+            // Usamos el método de Reversión que creamos en ReservaService (paso 1.1)
+            await ExecuteReservaActionAsync(_reservaService.RevertirAReservadaAsync, "Reserva revertida a estado 'Reservada' con éxito.");
+        }
+
+        // Capa_Presentacion.menu.cs
+
+        private async Task CargarIdsReservas()
+        {
+            cbmBuscarIDR.Items.Clear();
+            cbmBuscarIDR.Items.Add("Todas");
+
+            using (var conn = _conexion.CrearConexion())
+            {
+                await conn.OpenAsync();
+                string query = "SELECT IdReserva FROM Reserva ORDER BY IdReserva DESC";
+                using (SqlCommand cmd = new SqlCommand(query, conn))
+                using (SqlDataReader reader = await cmd.ExecuteReaderAsync())
+                {
+                    while (await reader.ReadAsync())
+                    {
+                        cbmBuscarIDR.Items.Add(reader["IdReserva"].ToString());
+                    }
+                }
+            }
+            cbmBuscarIDR.SelectedIndex = 0; // Selecciona "Todas" por defecto
+        }
+
+        private async Task CargarIdsClientesBusqueda()
+        {
+            cbmBuscarIDC.Items.Clear();
+            cbmBuscarIDC.Items.Add("Todos");
+
+            using (var conn = _conexion.CrearConexion())
+            {
+                await conn.OpenAsync();
+                string query = "SELECT IdCliente FROM Cliente ORDER BY IdCliente";
+                using (SqlCommand cmd = new SqlCommand(query, conn))
+                using (SqlDataReader reader = await cmd.ExecuteReaderAsync())
+                {
+                    while (await reader.ReadAsync())
+                    {
+                        cbmBuscarIDC.Items.Add(reader["IdCliente"].ToString());
+                    }
+                }
+            }
+            cbmBuscarIDC.SelectedIndex = 0; // Selecciona "Todos" por defecto
+        }
+        // Capa_Presentacion.menu.cs
+
+        // Capa_Presentacion.menu.cs
+
+        // Capa_Presentacion.menu.cs (Reemplazar btnBuscarR_Click)
+
+        private async void btnBuscarR_Click(object sender, EventArgs e)
+        {
+            string idReservaStr = cbmBuscarIDR.SelectedItem?.ToString();
+            string idClienteStr = cbmBuscarIDC.SelectedItem?.ToString();
+
+            bool buscarTodasReservas = (idReservaStr == "Todas" || string.IsNullOrEmpty(idReservaStr));
+            bool buscarTodosClientes = (idClienteStr == "Todos" || string.IsNullOrEmpty(idClienteStr));
+
+            // 1. Caso de limpieza/mostrar todo:
+            if (buscarTodasReservas && buscarTodosClientes)
+            {
+                await CargarReservasEnDGVAsync();
+                MessageBox.Show("Mostrando todas las reservas activas.", "Búsqueda Completa", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
+            }
+
+            // 2. Caso de FILTRO específico
+            try
+            {
+                using (var conn = _conexion.CrearConexion())
+                {
+                    await conn.OpenAsync();
+
+                    string baseQuery = @"
+                SELECT R.IdReserva, H.Numero AS HabitacionNumero, C.Nombre AS ClienteNombre,
+                       R.FechaEntrada, R.FechaSalida, R.EstadoReserva, R.FechaCreacion, 
+                       R.PrecioPorNoche, R.Notas
+                FROM Reserva R
+                INNER JOIN Habitacion H ON R.IdHabitacion = H.IdHabitacion
+                INNER JOIN Cliente C ON R.IdCliente = C.IdCliente
+                WHERE 1=1";
+
+                    var parametros = new List<SqlParameter>();
+
+                    if (!buscarTodasReservas)
+                    {
+                        baseQuery += " AND R.IdReserva = @IdReserva";
+                        parametros.Add(new SqlParameter("@IdReserva", idReservaStr));
+                    }
+
+                    if (!buscarTodosClientes)
+                    {
+                        baseQuery += " AND R.IdCliente = @IdCliente";
+                        parametros.Add(new SqlParameter("@IdCliente", idClienteStr));
+                    }
+
+                    baseQuery += " ORDER BY R.IdReserva DESC";
+
+                    using (SqlCommand cmd = new SqlCommand(baseQuery, conn))
+                    {
+                        cmd.Parameters.AddRange(parametros.ToArray());
+
+                        DataTable tabla = new DataTable();
+                        new SqlDataAdapter(cmd).Fill(tabla);
+
+                        // --- 3. CREAR COLUMNAS CALCULADAS Y DE TEXTO (FUERA DEL BUCLE) ---
+                        tabla.Columns.Add("Dias", typeof(int));
+                        tabla.Columns.Add("Subtotal", typeof(string));
+                        tabla.Columns.Add("ITBIS", typeof(string));
+                        tabla.Columns.Add("Total", typeof(string));
+                        tabla.Columns.Add("EstadoTexto", typeof(string)); // Columna de estado legible
+
+
+                        // --- 4. LLENAR DATOS CALCULADOS Y CONVERTIDOS DENTRO DEL BUCLE ---
+                        foreach (DataRow row in tabla.Rows)
+                        {
+                            // Conversión y Cálculo
+                            int estado = Convert.ToInt32(row["EstadoReserva"]);
+                            decimal precio = Convert.ToDecimal(row["PrecioPorNoche"]);
+                            DateTime fechaE = Convert.ToDateTime(row["FechaEntrada"]);
+                            DateTime fechaS = Convert.ToDateTime(row["FechaSalida"]);
+                            int dias = (fechaS.Date - fechaE.Date).Days;
+                            decimal subtotal = precio * dias;
+                            decimal itbis = subtotal * 0.18m;
+                            decimal total = subtotal + itbis;
+
+
+                            // Asignación de valores
+                            row["Dias"] = dias;
+                            row["Subtotal"] = subtotal.ToString("N2");
+                            row["ITBIS"] = itbis.ToString("N2");
+                            row["Total"] = total.ToString("N2");
+
+                            // Asignación de Estado Legible
+                            row["EstadoTexto"] = estado switch
+                            {
+                                0 => "Reservada",
+                                1 => "CheckIn",
+                                2 => "CheckOut",
+                                3 => "Cancelada",
+                                _ => "Desconocido"
+                            };
+                        }
+
+                        dgvReserva.DataSource = tabla;
+                        FormatearDgvReservasBusqueda(dgvReserva);
+
+                        if (tabla.Rows.Count == 0)
+                        {
+                            MessageBox.Show("No se encontraron reservas con los criterios seleccionados.", "Búsqueda vacía", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error al buscar reservas: {ex.Message}", "Error");
+            }
+        }
+
+        
+
+        private async void btnLimpiarR_Click(object sender, EventArgs e)
+        {
+            // 1. Limpiar filtros
+            cbmBuscarIDR.SelectedIndex = 0; // "Todas"
+            cbmBuscarIDC.SelectedIndex = 0; // "Todos"
+
+            // 2. Recargar el DGV con todas las reservas activas (vista por defecto)
+            await CargarReservasEnDGVAsync();
+        }
+        // Capa_Presentacion.menu.cs
+
+        private void FormatearDgvReservasBusqueda(DataGridView dgv)
+        {
+            if (dgv.Columns.Count == 0) return;
+
+            // --- Renombrar Columnas Principales ---
+            if (dgv.Columns.Contains("IdReserva")) dgv.Columns["IdReserva"].HeaderText = "ID Reserva";
+            if (dgv.Columns.Contains("HabitacionNumero")) dgv.Columns["HabitacionNumero"].HeaderText = "Habitación";
+            if (dgv.Columns.Contains("ClienteNombre")) dgv.Columns["ClienteNombre"].HeaderText = "Cliente";
+
+            // --- Fechas ---
+            if (dgv.Columns.Contains("FechaEntrada")) dgv.Columns["FechaEntrada"].HeaderText = "Entrada";
+            if (dgv.Columns.Contains("FechaSalida")) dgv.Columns["FechaSalida"].HeaderText = "Salida";
+            if (dgv.Columns.Contains("FechaCreacion")) dgv.Columns["FechaCreacion"].HeaderText = "Creación";
+
+            // --- Estado (Texto Legible) ---
+            if (dgv.Columns.Contains("EstadoTexto"))
+            {
+                dgv.Columns["EstadoTexto"].HeaderText = "Estado";
+                dgv.Columns["EstadoTexto"].Visible = true; // Aseguramos que se vea el texto
+            }
+
+            // --- Valores Financieros y Calculados (Añadido para las columnas creadas en btnBuscarR) ---
+            if (dgv.Columns.Contains("PrecioPorNoche")) dgv.Columns["PrecioPorNoche"].HeaderText = "Precio/Noche";
+            if (dgv.Columns.Contains("Dias")) dgv.Columns["Dias"].HeaderText = "Días";
+            if (dgv.Columns.Contains("Subtotal")) dgv.Columns["Subtotal"].HeaderText = "Subtotal";
+            if (dgv.Columns.Contains("ITBIS")) dgv.Columns["ITBIS"].HeaderText = "ITBIS (18%)";
+            if (dgv.Columns.Contains("Total")) dgv.Columns["Total"].HeaderText = "TOTAL";
+
+            // --- Ocultar Columnas Numéricas/Redundantes ---
+            if (dgv.Columns.Contains("IdHabitacion")) dgv.Columns["IdHabitacion"].Visible = false;
+            if (dgv.Columns.Contains("IdCliente")) dgv.Columns["IdCliente"].Visible = false;
+
+            // Ocultar el estado numérico original y las notas
+            if (dgv.Columns.Contains("EstadoReserva")) dgv.Columns["EstadoReserva"].Visible = false;
+            if (dgv.Columns.Contains("Notas")) dgv.Columns["Notas"].Visible = false;
+
+            // --- Ajuste Final ---
+            dgv.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
         }
 
 

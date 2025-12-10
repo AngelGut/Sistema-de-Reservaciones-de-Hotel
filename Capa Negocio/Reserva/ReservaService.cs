@@ -304,6 +304,57 @@ namespace Capa_Negocio.Reserva.Servicios
 
             return lista;
         }
+
+        
+
+        // ---------------------------------------------------------
+        // 7. REVERTIR A RESERVADA
+        // ---------------------------------------------------------
+        /// <summary>
+        /// Cambia el estado de una reserva (Cancelada o CheckOut) a Reservada.
+        /// Si revierte desde CheckOut/Cancelada, debe poner la habitación como Ocupada.
+        /// </summary>
+        public async Task RevertirAReservadaAsync(int idReserva, CancellationToken token)
+        {
+            await Task.Delay(500, token); // Simulación de espera
+
+            var reserva = await ObtenerPorIdAsync(idReserva, token);
+            if (reserva is null)
+                throw new ReservacionNoEncontradaException("No se encontró la reserva para revertir.");
+
+            if (reserva.EstadoReserva == EstadoReserva.Reservada)
+                throw new InvalidOperationException("La reserva ya se encuentra en estado 'Reservada'.");
+
+            // Lógica para revertir
+            EstadoReserva estadoAnterior = reserva.EstadoReserva;
+            reserva.EstadoReserva = EstadoReserva.Reservada;
+
+            using SqlConnection conn = _conexion.CrearConexion();
+            await conn.OpenAsync(token);
+
+            string sql = @"
+        UPDATE Reserva
+        SET EstadoReserva = @Estado
+        WHERE IdReserva = @IdReserva;";
+
+            using SqlCommand cmd = new SqlCommand(sql, conn);
+            cmd.Parameters.AddWithValue("@Estado", (int)reserva.EstadoReserva);
+            cmd.Parameters.AddWithValue("@IdReserva", reserva.IdReserva);
+
+            await cmd.ExecuteNonQueryAsync(token);
+
+            // Si el estado anterior NO era CheckIn, y lo estamos volviendo a Reservada, 
+            // la habitación debe estar marcada como Ocupada para el período.
+            if (estadoAnterior != EstadoReserva.CheckIn)
+            {
+                var habitacion = await _habitacionService.ObtenerPorIdAsync(reserva.IdHabitacion, token);
+                if (habitacion != null)
+                {
+                    habitacion.Estado = EstadoHabitacion.Ocupada; // Reservada implica Ocupada para fines de disponibilidad.
+                    await _habitacionService.ActualizarHabitacionAsync(habitacion, token);
+                }
+            }
+        }
     }
 
     // -------------------------------------------------------------
