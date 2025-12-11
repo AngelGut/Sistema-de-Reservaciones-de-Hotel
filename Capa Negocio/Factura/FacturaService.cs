@@ -183,5 +183,51 @@ namespace Capa_Negocio.Factura
 
             return lista;
         }
+
+        // Capa_Negocio.Factura.FacturaService.cs
+
+        // ---------------------------------------------------------
+        // 4. OBTENER FACTURA POR ID RESERVA
+        // ---------------------------------------------------------
+        /// <summary>
+        /// Busca una factura por el Id de la Reserva asociada (debido al UNIQUE constraint, solo puede haber una).
+        /// </summary>
+        public async Task<Factura?> ObtenerPorIdReservaAsync(int idReserva, CancellationToken token)
+        {
+            // Usamos Task.Delay() para simular el tiempo de respuesta del servidor (100ms)
+            await Task.Delay(100, token);
+
+            // 1. Intentar buscar en la cache (Opcional, requiere cache mapeada por IdReserva)
+            // Para simplificar, buscamos directamente en la BD (más seguro por el UNIQUE constraint)
+
+            using SqlConnection conn = _conexion.CrearConexion();
+            await conn.OpenAsync(token);
+
+            string sql = @"
+        SELECT IdFactura, IdReserva, FechaEmision, Subtotal, Itbis, Total
+        FROM Factura
+        WHERE IdReserva = @IdReserva;";
+
+            using SqlCommand cmd = new SqlCommand(sql, conn);
+            cmd.Parameters.AddWithValue("@IdReserva", idReserva);
+
+            using SqlDataReader reader = await cmd.ExecuteReaderAsync(token);
+
+            if (!await reader.ReadAsync(token))
+                return null;
+
+            // 2. Mapear y devolver (usando la misma lógica de FacturaService.ObtenerPorIdAsync)
+            var factura = new Factura
+            {
+                IdFactura = reader.GetInt32(0),
+                IdReserva = reader.GetInt32(1),
+                FechaEmision = reader.GetDateTime(2),
+                Subtotal = reader.GetDecimal(3),
+                Itbis = reader.GetDecimal(4),
+                Total = reader.GetDecimal(5)
+            };
+
+            return factura;
+        }
     }
 }

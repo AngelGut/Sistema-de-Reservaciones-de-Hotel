@@ -12,6 +12,7 @@ using Capa_Negocio.Habitacion.Servicios;
 using Capa_Negocio.Reserva.Servicios;
 using Capa_Negocio.Reserva;
 using Capa_Negocio.Habitacion;
+using Capa_Negocio.Factura;
 
 namespace Capa_Presentacion
 {
@@ -26,7 +27,7 @@ namespace Capa_Presentacion
         private readonly Capa_datos.ConexionBD _conexion = new Capa_datos.ConexionBD();
         private readonly HabitacionService _habitacionService;
         private readonly ReservaService _reservaService;
-
+        private readonly FacturaService _facturaService;
 
 
         public menu()
@@ -34,7 +35,7 @@ namespace Capa_Presentacion
             InitializeComponent();
             _habitacionService = new HabitacionService();
             _reservaService = new ReservaService(_habitacionService);
-            
+            _facturaService = new FacturaService(_reservaService);
             dgvClientes.ReadOnly = true;                 // No permitir editar celdas
             dgvClientes.AllowUserToAddRows = false;      // No permitir agregar filas
             dgvClientes.AllowUserToDeleteRows = false;   // No permitir eliminar filas
@@ -56,6 +57,13 @@ namespace Capa_Presentacion
             dgvReserva.SelectionMode = DataGridViewSelectionMode.FullRowSelect; // Esencial: Selecciona toda la fila con un clic
             dgvReserva.MultiSelect = false; // Solo una fila a la vez
             dgvReserva.RowHeadersVisible = false; // Quitar la columna izquierda
+            dgvFactura.ReadOnly = true;
+            dgvFactura.AllowUserToAddRows = false;
+            dgvFactura.AllowUserToDeleteRows = false;
+            dgvFactura.AllowUserToResizeRows = false;
+            dgvFactura.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
+            dgvFactura.MultiSelect = false;
+            dgvFactura.RowHeadersVisible = false;
             cmbEstado.DropDownStyle = ComboBoxStyle.DropDownList;
             cmbTipo.DropDownStyle = ComboBoxStyle.DropDownList;
             cmbID.DropDownStyle = ComboBoxStyle.DropDownList;
@@ -110,7 +118,9 @@ namespace Capa_Presentacion
             btnCancelada.Click += btnCancelada_Click;
             btnBuscarR.Click += btnBuscarR_Click;
             dgvHabitaciones.CellFormatting += DgvHabitaciones_CellFormatting;
-
+            btnBuscarF.Click += btnBuscarF_Click;
+            btnFactura.Click += btnFactura_Click;
+            BtnGenerarFactura.Click += BtnGenerarFactura_Click;
         }
 
         private void BtnLimpiarH_Click(object? sender, EventArgs e)
@@ -137,7 +147,8 @@ namespace Capa_Presentacion
             await CargarHabitacionesReserva();
             await CargarIdsReservas();
             await CargarIdsClientesBusqueda();
-
+            await CargarIdsFacturas();
+            await CargarFacturasEnDGVAsync();
 
 
 
@@ -215,7 +226,7 @@ namespace Capa_Presentacion
         private async Task CargarCedulas()
         {
             cmbCedula.Items.Clear();   // Muy importante
-
+            cmbCedula.Items.Add("Todas");
             using (var conn = _conexion.CrearConexion())
             {
                 await conn.OpenAsync();
@@ -238,91 +249,118 @@ namespace Capa_Presentacion
         }
 
 
+        // Capa_Presentacion.menu.cs
+
         private async Task CargarIdsClientes()
         {
-            using (var conn = _conexion.CrearConexion())
+            // 1. Limpiar la lista (CRUCIAL)
+            cmbID.Items.Clear();
 
+            // 2. AÑADIR LA OPCIÓN "TODAS" MANUALMENTE
+            cmbID.Items.Add("Todas");
+
+            using (var conn = _conexion.CrearConexion())
             {
                 await conn.OpenAsync();
 
-                string query = "SELECT IdCliente FROM Cliente";
+                // Consulta que solo trae las IDs de la base de datos
+                string query = "SELECT IdCliente FROM Cliente ORDER BY IdCliente";
 
                 using (SqlCommand cmd = new SqlCommand(query, conn))
                 using (SqlDataReader reader = await cmd.ExecuteReaderAsync())
                 {
-                    cmbID.Items.Clear();
-
+                    // 3. Agregar los IDs numéricos de la base de datos
                     while (await reader.ReadAsync())
                     {
                         cmbID.Items.Add(reader["IdCliente"].ToString());
                     }
                 }
             }
+
+            // 4. Seleccionar "Todas" (índice 0)
+            // Esto solo funciona si cmbID.DropDownStyle está en DropDownList (que ya lo tienes configurado).
+            cmbID.SelectedIndex = 0;
         }
+        // Capa_Presentacion.menu.cs
+
         private async void btnBusqueda_Click(object sender, EventArgs e)
         {
+            // Obtener los valores seleccionados de los ComboBox
             string cedula = cmbCedula.SelectedItem?.ToString();
             string idCliente = cmbID.SelectedItem?.ToString();
 
-            // Validación
-            if (cedula == null && idCliente == null)
+            bool buscarTodo = (cedula == "Todas" || string.IsNullOrWhiteSpace(cedula)) &&
+                              (idCliente == "Todas" || string.IsNullOrWhiteSpace(idCliente));
+
+            // 1. CASO DE MOSTRAR TODO
+            if (buscarTodo)
             {
-                MessageBox.Show("Debes seleccionar una cédula o un ID.",
-                                "Aviso", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                await CargarClientesAsync();
+                MessageBox.Show("Mostrando todos los clientes registrados.", "Búsqueda Completa", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 return;
             }
 
+            // 2. CASO DE FILTRO ESPECÍFICO
             using (var conn = _conexion.CrearConexion())
             {
-                await conn.OpenAsync();
-
-                string query = "SELECT * FROM Cliente WHERE 1=1";
-
-                if (cedula != null)
-                    query += " AND Documento = @Documento";
-
-                if (idCliente != null)
-                    query += " AND IdCliente = @IdCliente";
-
-                using (SqlCommand cmd = new SqlCommand(query, conn))
+                try
                 {
-                    if (cedula != null)
-                        cmd.Parameters.AddWithValue("@Documento", cedula);
+                    await conn.OpenAsync();
 
-                    if (idCliente != null)
-                        cmd.Parameters.AddWithValue("@IdCliente", idCliente);
+                    string query = "SELECT * FROM Cliente WHERE 1=1";
+                    var parametros = new List<SqlParameter>();
 
-                    // FILTRAR Y MOSTRAR EN EL DGV
-                    DataTable tabla = new DataTable();
-                    using (SqlDataAdapter da = new SqlDataAdapter(cmd))
+                    if (!(cedula == "Todas" || string.IsNullOrWhiteSpace(cedula)))
                     {
-                        da.Fill(tabla);
+                        query += " AND Documento = @Documento";
+                        parametros.Add(new SqlParameter("@Documento", cedula));
                     }
 
-                    if (tabla.Rows.Count > 0)
+                    if (!(idCliente == "Todas" || string.IsNullOrWhiteSpace(idCliente)))
                     {
-                        // Muestra solo el resultado filtrado
-                        dgvClientes.DataSource = tabla;
-
-                        // También rellenar los TextBox
-                        DataRow row = tabla.Rows[0];
-                        txtNombre.Text = row["Nombre"].ToString();
-                        txtTelefono.Text = row["Telefono"].ToString();
-                        txtCorreo.Text = row["Email"].ToString();
-                        txtNacionalidad.Text = row["Nacionalidad"].ToString();
-
-                        MessageBox.Show("Cliente encontrado.",
-                                        "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                        query += " AND IdCliente = @IdCliente";
+                        // Asumiendo que el ID es un INT, asegúrate de que el valor sea correcto
+                        parametros.Add(new SqlParameter("@IdCliente", idCliente));
                     }
-                    else
+
+                    // Si el usuario seleccionó uno específico, la consulta se arma con el filtro.
+
+                    using (SqlCommand cmd = new SqlCommand(query, conn))
                     {
-                        MessageBox.Show("No se encontró ningún cliente.",
-                                        "Sin resultados",
-                                        MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                        cmd.Parameters.AddRange(parametros.ToArray());
 
-                        // Limpia el DGV si no hay nada
-                        dgvClientes.DataSource = null;
+                        // FILTRAR Y MOSTRAR EN EL DGV
+                        DataTable tabla = new DataTable();
+                        using (SqlDataAdapter da = new SqlDataAdapter(cmd))
+                        {
+                            da.Fill(tabla);
+                        }
+
+                        if (tabla.Rows.Count > 0)
+                        {
+                            // Muestra solo el resultado filtrado
+                            dgvClientes.DataSource = tabla;
+
+                            // También rellenar los TextBox con el primer resultado
+                            DataRow row = tabla.Rows[0];
+                            txtNombre.Text = row["Nombre"].ToString();
+                            txtTelefono.Text = row["Telefono"].ToString();
+                            txtCorreo.Text = row["Email"].ToString();
+                            txtNacionalidad.Text = row["Nacionalidad"].ToString();
+
+                            MessageBox.Show("Cliente encontrado.", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                        }
+                        else
+                        {
+                            MessageBox.Show("No se encontró ningún cliente con los criterios especificados.", "Sin resultados", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                            dgvClientes.DataSource = null;
+                            LimpiarCampos(); // Limpiar también los TextBoxes
+                        }
                     }
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show("Error al buscar el cliente: " + ex.Message);
                 }
             }
         }
@@ -1635,6 +1673,218 @@ namespace Capa_Presentacion
 
             // --- Ajuste Final ---
             dgv.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
+        }
+        private async Task CargarIdsFacturas()
+        {
+            cbmFactura.Items.Clear();
+            cbmFactura.Items.Add("Todas");
+
+            try
+            {
+                // No hay un método para solo IDs, así que cargamos todas las facturas
+                var lista = await _facturaService.ObtenerTodasAsync(_cts.Token);
+
+                foreach (var factura in lista.OrderByDescending(f => f.IdFactura))
+                {
+                    cbmFactura.Items.Add(factura.IdFactura.ToString());
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error al cargar IDs de facturas: {ex.Message}");
+            }
+
+            cbmFactura.SelectedIndex = 0; // Selecciona "Todas"
+        }
+
+        /// <summary>
+        /// Carga todas las facturas en el DGV. Usado para la carga inicial y el botón de búsqueda "Todas".
+        /// </summary>
+        private async Task CargarFacturasEnDGVAsync()
+        {
+            try
+            {
+                var lista = await _facturaService.ObtenerTodasAsync(_cts.Token);
+
+                dgvFactura.DataSource = lista.Select(f => new
+                {
+                    f.IdFactura,
+                    f.IdReserva,
+                    FechaEmision = f.FechaEmision.ToString("dd/MM/yyyy HH:mm"), // Formato legible
+                    Subtotal = f.Subtotal.ToString("N2"),
+                    Itbis = f.Itbis.ToString("N2"),
+                    Total = f.Total.ToString("N2")
+                }).ToList();
+
+                FormatearDgvFactura();
+
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error al cargar el DGV de facturas: {ex.Message}");
+            }
+        }
+
+        /// <summary>
+        /// Aplica el formato y encabezados al dgvFactura.
+        /// </summary>
+        private void FormatearDgvFactura()
+        {
+            if (dgvFactura.Columns.Count == 0) return;
+
+            if (dgvFactura.Columns.Contains("IdFactura")) dgvFactura.Columns["IdFactura"].HeaderText = "ID Factura";
+            if (dgvFactura.Columns.Contains("IdReserva")) dgvFactura.Columns["IdReserva"].HeaderText = "ID Reserva";
+            if (dgvFactura.Columns.Contains("FechaEmision")) dgvFactura.Columns["FechaEmision"].HeaderText = "Emisión";
+            if (dgvFactura.Columns.Contains("Subtotal")) dgvFactura.Columns["Subtotal"].HeaderText = "Subtotal";
+            if (dgvFactura.Columns.Contains("Itbis")) dgvFactura.Columns["Itbis"].HeaderText = "ITBIS";
+            if (dgvFactura.Columns.Contains("Total")) dgvFactura.Columns["Total"].HeaderText = "TOTAL";
+
+            dgvFactura.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
+        }
+
+        // Capa_Presentacion.menu.cs
+
+        private async void btnBuscarF_Click(object sender, EventArgs e)
+        {
+            string idFacturaStr = cbmFactura.SelectedItem?.ToString();
+
+            if (idFacturaStr == "Todas" || string.IsNullOrEmpty(idFacturaStr))
+            {
+                // Si selecciona "Todas" o está vacío, muestra todas las facturas.
+                await CargarFacturasEnDGVAsync();
+                return;
+            }
+
+            if (!int.TryParse(idFacturaStr, out int idFactura))
+            {
+                MessageBox.Show("ID de factura inválido.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+
+            try
+            {
+                // 1. Obtener la factura específica
+                var factura = await _facturaService.ObtenerPorIdAsync(idFactura, _cts.Token);
+
+                if (factura != null)
+                {
+                    // 2. Mostrar SOLO la factura encontrada
+                    var lista = new List<object> { new {
+                factura.IdFactura,
+                factura.IdReserva,
+                FechaEmision = factura.FechaEmision.ToString("dd/MM/yyyy HH:mm"),
+                Subtotal = factura.Subtotal.ToString("N2"),
+                Itbis = factura.Itbis.ToString("N2"),
+                Total = factura.Total.ToString("N2")
+            }};
+
+                    dgvFactura.DataSource = lista;
+                    FormatearDgvFactura();
+                    MessageBox.Show($"Factura ID {idFactura} encontrada.", "Éxito");
+                }
+                else
+                {
+                    MessageBox.Show($"Factura ID {idFactura} no encontrada.", "Sin resultados");
+                    dgvFactura.DataSource = null;
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error al buscar factura: {ex.Message}", "Error");
+            }
+        }
+        // Capa_Presentacion.menu.cs
+
+        private async void btnFactura_Click(object sender, EventArgs e)
+        {
+            // 1. Verificar selección
+            if (dgvFactura.SelectedRows.Count == 0)
+            {
+                MessageBox.Show("Selecciona una fila para ver el detalle de la factura.", "Advertencia");
+                return;
+            }
+
+            // 2. Obtener los valores directamente del DGV (ya están formateados)
+            DataGridViewRow row = dgvFactura.SelectedRows[0];
+
+            string idFactura = row.Cells["IdFactura"].Value.ToString();
+            string idReserva = row.Cells["IdReserva"].Value.ToString();
+            string fechaEmision = row.Cells["FechaEmision"].Value.ToString();
+            string subtotal = row.Cells["Subtotal"].Value.ToString();
+            string itbis = row.Cells["Itbis"].Value.ToString();
+            string total = row.Cells["Total"].Value.ToString();
+
+            // 3. Crear el mensaje detallado (incluyendo los detalles de la RESERVA para contexto)
+            string mensaje = $"--- DETALLE DE FACTURA ---\n\n" +
+                             $"ID Factura: {idFactura}\n" +
+                             $"ID Reserva: {idReserva}\n" +
+                             $"Fecha Emisión: {fechaEmision}\n" +
+                             $"---------------------------\n" +
+                             $"Subtotal: {subtotal}\n" +
+                             $"ITBIS (18%): {itbis}\n" +
+                             $"TOTAL: {total}\n" +
+                             $"---------------------------\n\n" +
+                             $"Nota: Esta factura está basada en la Reserva {idReserva}.";
+
+            // 4. Mostrar la ventana emergente
+            MessageBox.Show(mensaje, $"Factura No. {idFactura} - Detalle", MessageBoxButtons.OK, MessageBoxIcon.Information);
+        }
+
+        // Capa_Presentacion.menu.cs (Reemplaza tu método BtnGenerarFactura_Click)
+
+        private async void BtnGenerarFactura_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                // 1. Obtener el ID de la reserva seleccionada
+                int idReserva = GetSelectedReservaId();
+
+                // 2. Obtener la reserva para validar
+                var reserva = await _reservaService.ObtenerPorIdAsync(idReserva, _cts.Token);
+
+                if (reserva == null)
+                {
+                    MessageBox.Show("La reserva no fue encontrada.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
+
+                // Validación CLAVE: Verificar si ya existe una factura
+                var facturaExistente = await _facturaService.ObtenerPorIdReservaAsync(idReserva, _cts.Token);
+                if (facturaExistente != null)
+                {
+                    MessageBox.Show($"Esta reserva ya tiene una factura registrada (No. {facturaExistente.IdFactura}). No se permite duplicar.", "Advertencia", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    return;
+                }
+
+                // Regla de negocio: Solo generar factura si está en estado RESERVADA
+                if (reserva.EstadoReserva != EstadoReserva.Reservada)
+                {
+                    MessageBox.Show($"La factura solo debe generarse cuando la reserva está en estado 'Reservada'. El estado actual es: {reserva.EstadoReserva}.", "Advertencia de Facturación", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    return;
+                }
+
+                // 3. Generar la factura
+                Factura nuevaFactura = await _facturaService.GenerarFacturaAsync(idReserva, _cts.Token);
+
+                MessageBox.Show(
+                    $"Factura No. {nuevaFactura.IdFactura} generada para la reserva {idReserva}. Los montos son inmutables.",
+                    "Factura Generada",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Information);
+
+                // 4. Actualizar la interfaz
+                await CargarReservasEnDGVAsync();
+                await CargarFacturasEnDGVAsync();
+                await CargarIdsFacturas();
+            }
+            catch (InvalidOperationException ex)
+            {
+                MessageBox.Show(ex.Message, "Advertencia", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error al intentar generar la factura: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
 
 

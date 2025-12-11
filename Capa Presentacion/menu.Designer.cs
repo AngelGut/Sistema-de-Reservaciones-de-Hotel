@@ -95,7 +95,16 @@ namespace Capa_Presentacion
             cbmElegirCliente = new MaterialSkin.Controls.MaterialComboBox();
             cbmElegirHR = new MaterialSkin.Controls.MaterialComboBox();
             dgvReserva = new DataGridView();
+            tabPage5 = new TabPage();
+            materialCard9 = new MaterialSkin.Controls.MaterialCard();
+            btnBuscarF = new MaterialSkin.Controls.MaterialButton();
+            cbmFactura = new MaterialSkin.Controls.MaterialComboBox();
+            btnFactura = new MaterialSkin.Controls.MaterialButton();
+            materialCard8 = new MaterialSkin.Controls.MaterialCard();
+            dgvFactura = new DataGridView();
             fileSystemWatcher1 = new FileSystemWatcher();
+            materialCard10 = new MaterialSkin.Controls.MaterialCard();
+            BtnGenerarFactura = new MaterialSkin.Controls.MaterialButton();
             tabPage3.SuspendLayout();
             materialCard3.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)dgvHabitaciones).BeginInit();
@@ -110,7 +119,12 @@ namespace Capa_Presentacion
             materialCard5.SuspendLayout();
             materialCard4.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)dgvReserva).BeginInit();
+            tabPage5.SuspendLayout();
+            materialCard9.SuspendLayout();
+            materialCard8.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)dgvFactura).BeginInit();
             ((System.ComponentModel.ISupportInitialize)fileSystemWatcher1).BeginInit();
+            materialCard10.SuspendLayout();
             SuspendLayout();
             // 
             // tabPage3
@@ -998,6 +1012,7 @@ namespace Capa_Presentacion
             materialTabControl1.Controls.Add(tabPage2);
             materialTabControl1.Controls.Add(tabPage3);
             materialTabControl1.Controls.Add(tabPage4);
+            materialTabControl1.Controls.Add(tabPage5);
             materialTabControl1.Depth = 0;
             materialTabControl1.Dock = DockStyle.Fill;
             materialTabControl1.Location = new Point(3, 64);
@@ -1010,6 +1025,7 @@ namespace Capa_Presentacion
             // 
             // tabPage4
             // 
+            tabPage4.Controls.Add(materialCard10);
             tabPage4.Controls.Add(materialCard7);
             tabPage4.Controls.Add(materialCard5);
             tabPage4.Controls.Add(materialCard4);
@@ -1036,7 +1052,7 @@ namespace Capa_Presentacion
             materialCard7.MouseState = MaterialSkin.MouseState.HOVER;
             materialCard7.Name = "materialCard7";
             materialCard7.Padding = new Padding(14);
-            materialCard7.Size = new Size(626, 69);
+            materialCard7.Size = new Size(597, 69);
             materialCard7.TabIndex = 6;
             // 
             // btnCancelada
@@ -1374,10 +1390,153 @@ namespace Capa_Presentacion
             dgvReserva.TabIndex = 0;
             dgvReserva.CellContentClick += dataGridView1_CellContentClick;
             // 
+            // tabPage5
+            // 
+            tabPage5.Controls.Add(materialCard9);
+            tabPage5.Controls.Add(materialCard8);
+            tabPage5.Location = new Point(4, 24);
+            tabPage5.Name = "tabPage5";
+            tabPage5.Padding = new Padding(3);
+            tabPage5.Size = new Size(1616, 857);
+            tabPage5.TabIndex = 4;
+            tabPage5.Text = "Factura";
+            tabPage5.UseVisualStyleBackColor = true;
+            // 
+            // materialCard9
+            // 
+            materialCard9.BackColor = Color.FromArgb(255, 255, 255);
+            materialCard9.Controls.Add(btnBuscarF);
+            materialCard9.Controls.Add(cbmFactura);
+            materialCard9.Controls.Add(btnFactura);
+            materialCard9.Depth = 0;
+            materialCard9.ForeColor = Color.FromArgb(222, 0, 0, 0);
+            materialCard9.Location = new Point(396, 598);
+            materialCard9.Margin = new Padding(14);
+            materialCard9.MouseState = MaterialSkin.MouseState.HOVER;
+            materialCard9.Name = "materialCard9";
+            materialCard9.Padding = new Padding(14);
+            materialCard9.Size = new Size(361, 169);
+            materialCard9.TabIndex = 3;
+            // 
+            // btnBuscarF
+            // 
+            btnBuscarF.AutoSizeMode = AutoSizeMode.GrowAndShrink;
+            btnBuscarF.Density = MaterialSkin.Controls.MaterialButton.MaterialButtonDensity.Default;
+            btnBuscarF.Depth = 0;
+            btnBuscarF.HighEmphasis = true;
+            btnBuscarF.Icon = null;
+            btnBuscarF.Location = new Point(49, 113);
+            btnBuscarF.Margin = new Padding(4, 6, 4, 6);
+            btnBuscarF.MouseState = MaterialSkin.MouseState.HOVER;
+            btnBuscarF.Name = "btnBuscarF";
+            btnBuscarF.NoAccentTextColor = Color.Empty;
+            btnBuscarF.Size = new Size(77, 36);
+            btnBuscarF.TabIndex = 3;
+            btnBuscarF.Text = "BUSCAR";
+            btnBuscarF.Type = MaterialSkin.Controls.MaterialButton.MaterialButtonType.Contained;
+            btnBuscarF.UseAccentColor = false;
+            btnBuscarF.UseVisualStyleBackColor = true;
+            // 
+            // cbmFactura
+            // 
+            cbmFactura.AutoResize = false;
+            cbmFactura.BackColor = Color.FromArgb(255, 255, 255);
+            cbmFactura.Depth = 0;
+            cbmFactura.DrawMode = DrawMode.OwnerDrawVariable;
+            cbmFactura.DropDownHeight = 174;
+            cbmFactura.DropDownStyle = ComboBoxStyle.DropDownList;
+            cbmFactura.DropDownWidth = 121;
+            cbmFactura.Font = new Font("Microsoft Sans Serif", 14F, FontStyle.Bold, GraphicsUnit.Pixel);
+            cbmFactura.ForeColor = Color.FromArgb(222, 0, 0, 0);
+            cbmFactura.FormattingEnabled = true;
+            cbmFactura.IntegralHeight = false;
+            cbmFactura.ItemHeight = 43;
+            cbmFactura.Location = new Point(29, 28);
+            cbmFactura.MaxDropDownItems = 4;
+            cbmFactura.MouseState = MaterialSkin.MouseState.OUT;
+            cbmFactura.Name = "cbmFactura";
+            cbmFactura.Size = new Size(121, 49);
+            cbmFactura.StartIndex = 0;
+            cbmFactura.TabIndex = 2;
+            // 
+            // btnFactura
+            // 
+            btnFactura.AutoSizeMode = AutoSizeMode.GrowAndShrink;
+            btnFactura.Density = MaterialSkin.Controls.MaterialButton.MaterialButtonDensity.Default;
+            btnFactura.Depth = 0;
+            btnFactura.HighEmphasis = true;
+            btnFactura.Icon = null;
+            btnFactura.Location = new Point(218, 113);
+            btnFactura.Margin = new Padding(4, 6, 4, 6);
+            btnFactura.MouseState = MaterialSkin.MouseState.HOVER;
+            btnFactura.Name = "btnFactura";
+            btnFactura.NoAccentTextColor = Color.Empty;
+            btnFactura.Size = new Size(86, 36);
+            btnFactura.TabIndex = 1;
+            btnFactura.Text = "FACTURA";
+            btnFactura.Type = MaterialSkin.Controls.MaterialButton.MaterialButtonType.Contained;
+            btnFactura.UseAccentColor = false;
+            btnFactura.UseVisualStyleBackColor = true;
+            // 
+            // materialCard8
+            // 
+            materialCard8.BackColor = Color.FromArgb(255, 255, 255);
+            materialCard8.Controls.Add(dgvFactura);
+            materialCard8.Depth = 0;
+            materialCard8.ForeColor = Color.FromArgb(222, 0, 0, 0);
+            materialCard8.Location = new Point(333, 86);
+            materialCard8.Margin = new Padding(14);
+            materialCard8.MouseState = MaterialSkin.MouseState.HOVER;
+            materialCard8.Name = "materialCard8";
+            materialCard8.Padding = new Padding(14);
+            materialCard8.Size = new Size(910, 467);
+            materialCard8.TabIndex = 2;
+            // 
+            // dgvFactura
+            // 
+            dgvFactura.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            dgvFactura.Location = new Point(155, 50);
+            dgvFactura.Name = "dgvFactura";
+            dgvFactura.Size = new Size(603, 332);
+            dgvFactura.TabIndex = 0;
+            // 
             // fileSystemWatcher1
             // 
             fileSystemWatcher1.EnableRaisingEvents = true;
             fileSystemWatcher1.SynchronizingObject = this;
+            // 
+            // materialCard10
+            // 
+            materialCard10.BackColor = Color.FromArgb(255, 255, 255);
+            materialCard10.Controls.Add(BtnGenerarFactura);
+            materialCard10.Depth = 0;
+            materialCard10.ForeColor = Color.FromArgb(222, 0, 0, 0);
+            materialCard10.Location = new Point(1374, 479);
+            materialCard10.Margin = new Padding(14);
+            materialCard10.MouseState = MaterialSkin.MouseState.HOVER;
+            materialCard10.Name = "materialCard10";
+            materialCard10.Padding = new Padding(14);
+            materialCard10.Size = new Size(178, 59);
+            materialCard10.TabIndex = 7;
+            // 
+            // BtnGenerarFactura
+            // 
+            BtnGenerarFactura.AutoSizeMode = AutoSizeMode.GrowAndShrink;
+            BtnGenerarFactura.Density = MaterialSkin.Controls.MaterialButton.MaterialButtonDensity.Default;
+            BtnGenerarFactura.Depth = 0;
+            BtnGenerarFactura.HighEmphasis = true;
+            BtnGenerarFactura.Icon = null;
+            BtnGenerarFactura.Location = new Point(18, 13);
+            BtnGenerarFactura.Margin = new Padding(4, 6, 4, 6);
+            BtnGenerarFactura.MouseState = MaterialSkin.MouseState.HOVER;
+            BtnGenerarFactura.Name = "BtnGenerarFactura";
+            BtnGenerarFactura.NoAccentTextColor = Color.Empty;
+            BtnGenerarFactura.Size = new Size(155, 36);
+            BtnGenerarFactura.TabIndex = 0;
+            BtnGenerarFactura.Text = "Generar Factura";
+            BtnGenerarFactura.Type = MaterialSkin.Controls.MaterialButton.MaterialButtonType.Contained;
+            BtnGenerarFactura.UseAccentColor = false;
+            BtnGenerarFactura.UseVisualStyleBackColor = true;
             // 
             // menu
             // 
@@ -1412,7 +1571,14 @@ namespace Capa_Presentacion
             materialCard4.ResumeLayout(false);
             materialCard4.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)dgvReserva).EndInit();
+            tabPage5.ResumeLayout(false);
+            materialCard9.ResumeLayout(false);
+            materialCard9.PerformLayout();
+            materialCard8.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)dgvFactura).EndInit();
             ((System.ComponentModel.ISupportInitialize)fileSystemWatcher1).EndInit();
+            materialCard10.ResumeLayout(false);
+            materialCard10.PerformLayout();
             ResumeLayout(false);
         }
 
@@ -1485,5 +1651,14 @@ namespace Capa_Presentacion
         private MaterialSkin.Controls.MaterialButton btnCheckI;
         private MaterialSkin.Controls.MaterialLabel materialLabel9;
         private MaterialSkin.Controls.MaterialLabel materialLabel6;
+        private TabPage tabPage5;
+        private DataGridView dgvFactura;
+        private MaterialSkin.Controls.MaterialCard materialCard8;
+        private MaterialSkin.Controls.MaterialButton btnFactura;
+        private MaterialSkin.Controls.MaterialCard materialCard9;
+        private MaterialSkin.Controls.MaterialButton btnBuscarF;
+        private MaterialSkin.Controls.MaterialComboBox cbmFactura;
+        private MaterialSkin.Controls.MaterialCard materialCard10;
+        private MaterialSkin.Controls.MaterialButton BtnGenerarFactura;
     }
 }
