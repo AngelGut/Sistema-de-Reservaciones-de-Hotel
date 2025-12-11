@@ -50,6 +50,7 @@ namespace Capa_Presentacion
             txtNumeroHab = new MaterialSkin.Controls.MaterialMaskedTextBox();
             lblNumeroHab = new MaterialSkin.Controls.MaterialLabel();
             tabPage2 = new TabPage();
+            progressBarC = new ProgressBar();
             btnEliminarCliente = new MaterialSkin.Controls.MaterialButton();
             materialCard6 = new MaterialSkin.Controls.MaterialCard();
             cmbID = new MaterialSkin.Controls.MaterialComboBox();
@@ -73,6 +74,8 @@ namespace Capa_Presentacion
             tabPage1 = new TabPage();
             materialTabControl1 = new MaterialSkin.Controls.MaterialTabControl();
             tabPage4 = new TabPage();
+            materialCard10 = new MaterialSkin.Controls.MaterialCard();
+            BtnGenerarFactura = new MaterialSkin.Controls.MaterialButton();
             materialCard7 = new MaterialSkin.Controls.MaterialCard();
             btnCancelada = new MaterialSkin.Controls.MaterialButton();
             btnCheckO = new MaterialSkin.Controls.MaterialButton();
@@ -103,8 +106,9 @@ namespace Capa_Presentacion
             materialCard8 = new MaterialSkin.Controls.MaterialCard();
             dgvFactura = new DataGridView();
             fileSystemWatcher1 = new FileSystemWatcher();
-            materialCard10 = new MaterialSkin.Controls.MaterialCard();
-            BtnGenerarFactura = new MaterialSkin.Controls.MaterialButton();
+            progressBarH = new ProgressBar();
+            progressBarR = new ProgressBar();
+            progressBarF = new ProgressBar();
             tabPage3.SuspendLayout();
             materialCard3.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)dgvHabitaciones).BeginInit();
@@ -115,6 +119,7 @@ namespace Capa_Presentacion
             ((System.ComponentModel.ISupportInitialize)dgvClientes).BeginInit();
             materialTabControl1.SuspendLayout();
             tabPage4.SuspendLayout();
+            materialCard10.SuspendLayout();
             materialCard7.SuspendLayout();
             materialCard5.SuspendLayout();
             materialCard4.SuspendLayout();
@@ -124,11 +129,11 @@ namespace Capa_Presentacion
             materialCard8.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)dgvFactura).BeginInit();
             ((System.ComponentModel.ISupportInitialize)fileSystemWatcher1).BeginInit();
-            materialCard10.SuspendLayout();
             SuspendLayout();
             // 
             // tabPage3
             // 
+            tabPage3.Controls.Add(progressBarH);
             tabPage3.Controls.Add(btnEliminarHab);
             tabPage3.Controls.Add(materialCard3);
             tabPage3.Controls.Add(dgvHabitaciones);
@@ -539,6 +544,7 @@ namespace Capa_Presentacion
             // 
             // tabPage2
             // 
+            tabPage2.Controls.Add(progressBarC);
             tabPage2.Controls.Add(btnEliminarCliente);
             tabPage2.Controls.Add(materialCard6);
             tabPage2.Controls.Add(materialCard1);
@@ -550,6 +556,13 @@ namespace Capa_Presentacion
             tabPage2.TabIndex = 1;
             tabPage2.Text = "Clientes";
             tabPage2.UseVisualStyleBackColor = true;
+            // 
+            // progressBarC
+            // 
+            progressBarC.Location = new Point(1027, 89);
+            progressBarC.Name = "progressBarC";
+            progressBarC.Size = new Size(189, 23);
+            progressBarC.TabIndex = 23;
             // 
             // btnEliminarCliente
             // 
@@ -1025,6 +1038,7 @@ namespace Capa_Presentacion
             // 
             // tabPage4
             // 
+            tabPage4.Controls.Add(progressBarR);
             tabPage4.Controls.Add(materialCard10);
             tabPage4.Controls.Add(materialCard7);
             tabPage4.Controls.Add(materialCard5);
@@ -1037,6 +1051,39 @@ namespace Capa_Presentacion
             tabPage4.TabIndex = 3;
             tabPage4.Text = "Reservacion";
             tabPage4.UseVisualStyleBackColor = true;
+            // 
+            // materialCard10
+            // 
+            materialCard10.BackColor = Color.FromArgb(255, 255, 255);
+            materialCard10.Controls.Add(BtnGenerarFactura);
+            materialCard10.Depth = 0;
+            materialCard10.ForeColor = Color.FromArgb(222, 0, 0, 0);
+            materialCard10.Location = new Point(1374, 479);
+            materialCard10.Margin = new Padding(14);
+            materialCard10.MouseState = MaterialSkin.MouseState.HOVER;
+            materialCard10.Name = "materialCard10";
+            materialCard10.Padding = new Padding(14);
+            materialCard10.Size = new Size(178, 59);
+            materialCard10.TabIndex = 7;
+            // 
+            // BtnGenerarFactura
+            // 
+            BtnGenerarFactura.AutoSizeMode = AutoSizeMode.GrowAndShrink;
+            BtnGenerarFactura.Density = MaterialSkin.Controls.MaterialButton.MaterialButtonDensity.Default;
+            BtnGenerarFactura.Depth = 0;
+            BtnGenerarFactura.HighEmphasis = true;
+            BtnGenerarFactura.Icon = null;
+            BtnGenerarFactura.Location = new Point(18, 13);
+            BtnGenerarFactura.Margin = new Padding(4, 6, 4, 6);
+            BtnGenerarFactura.MouseState = MaterialSkin.MouseState.HOVER;
+            BtnGenerarFactura.Name = "BtnGenerarFactura";
+            BtnGenerarFactura.NoAccentTextColor = Color.Empty;
+            BtnGenerarFactura.Size = new Size(155, 36);
+            BtnGenerarFactura.TabIndex = 0;
+            BtnGenerarFactura.Text = "Generar Factura";
+            BtnGenerarFactura.Type = MaterialSkin.Controls.MaterialButton.MaterialButtonType.Contained;
+            BtnGenerarFactura.UseAccentColor = false;
+            BtnGenerarFactura.UseVisualStyleBackColor = true;
             // 
             // materialCard7
             // 
@@ -1392,6 +1439,7 @@ namespace Capa_Presentacion
             // 
             // tabPage5
             // 
+            tabPage5.Controls.Add(progressBarF);
             tabPage5.Controls.Add(materialCard9);
             tabPage5.Controls.Add(materialCard8);
             tabPage5.Location = new Point(4, 24);
@@ -1505,38 +1553,26 @@ namespace Capa_Presentacion
             fileSystemWatcher1.EnableRaisingEvents = true;
             fileSystemWatcher1.SynchronizingObject = this;
             // 
-            // materialCard10
+            // progressBarH
             // 
-            materialCard10.BackColor = Color.FromArgb(255, 255, 255);
-            materialCard10.Controls.Add(BtnGenerarFactura);
-            materialCard10.Depth = 0;
-            materialCard10.ForeColor = Color.FromArgb(222, 0, 0, 0);
-            materialCard10.Location = new Point(1374, 479);
-            materialCard10.Margin = new Padding(14);
-            materialCard10.MouseState = MaterialSkin.MouseState.HOVER;
-            materialCard10.Name = "materialCard10";
-            materialCard10.Padding = new Padding(14);
-            materialCard10.Size = new Size(178, 59);
-            materialCard10.TabIndex = 7;
+            progressBarH.Location = new Point(1181, 476);
+            progressBarH.Name = "progressBarH";
+            progressBarH.Size = new Size(189, 23);
+            progressBarH.TabIndex = 24;
             // 
-            // BtnGenerarFactura
+            // progressBarR
             // 
-            BtnGenerarFactura.AutoSizeMode = AutoSizeMode.GrowAndShrink;
-            BtnGenerarFactura.Density = MaterialSkin.Controls.MaterialButton.MaterialButtonDensity.Default;
-            BtnGenerarFactura.Depth = 0;
-            BtnGenerarFactura.HighEmphasis = true;
-            BtnGenerarFactura.Icon = null;
-            BtnGenerarFactura.Location = new Point(18, 13);
-            BtnGenerarFactura.Margin = new Padding(4, 6, 4, 6);
-            BtnGenerarFactura.MouseState = MaterialSkin.MouseState.HOVER;
-            BtnGenerarFactura.Name = "BtnGenerarFactura";
-            BtnGenerarFactura.NoAccentTextColor = Color.Empty;
-            BtnGenerarFactura.Size = new Size(155, 36);
-            BtnGenerarFactura.TabIndex = 0;
-            BtnGenerarFactura.Text = "Generar Factura";
-            BtnGenerarFactura.Type = MaterialSkin.Controls.MaterialButton.MaterialButtonType.Contained;
-            BtnGenerarFactura.UseAccentColor = false;
-            BtnGenerarFactura.UseVisualStyleBackColor = true;
+            progressBarR.Location = new Point(1117, 601);
+            progressBarR.Name = "progressBarR";
+            progressBarR.Size = new Size(189, 23);
+            progressBarR.TabIndex = 24;
+            // 
+            // progressBarF
+            // 
+            progressBarF.Location = new Point(774, 598);
+            progressBarF.Name = "progressBarF";
+            progressBarF.Size = new Size(189, 23);
+            progressBarF.TabIndex = 24;
             // 
             // menu
             // 
@@ -1564,6 +1600,8 @@ namespace Capa_Presentacion
             ((System.ComponentModel.ISupportInitialize)dgvClientes).EndInit();
             materialTabControl1.ResumeLayout(false);
             tabPage4.ResumeLayout(false);
+            materialCard10.ResumeLayout(false);
+            materialCard10.PerformLayout();
             materialCard7.ResumeLayout(false);
             materialCard7.PerformLayout();
             materialCard5.ResumeLayout(false);
@@ -1577,8 +1615,6 @@ namespace Capa_Presentacion
             materialCard8.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)dgvFactura).EndInit();
             ((System.ComponentModel.ISupportInitialize)fileSystemWatcher1).EndInit();
-            materialCard10.ResumeLayout(false);
-            materialCard10.PerformLayout();
             ResumeLayout(false);
         }
 
@@ -1660,5 +1696,9 @@ namespace Capa_Presentacion
         private MaterialSkin.Controls.MaterialComboBox cbmFactura;
         private MaterialSkin.Controls.MaterialCard materialCard10;
         private MaterialSkin.Controls.MaterialButton BtnGenerarFactura;
+        private ProgressBar progressBarC;
+        private ProgressBar progressBarH;
+        private ProgressBar progressBarR;
+        private ProgressBar progressBarF;
     }
 }

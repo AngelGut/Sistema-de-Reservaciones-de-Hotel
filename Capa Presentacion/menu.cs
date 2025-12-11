@@ -13,6 +13,7 @@ using Capa_Negocio.Reserva.Servicios;
 using Capa_Negocio.Reserva;
 using Capa_Negocio.Habitacion;
 using Capa_Negocio.Factura;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 
 namespace Capa_Presentacion
 {
@@ -22,7 +23,7 @@ namespace Capa_Presentacion
         private readonly ClienteServicios _clienteServicios = new ClienteServicios();
 
         // Token para operaciones async
-        private readonly CancellationTokenSource _cts = new CancellationTokenSource();
+        
 
         private readonly Capa_datos.ConexionBD _conexion = new Capa_datos.ConexionBD();
         private readonly HabitacionService _habitacionService;
@@ -72,7 +73,7 @@ namespace Capa_Presentacion
             cmbIDH.DropDownStyle = ComboBoxStyle.DropDownList;
             cmbEstadoH.DropDownStyle = ComboBoxStyle.DropDownList;
             txtPrecioN.KeyPress += txtPrecioN_KeyPress;
-            
+            this.Text = $"Hotel Leche Alegre";
 
 
 
@@ -133,30 +134,44 @@ namespace Capa_Presentacion
             CargarHabitaciones();
         }
 
+        // Capa_Presentacion.menu.cs
+
         private async void menu_Load(object sender, EventArgs e)
         {
-            // Cargar clientes en el DataGrid al abrir el formulario
-            await CargarClientesAsync();
-            await CargarCedulas();
-            await CargarIdsClientes();
-            CargarEstadosHabitacion();
-            CargarTiposHabitacion();
-            CargarIDs();
-            CargarEstados();
-            await CargarClientesReserva();
-            await CargarHabitacionesReserva();
-            await CargarIdsReservas();
-            await CargarIdsClientesBusqueda();
-            await CargarIdsFacturas();
-            await CargarFacturasEnDGVAsync();
+            ToggleLoading(true, progressBarC); // INICIO DE CARGA GLOBAL
+            try
+            {
+                // Carga de Clientes
+                await CargarClientesAsync();
+                await CargarCedulas();
+                await CargarIdsClientes();
 
+                // Carga de Habitaciones
+                CargarEstadosHabitacion();
+                CargarTiposHabitacion();
+                CargarIDs();
+                CargarEstados();
 
+                // Carga de Reservas y Facturas
+                await CargarClientesReserva();
+                await CargarHabitacionesReserva();
+                await CargarIdsReservas();
+                await CargarIdsClientesBusqueda();
+                await CargarIdsFacturas();
+                await CargarFacturasEnDGVAsync();
 
-
-
-            // Cargar habitaciones desde la BD
-            CargarHabitaciones();
-            await CargarReservasEnDGVAsync();
+                // Carga final de DGV (que contiene el delay más largo)
+                CargarHabitaciones();
+                await CargarReservasEnDGVAsync();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error en la carga inicial: {ex.Message}", "Error Crítico");
+            }
+            finally
+            {
+                ToggleLoading(false, progressBarC); // FIN DE CARGA GLOBAL
+            }
         }
 
         // ----------------------------------------------------------
@@ -178,48 +193,53 @@ namespace Capa_Presentacion
         // ----------------------------------------------------------
         private async Task CargarClientesAsync()
         {
-            var lista = await _clienteServicios.ObtenerTodosAsync(_cts.Token);
+            var lista = await _clienteServicios.ObtenerTodosAsync(CancellationToken.None);
             dgvClientes.DataSource = lista;
         }
 
         // ----------------------------------------------------------
         // EVENTO CLICK DEL BOTÓN REGISTRAR
         // ----------------------------------------------------------
+        // Capa_Presentacion.menu.cs (Modificar btnRegistrar_Click)
+
         private async void btnRegistrar_Click(object sender, EventArgs e)
         {
-            try
+            // Usamos un timeout de 30 segundos para las operaciones de registro general
+            using (var ctsLocal = new CancellationTokenSource(TimeSpan.FromSeconds(30)))
             {
-                if (string.IsNullOrWhiteSpace(txtNombre.Text))
+                ToggleLoading(true, progressBarC);
+                try
                 {
-                    MessageBox.Show("El nombre no puede estar vacío.");
-                    return;
+                    // ... (validaciones existentes) ...
+
+                    var cliente = new Cliente { /* ... */ };
+
+                    // Guardar, pasando el token temporal
+                    await _clienteServicios.CrearClienteAsync(cliente, ctsLocal.Token); // Pasa el token
+
+                    MessageBox.Show("Cliente registrado correctamente.");
+
+                    LimpiarCampos();
+
+                    // ... (Actualizaciones de UI existentes, deben usar _cts.Token si no tienen timeout)
+                    await CargarClientesAsync();
+                    await CargarCedulas();
+                    await CargarIdsClientes();
+                    await CargarClientesReserva();
+                    await CargarIdsClientesBusqueda();
                 }
-
-                var cliente = new Cliente
+                catch (OperationCanceledException)
                 {
-                    Nombre = txtNombre.Text.Trim(),
-                    Documento = txtCedula.Text.Trim(),
-                    Telefono = txtTelefono.Text.Trim(),
-                    Email = txtCorreo.Text.Trim(),
-                    Nacionalidad = txtNacionalidad.Text.Trim()
-                };
-
-                // Guardar
-                await _clienteServicios.CrearClienteAsync(cliente, _cts.Token);
-
-                MessageBox.Show("Cliente registrado correctamente.");
-
-                LimpiarCampos();
-
-                await CargarClientesAsync();
-                await CargarCedulas();     // <<========= ComboBox se actualiza
-                await CargarIdsClientes(); // <<========= ComboBox se actualiza
-                await CargarClientesReserva();
-                await CargarIdsClientesBusqueda();
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("Error al registrar el cliente: " + ex.Message);
+                    MessageBox.Show("La operación de registro de cliente excedió el tiempo límite.", "Timeout", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show("Error al registrar el cliente: " + ex.Message);
+                }
+                finally
+                { 
+                    ToggleLoading(false, progressBarC); 
+                }
             }
         }
 
@@ -303,7 +323,9 @@ namespace Capa_Presentacion
             // 2. CASO DE FILTRO ESPECÍFICO
             using (var conn = _conexion.CrearConexion())
             {
+                ToggleLoading(true, progressBarC);
                 try
+                   
                 {
                     await conn.OpenAsync();
 
@@ -361,6 +383,10 @@ namespace Capa_Presentacion
                 catch (Exception ex)
                 {
                     MessageBox.Show("Error al buscar el cliente: " + ex.Message);
+                }
+                finally
+                {
+                    ToggleLoading(false, progressBarC);
                 }
             }
         }
@@ -754,6 +780,7 @@ namespace Capa_Presentacion
 
         private async void btnRegistrarH_Click(object sender, EventArgs e)
         {
+            ToggleLoading(true, progressBarH);
             try
             {
                 // Usamos una variable local para el Nombre, que usaremos si el control existe:
@@ -814,7 +841,7 @@ namespace Capa_Presentacion
                 habitacion.PrecioPorNoche = precio;
 
                 // 2. Llamar al servicio de negocio (se mantiene)
-                await _habitacionService.CrearHabitacionAsync(habitacion, _cts.Token);
+                await _habitacionService.CrearHabitacionAsync(habitacion, CancellationToken.None);
 
                 MessageBox.Show("Habitación registrada correctamente.");
 
@@ -832,23 +859,31 @@ namespace Capa_Presentacion
             {
                 MessageBox.Show("Error al registrar la habitación: " + ex.Message);
             }
+            finally
+            {
+                ToggleLoading(false, progressBarH);
+            }
         }
-        
+
 
         private void txtPrecioN_KeyPress(object sender, KeyPressEventArgs e)
         {
-            // Permitir dígitos, la tecla de control (borrar, etc.) y un solo separador decimal (punto o coma)
+            
+            string currentText = ((System.Windows.Forms.Control)sender).Text;
+
+            // 1. Permitir dígitos, la tecla de control (borrar, etc.) y un solo separador decimal (punto o coma)
             if (!char.IsDigit(e.KeyChar) && !char.IsControl(e.KeyChar) && (e.KeyChar != '.') && (e.KeyChar != ','))
             {
                 e.Handled = true; // Bloquea otros caracteres
             }
 
-            // Asegura que solo se puede ingresar un punto/coma decimal
+            // 2. Asegura que solo se puede ingresar un punto/coma decimal
             if ((e.KeyChar == '.') || (e.KeyChar == ','))
             {
-                if (((TextBox)sender).Text.Contains(".") || ((TextBox)sender).Text.Contains(","))
+                // Si el texto actual ya contiene un punto O una coma, bloquea el nuevo ingreso.
+                if (currentText.Contains(".") || currentText.Contains(","))
                 {
-                    e.Handled = true; // Bloquea si ya hay un separador decimal
+                    e.Handled = true; // Bloquea si ya existe un separador decimal
                 }
             }
         }
@@ -1139,6 +1174,7 @@ namespace Capa_Presentacion
 
         private async void btnRegistrarR_Click(object sender, EventArgs e)
         {
+            ToggleLoading(true, progressBarR);
             try
             {
                 // 1. Validaciones
@@ -1211,6 +1247,10 @@ namespace Capa_Presentacion
             {
                 MessageBox.Show($"Error al registrar la reserva: {ex.Message}", "Error General");
             }
+            finally
+            {
+                ToggleLoading(false, progressBarR);
+            }
         }
 
 
@@ -1254,7 +1294,7 @@ namespace Capa_Presentacion
                 try
                 {
                     // Usamos el servicio para obtener los detalles de la habitación (incluyendo el precio)
-                    var habitacion = await _habitacionService.ObtenerPorIdAsync(idHabitacion, _cts.Token);
+                    var habitacion = await _habitacionService.ObtenerPorIdAsync(idHabitacion, CancellationToken.None);
 
                     if (habitacion != null)
                     {
@@ -1268,7 +1308,9 @@ namespace Capa_Presentacion
                 }
             }
         }
-       
+
+
+        // Capa_Presentacion.menu.cs
 
         private async void btnEliminarCliente_Click(object sender, EventArgs e)
         {
@@ -1280,55 +1322,64 @@ namespace Capa_Presentacion
             }
 
             // 2. Obtener el ID
-            // Se asume que la columna 'IdCliente' existe y es donde se extrae el valor.
             int idCliente = Convert.ToInt32(dgvClientes.SelectedRows[0].Cells["IdCliente"].Value);
 
             // 3. Confirmación
             DialogResult confirmacion = MessageBox.Show(
-                $"¿Estás seguro de que deseas eliminar el cliente con ID {idCliente}? Esto puede fallar si tiene reservas o facturas asociadas.",
+                $"¿Estás seguro de que deseas eliminar el cliente con ID {idCliente}? Esta acción puede fallar si tiene reservas o facturas asociadas.",
                 "Confirmar Eliminación",
                 MessageBoxButtons.YesNo,
                 MessageBoxIcon.Question);
 
             if (confirmacion == DialogResult.Yes)
             {
-                try
+                // === APLICACIÓN DEL CANCELLATION TOKEN CON TIMEOUT (30 SEGUNDOS) ===
+                TimeSpan timeout = TimeSpan.FromSeconds(30);
+                using (var ctsGeneral = new CancellationTokenSource(timeout))
                 {
-                    // 4. Llamar al servicio de negocio para eliminar
-                    // Usamos _clienteServicios que contiene el método EliminarClienteAsync
-                    await _clienteServicios.EliminarClienteAsync(idCliente, _cts.Token);
-
-                    MessageBox.Show($"Cliente ID {idCliente} eliminado correctamente.", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information);
-
-                    // 5. Actualizar la interfaz (DGV y todos los ComboBoxes de cliente/reserva)
-                    await CargarClientesAsync();
-                    await CargarCedulas();
-                    await CargarIdsClientes();
-                    await CargarClientesReserva(); // Actualiza el ComboBox de reserva (cbmElegirCliente)
-
-                    // Recargar reservas, ya que las reservas sin cliente pueden causar problemas, 
-                    // pero la BD debería haberlo bloqueado (Foreign Key Constraint).
-                    await CargarReservasEnDGVAsync();
-                    await CargarIdsClientesBusqueda();
-                    await CargarReservasEnDGVAsync();
-
-                }
-                catch (Microsoft.Data.SqlClient.SqlException sqlEx)
-                {
-                    // Manejar error de llave foránea (Error 547)
-                    if (sqlEx.Number == 547)
+                    ToggleLoading(true, progressBarC);
+                    try
                     {
-                        MessageBox.Show("No se puede eliminar el cliente porque tiene reservas o facturas activas/asociadas.", "Error de Integridad", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        // 4. Llamar al servicio de negocio para eliminar, pasando el token temporal
+                        await _clienteServicios.EliminarClienteAsync(idCliente, ctsGeneral.Token);
+
+                        MessageBox.Show($"Cliente ID {idCliente} eliminado correctamente.", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information);
+
+                        // 5. Actualizar la interfaz
+                        await CargarClientesAsync();
+                        await CargarCedulas();
+                        await CargarIdsClientes();
+                        await CargarClientesReserva();
+                        await CargarIdsClientesBusqueda();
+                        await CargarReservasEnDGVAsync();
+
                     }
-                    else
+                    catch (OperationCanceledException)
                     {
-                        MessageBox.Show($"Error de SQL al eliminar: {sqlEx.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        // Captura si la eliminación superó los 30 segundos
+                        MessageBox.Show("La operación de eliminación excedió el tiempo límite de 30 segundos y fue cancelada.", "Timeout", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                     }
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show($"Error inesperado al eliminar el cliente: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                }
+                    catch (Microsoft.Data.SqlClient.SqlException sqlEx)
+                    {
+                        // Manejar error de llave foránea (Error 547)
+                        if (sqlEx.Number == 547)
+                        {
+                            MessageBox.Show("No se puede eliminar el cliente porque tiene reservas o facturas activas/asociadas.", "Error de Integridad", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        }
+                        else
+                        {
+                            MessageBox.Show($"Error de SQL al eliminar: {sqlEx.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show($"Error inesperado al eliminar el cliente: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    }
+                    finally 
+                    { 
+                        ToggleLoading(false, progressBarC);
+                    }
+                } // El using garantiza que ctsGeneral.Dispose() se llama al final
             }
         }
 
@@ -1358,11 +1409,12 @@ namespace Capa_Presentacion
 
             if (confirmacion == DialogResult.Yes)
             {
+                ToggleLoading(true,progressBarH);
                 try
                 {
                     // 4. Llamar al servicio de negocio para eliminar
                     // Usamos _habitacionService que contiene el método EliminarHabitacionAsync
-                    await _habitacionService.EliminarHabitacionAsync(idHabitacion, _cts.Token);
+                    await _habitacionService.EliminarHabitacionAsync(idHabitacion, CancellationToken.None);
 
                     MessageBox.Show($"Habitación {numeroHab} eliminada correctamente.", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information);
 
@@ -1389,6 +1441,10 @@ namespace Capa_Presentacion
                 {
                     MessageBox.Show($"Error inesperado al eliminar la habitación: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
+                finally
+                {
+                    ToggleLoading(false,progressBarH);
+                }
             }
         }
 
@@ -1410,34 +1466,51 @@ namespace Capa_Presentacion
         /// <summary>
         /// Método genérico para ejecutar acciones en el servicio de reserva y actualizar la UI.
         /// </summary>
+        // Capa_Presentacion.menu.cs (Reemplazar ExecuteReservaActionAsync)
+
         private async Task ExecuteReservaActionAsync(Func<int, CancellationToken, Task> action, string successMessage)
         {
-            try
-            {
-                int idReserva = GetSelectedReservaId();
+            // Definimos el límite de 5 minutos (300 segundos) para esta operación.
+            TimeSpan timeout = TimeSpan.FromMinutes(5);
 
-                // Ejecuta la función del servicio (CheckInAsync, CancelarReservaAsync, etc.)
-                await action(idReserva, _cts.Token);
-
-                MessageBox.Show(successMessage, "Éxito");
-
-                // Actualizar UI
-                await CargarReservasEnDGVAsync();
-                CargarHabitaciones(); // Actualizar el estado de la habitación
-
-            }
-            catch (InvalidOperationException ex)
+            // Usamos un CTS local que se cancelará automáticamente después del timeout.
+            using (var ctsTiempoLimite = new CancellationTokenSource(timeout))
             {
-                // Se lanza si no hay selección (GetSelectedReservaId) o si la lógica de negocio lo impide
-                MessageBox.Show(ex.Message, "Advertencia", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-            }
-            catch (ReservacionNoEncontradaException ex)
-            {
-                MessageBox.Show(ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Error durante la operación: {ex.Message}", "Error General", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                ToggleLoading(true, progressBarR);
+                try
+                {
+                    int idReserva = GetSelectedReservaId();
+
+                    // Ejecuta la función del servicio, pasando el token con timeout.
+                    await action(idReserva, ctsTiempoLimite.Token);
+
+                    MessageBox.Show(successMessage, "Éxito");
+
+                    // Actualizar UI
+                    await CargarReservasEnDGVAsync();
+                    CargarHabitaciones();
+                }
+                catch (OperationCanceledException)
+                {
+                    // Captura si la cancelación fue forzada por el timeout.
+                    MessageBox.Show("La operación excedió el tiempo límite de 5 minutos y fue cancelada.", "Timeout", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                }
+                catch (InvalidOperationException ex)
+                {
+                    MessageBox.Show(ex.Message, "Advertencia", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                }
+                catch (ReservacionNoEncontradaException ex)
+                {
+                    MessageBox.Show(ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Error durante la operación: {ex.Message}", "Error General", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+                finally
+                {
+                    ToggleLoading(false, progressBarR);
+                }
             }
         }
         // Capa_Presentacion.menu.cs
@@ -1682,7 +1755,7 @@ namespace Capa_Presentacion
             try
             {
                 // No hay un método para solo IDs, así que cargamos todas las facturas
-                var lista = await _facturaService.ObtenerTodasAsync(_cts.Token);
+                var lista = await _facturaService.ObtenerTodasAsync(CancellationToken.None);
 
                 foreach (var factura in lista.OrderByDescending(f => f.IdFactura))
                 {
@@ -1704,7 +1777,7 @@ namespace Capa_Presentacion
         {
             try
             {
-                var lista = await _facturaService.ObtenerTodasAsync(_cts.Token);
+                var lista = await _facturaService.ObtenerTodasAsync(CancellationToken.None);
 
                 dgvFactura.DataSource = lista.Select(f => new
                 {
@@ -1760,11 +1833,11 @@ namespace Capa_Presentacion
                 MessageBox.Show("ID de factura inválido.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
-
+            ToggleLoading(true, progressBarF);
             try
             {
                 // 1. Obtener la factura específica
-                var factura = await _facturaService.ObtenerPorIdAsync(idFactura, _cts.Token);
+                var factura = await _facturaService.ObtenerPorIdAsync(idFactura, CancellationToken.None);
 
                 if (factura != null)
                 {
@@ -1791,6 +1864,10 @@ namespace Capa_Presentacion
             catch (Exception ex)
             {
                 MessageBox.Show($"Error al buscar factura: {ex.Message}", "Error");
+            }
+            finally
+            {
+                ToggleLoading(false, progressBarF);
             }
         }
         // Capa_Presentacion.menu.cs
@@ -1834,13 +1911,14 @@ namespace Capa_Presentacion
 
         private async void BtnGenerarFactura_Click(object sender, EventArgs e)
         {
+            ToggleLoading(true, progressBarF);
             try
             {
                 // 1. Obtener el ID de la reserva seleccionada
                 int idReserva = GetSelectedReservaId();
 
                 // 2. Obtener la reserva para validar
-                var reserva = await _reservaService.ObtenerPorIdAsync(idReserva, _cts.Token);
+                var reserva = await _reservaService.ObtenerPorIdAsync(idReserva, CancellationToken.None);
 
                 if (reserva == null)
                 {
@@ -1849,7 +1927,7 @@ namespace Capa_Presentacion
                 }
 
                 // Validación CLAVE: Verificar si ya existe una factura
-                var facturaExistente = await _facturaService.ObtenerPorIdReservaAsync(idReserva, _cts.Token);
+                var facturaExistente = await _facturaService.ObtenerPorIdReservaAsync(idReserva, CancellationToken.None);
                 if (facturaExistente != null)
                 {
                     MessageBox.Show($"Esta reserva ya tiene una factura registrada (No. {facturaExistente.IdFactura}). No se permite duplicar.", "Advertencia", MessageBoxButtons.OK, MessageBoxIcon.Warning);
@@ -1864,7 +1942,7 @@ namespace Capa_Presentacion
                 }
 
                 // 3. Generar la factura
-                Factura nuevaFactura = await _facturaService.GenerarFacturaAsync(idReserva, _cts.Token);
+                Factura nuevaFactura = await _facturaService.GenerarFacturaAsync(idReserva, CancellationToken.None);
 
                 MessageBox.Show(
                     $"Factura No. {nuevaFactura.IdFactura} generada para la reserva {idReserva}. Los montos son inmutables.",
@@ -1884,6 +1962,35 @@ namespace Capa_Presentacion
             catch (Exception ex)
             {
                 MessageBox.Show($"Error al intentar generar la factura: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            finally
+            {
+                ToggleLoading(false, progressBarF);
+            }
+        }
+
+        // Capa_Presentacion.menu.cs (Añadir a la clase menu)
+
+        // Capa_Presentacion.menu.cs (Añadir a la clase menu)
+
+        private void ToggleLoading(bool isLoading, System.Windows.Forms.ProgressBar targetBar)
+        {
+            // Deshabilitar/Habilitar los DataGridViews principales
+            // (Opcional: Si los DGV están en diferentes TabPages, puedes deshabilitar solo los controles del TabPage activo)
+            dgvClientes.Enabled = !isLoading;
+            dgvHabitaciones.Enabled = !isLoading;
+            dgvReserva.Enabled = !isLoading;
+            dgvFactura.Enabled = !isLoading;
+
+            if (isLoading)
+            {
+                targetBar.Style = ProgressBarStyle.Marquee;
+                targetBar.Visible = true;
+            }
+            else
+            {
+                targetBar.Visible = false;
+                targetBar.Style = ProgressBarStyle.Blocks;
             }
         }
 
