@@ -73,7 +73,7 @@ namespace Capa_Presentacion
             cmbIDH.DropDownStyle = ComboBoxStyle.DropDownList;
             cmbEstadoH.DropDownStyle = ComboBoxStyle.DropDownList;
             txtPrecioN.KeyPress += txtPrecioN_KeyPress;
-            this.Text = $"Hotel Leche Alegre";
+            this.Text = $"Hotel La Bendicion";
 
 
 

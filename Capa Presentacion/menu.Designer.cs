@@ -29,7 +29,9 @@ namespace Capa_Presentacion
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(menu));
             tabPage3 = new TabPage();
+            progressBarH = new ProgressBar();
             btnEliminarHab = new MaterialSkin.Controls.MaterialButton();
             materialCard3 = new MaterialSkin.Controls.MaterialCard();
             btnLimpiarH = new MaterialSkin.Controls.MaterialButton();
@@ -74,6 +76,7 @@ namespace Capa_Presentacion
             tabPage1 = new TabPage();
             materialTabControl1 = new MaterialSkin.Controls.MaterialTabControl();
             tabPage4 = new TabPage();
+            progressBarR = new ProgressBar();
             materialCard10 = new MaterialSkin.Controls.MaterialCard();
             BtnGenerarFactura = new MaterialSkin.Controls.MaterialButton();
             materialCard7 = new MaterialSkin.Controls.MaterialCard();
@@ -99,6 +102,7 @@ namespace Capa_Presentacion
             cbmElegirHR = new MaterialSkin.Controls.MaterialComboBox();
             dgvReserva = new DataGridView();
             tabPage5 = new TabPage();
+            progressBarF = new ProgressBar();
             materialCard9 = new MaterialSkin.Controls.MaterialCard();
             btnBuscarF = new MaterialSkin.Controls.MaterialButton();
             cbmFactura = new MaterialSkin.Controls.MaterialComboBox();
@@ -106,9 +110,7 @@ namespace Capa_Presentacion
             materialCard8 = new MaterialSkin.Controls.MaterialCard();
             dgvFactura = new DataGridView();
             fileSystemWatcher1 = new FileSystemWatcher();
-            progressBarH = new ProgressBar();
-            progressBarR = new ProgressBar();
-            progressBarF = new ProgressBar();
+            pictureBox1 = new PictureBox();
             tabPage3.SuspendLayout();
             materialCard3.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)dgvHabitaciones).BeginInit();
@@ -117,6 +119,7 @@ namespace Capa_Presentacion
             materialCard6.SuspendLayout();
             materialCard1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)dgvClientes).BeginInit();
+            tabPage1.SuspendLayout();
             materialTabControl1.SuspendLayout();
             tabPage4.SuspendLayout();
             materialCard10.SuspendLayout();
@@ -129,6 +132,7 @@ namespace Capa_Presentacion
             materialCard8.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)dgvFactura).BeginInit();
             ((System.ComponentModel.ISupportInitialize)fileSystemWatcher1).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)pictureBox1).BeginInit();
             SuspendLayout();
             // 
             // tabPage3
@@ -145,6 +149,13 @@ namespace Capa_Presentacion
             tabPage3.TabIndex = 2;
             tabPage3.Text = "Habitaciones";
             tabPage3.UseVisualStyleBackColor = true;
+            // 
+            // progressBarH
+            // 
+            progressBarH.Location = new Point(1181, 476);
+            progressBarH.Name = "progressBarH";
+            progressBarH.Size = new Size(189, 23);
+            progressBarH.TabIndex = 24;
             // 
             // btnEliminarHab
             // 
@@ -1011,6 +1022,7 @@ namespace Capa_Presentacion
             // 
             // tabPage1
             // 
+            tabPage1.Controls.Add(pictureBox1);
             tabPage1.Location = new Point(4, 24);
             tabPage1.Name = "tabPage1";
             tabPage1.Padding = new Padding(3);
@@ -1051,6 +1063,13 @@ namespace Capa_Presentacion
             tabPage4.TabIndex = 3;
             tabPage4.Text = "Reservacion";
             tabPage4.UseVisualStyleBackColor = true;
+            // 
+            // progressBarR
+            // 
+            progressBarR.Location = new Point(1117, 601);
+            progressBarR.Name = "progressBarR";
+            progressBarR.Size = new Size(189, 23);
+            progressBarR.TabIndex = 24;
             // 
             // materialCard10
             // 
@@ -1450,6 +1469,13 @@ namespace Capa_Presentacion
             tabPage5.Text = "Factura";
             tabPage5.UseVisualStyleBackColor = true;
             // 
+            // progressBarF
+            // 
+            progressBarF.Location = new Point(774, 598);
+            progressBarF.Name = "progressBarF";
+            progressBarF.Size = new Size(189, 23);
+            progressBarF.TabIndex = 24;
+            // 
             // materialCard9
             // 
             materialCard9.BackColor = Color.FromArgb(255, 255, 255);
@@ -1553,26 +1579,14 @@ namespace Capa_Presentacion
             fileSystemWatcher1.EnableRaisingEvents = true;
             fileSystemWatcher1.SynchronizingObject = this;
             // 
-            // progressBarH
+            // pictureBox1
             // 
-            progressBarH.Location = new Point(1181, 476);
-            progressBarH.Name = "progressBarH";
-            progressBarH.Size = new Size(189, 23);
-            progressBarH.TabIndex = 24;
-            // 
-            // progressBarR
-            // 
-            progressBarR.Location = new Point(1117, 601);
-            progressBarR.Name = "progressBarR";
-            progressBarR.Size = new Size(189, 23);
-            progressBarR.TabIndex = 24;
-            // 
-            // progressBarF
-            // 
-            progressBarF.Location = new Point(774, 598);
-            progressBarF.Name = "progressBarF";
-            progressBarF.Size = new Size(189, 23);
-            progressBarF.TabIndex = 24;
+            pictureBox1.Image = (Image)resources.GetObject("pictureBox1.Image");
+            pictureBox1.Location = new Point(564, 171);
+            pictureBox1.Name = "pictureBox1";
+            pictureBox1.Size = new Size(507, 494);
+            pictureBox1.TabIndex = 0;
+            pictureBox1.TabStop = false;
             // 
             // menu
             // 
@@ -1598,6 +1612,7 @@ namespace Capa_Presentacion
             materialCard1.ResumeLayout(false);
             materialCard1.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)dgvClientes).EndInit();
+            tabPage1.ResumeLayout(false);
             materialTabControl1.ResumeLayout(false);
             tabPage4.ResumeLayout(false);
             materialCard10.ResumeLayout(false);
@@ -1615,6 +1630,7 @@ namespace Capa_Presentacion
             materialCard8.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)dgvFactura).EndInit();
             ((System.ComponentModel.ISupportInitialize)fileSystemWatcher1).EndInit();
+            ((System.ComponentModel.ISupportInitialize)pictureBox1).EndInit();
             ResumeLayout(false);
         }
 
@@ -1700,5 +1716,6 @@ namespace Capa_Presentacion
         private ProgressBar progressBarH;
         private ProgressBar progressBarR;
         private ProgressBar progressBarF;
+        private PictureBox pictureBox1;
     }
 }
