@@ -21,9 +21,13 @@ namespace Capa_Presentacion
     {
         // Servicio de la capa negocio
         private readonly ClienteServicios _clienteServicios = new ClienteServicios();
+        private CancellationTokenSource _ctsCliente = new CancellationTokenSource();
+        private CancellationTokenSource _ctsHabitacion = new CancellationTokenSource();
+        private CancellationTokenSource _ctsReserva = new CancellationTokenSource();
+        private CancellationTokenSource _ctsFactura = new CancellationTokenSource();
 
         // Token para operaciones async
-        
+
 
         private readonly Capa_datos.ConexionBD _conexion = new Capa_datos.ConexionBD();
         private readonly HabitacionService _habitacionService;
@@ -34,6 +38,7 @@ namespace Capa_Presentacion
         public menu()
         {
             InitializeComponent();
+            ConfigurarDgvClientes();
             _habitacionService = new HabitacionService();
             _reservaService = new ReservaService(_habitacionService);
             _facturaService = new FacturaService(_reservaService);
@@ -122,6 +127,10 @@ namespace Capa_Presentacion
             btnBuscarF.Click += btnBuscarF_Click;
             btnFactura.Click += btnFactura_Click;
             BtnGenerarFactura.Click += BtnGenerarFactura_Click;
+            btnCancelarC.Click += btnCancelarC_Click;
+            btnCancelarH.Click += btnCancelarH_Click;
+            btnCancelarR.Click += btnCancelarR_Click;
+            btnCancelarF.Click += btnCancelarF_Click;
         }
 
         private void BtnLimpiarH_Click(object? sender, EventArgs e)
@@ -191,57 +200,121 @@ namespace Capa_Presentacion
         // ----------------------------------------------------------
         // MÉTODO PARA CARGAR EL DGV
         // ----------------------------------------------------------
+        // Capa_Presentacion.menu.cs (Modificar CargarClientesAsync)
+
+        // Capa_Presentacion.menu.cs (Modificación dentro de CargarClientesAsync)
+
+        // Capa_Presentacion.menu.cs (Modificación dentro de CargarClientesAsync)
+
+        // Capa_Presentacion.menu.cs (Método CargarClientesAsync modificado)
+
         private async Task CargarClientesAsync()
         {
-            var lista = await _clienteServicios.ObtenerTodosAsync(CancellationToken.None);
-            dgvClientes.DataSource = lista;
+            // Usamos un timeout corto (10 segundos) para la lectura.
+            using (var ctsLoad = new CancellationTokenSource(TimeSpan.FromSeconds(10)))
+            {
+                try
+                {
+                    // PASO CLAVE 1: Asegurar que las columnas existen y están mapeadas
+                    // Si no se hace esto antes o el DGV se ha enlazado previamente a un DataTable,
+                    // las propiedades de la clase Cliente no se mapearán correctamente.
+                    ConfigurarDgvClientes();
+
+                    var lista = await _clienteServicios.ObtenerTodosAsync(ctsLoad.Token);
+
+                    // PASO CLAVE 2: Limpiar la fuente de datos anterior (si existe)
+                    // y asignar la nueva lista de objetos Cliente
+                    dgvClientes.DataSource = null;
+                    dgvClientes.DataSource = lista;
+
+                    // Aseguramos que el DataGridView refresque su contenido con los nuevos datos
+                    dgvClientes.Refresh();
+                }
+                catch (OperationCanceledException)
+                {
+                    MessageBox.Show("La carga de clientes excedió el tiempo límite.", "Timeout", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show("Error al cargar la lista de clientes: " + ex.Message, "Error de Carga", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+            }
         }
 
         // ----------------------------------------------------------
         // EVENTO CLICK DEL BOTÓN REGISTRAR
         // ----------------------------------------------------------
-        
+
+
+        // Capa_Presentacion.menu.cs (Reemplazar btnRegistrar_Click)
+
+        // Capa_Presentacion.menu.cs
+
+        // Capa_Presentacion.menu.cs (Método btnRegistrar_Click)
+
+        // Capa_Presentacion.menu.cs (Método btnRegistrar_Click - Versión Final de Depuración)
+
+        // Capa_Presentacion.menu.cs (REEMPLAZAR btnRegistrar_Click)
 
         private async void btnRegistrar_Click(object sender, EventArgs e)
         {
-            // Usamos un timeout de 30 segundos para las operaciones de registro general
-            using (var ctsLocal = new CancellationTokenSource(TimeSpan.FromSeconds(30)))
+            TimeSpan timeout = TimeSpan.FromSeconds(30);
+            // Combina Cancelación Manual y Timeout
+            using (var linkedCts = CancellationTokenSource.CreateLinkedTokenSource(_ctsCliente.Token, new CancellationTokenSource(timeout).Token))
             {
                 ToggleLoading(true, progressBarC);
                 try
                 {
-                    //(validaciones existentes)
+                    // 1. Validaciones de UI
+                    if (string.IsNullOrWhiteSpace(txtNombre.Text) ||
+                        string.IsNullOrWhiteSpace(txtCedula.Text) ||
+                        string.IsNullOrWhiteSpace(txtTelefono.Text) ||
+                        string.IsNullOrWhiteSpace(txtCorreo.Text))
+                    {
+                        MessageBox.Show("Por favor, completa todos los campos obligatorios del cliente.", "Advertencia", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                        return;
+                    }
 
-                    var cliente = new Cliente { };
+                    var cliente = new Cliente
+                    {
+                        Nombre = txtNombre.Text.Trim(),
+                        Documento = txtCedula.Text.Trim(),
+                        Telefono = txtTelefono.Text.Trim(),
+                        Email = txtCorreo.Text.Trim(),
+                        Nacionalidad = txtNacionalidad.Text.Trim()
+                    };
 
-                    // Guardar, pasando el token temporal
-                    await _clienteServicios.CrearClienteAsync(cliente, ctsLocal.Token); // Pasa el token
+                    // Pasar el token combinado a la CN
+                    await _clienteServicios.CrearClienteAsync(cliente, linkedCts.Token);
 
-                    MessageBox.Show("Cliente registrado correctamente.");
+                    MessageBox.Show("Cliente registrado correctamente.", "Éxito");
 
                     LimpiarCampos();
 
-                    
+                    // 4. Actualizar DGV y ComboBoxes
                     await CargarClientesAsync();
                     await CargarCedulas();
                     await CargarIdsClientes();
                     await CargarClientesReserva();
                     await CargarIdsClientesBusqueda();
                 }
-                catch (OperationCanceledException)
+                catch (OperationCanceledException) when (linkedCts.IsCancellationRequested)
                 {
-                    MessageBox.Show("La operación de registro de cliente excedió el tiempo límite.", "Timeout", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    // No se muestra mensaje aquí; el botón de cancelación ya mostró su mensaje.
                 }
                 catch (Exception ex)
                 {
                     MessageBox.Show("Error al registrar el cliente: " + ex.Message);
                 }
                 finally
-                { 
-                    ToggleLoading(false, progressBarC); 
+                {
+                    ToggleLoading(false, progressBarC);
                 }
             }
         }
+
+
+
 
         private async Task CargarCedulas()
         {
@@ -559,65 +632,59 @@ namespace Capa_Presentacion
             dgvClientes.CurrentCell = dgvClientes.Rows[e.RowIndex].Cells[e.ColumnIndex];
             dgvClientes.BeginEdit(true);
         }
+        // Capa_Presentacion.menu.cs (Reemplazar dgvClientes_CellEndEdit)
+
         private async void dgvClientes_CellEndEdit(object sender, DataGridViewCellEventArgs e)
         {
             if (dgvClientes.ReadOnly) return;
-
             if (dgvClientes.CurrentRow == null) return;
 
             int id = Convert.ToInt32(dgvClientes.CurrentRow.Cells["IdCliente"].Value);
 
-            string nombre = dgvClientes.CurrentRow.Cells["Nombre"].Value?.ToString() ?? "";
-            string documento = dgvClientes.CurrentRow.Cells["Documento"].Value?.ToString() ?? "";
-            string telefono = dgvClientes.CurrentRow.Cells["Telefono"].Value?.ToString() ?? "";
-            string correo = dgvClientes.CurrentRow.Cells["Email"].Value?.ToString() ?? "";
-            string nacionalidad = dgvClientes.CurrentRow.Cells["Nacionalidad"].Value?.ToString() ?? "";
-
-            try
+            // Mapeo de datos (tomados directamente del DGV)
+            var cliente = new Cliente
             {
-                using (var conn = _conexion.CrearConexion())
+                IdCliente = id,
+                Nombre = dgvClientes.CurrentRow.Cells["Nombre"].Value?.ToString() ?? "",
+                Documento = dgvClientes.CurrentRow.Cells["Documento"].Value?.ToString() ?? "",
+                Telefono = dgvClientes.CurrentRow.Cells["Telefono"].Value?.ToString() ?? "",
+                Email = dgvClientes.CurrentRow.Cells["Email"].Value?.ToString() ?? "",
+                Nacionalidad = dgvClientes.CurrentRow.Cells["Nacionalidad"].Value?.ToString() ?? ""
+            };
+
+            // Usamos un timeout de 30 segundos para la actualización
+            using (var ctsLocal = new CancellationTokenSource(TimeSpan.FromSeconds(30)))
+            {
+                ToggleLoading(true, progressBarC);
+                try
                 {
-                    await conn.OpenAsync();
+                    // Llamar al servicio para ACTUALIZAR
+                    await _clienteServicios.ActualizarClienteAsync(cliente, ctsLocal.Token);
 
-                    string query = @"UPDATE Cliente SET 
-                                Nombre=@Nombre,
-                                Documento=@Documento,
-                                Telefono=@Telefono,
-                                Email=@Email,
-                                Nacionalidad=@Nacionalidad
-                             WHERE IdCliente=@IdCliente";
+                    MessageBox.Show("Cambios guardados correctamente.", "Éxito");
 
-                    using (SqlCommand cmd = new SqlCommand(query, conn))
-                    {
-                        cmd.Parameters.AddWithValue("@IdCliente", id);
-                        cmd.Parameters.AddWithValue("@Nombre", nombre);
-                        cmd.Parameters.AddWithValue("@Documento", documento);
-                        cmd.Parameters.AddWithValue("@Telefono", telefono);
-                        cmd.Parameters.AddWithValue("@Email", correo);
-                        cmd.Parameters.AddWithValue("@Nacionalidad", nacionalidad);
+                    // Revertir modo de edición y actualizar UI
+                    dgvClientes.ReadOnly = true;
+                    dgvClientes.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
+                    dgvClientes.EditMode = DataGridViewEditMode.EditProgrammatically;
+                    BloquearControles(false);
 
-                        await cmd.ExecuteNonQueryAsync();
-                    }
+                    await CargarClientesAsync();
+                    await CargarCedulas();
+                    await CargarIdsClientes();
                 }
-
-                // Refrescar UI
-                await CargarClientesAsync();
-                await CargarCedulas();
-                await CargarIdsClientes();
-
-                dgvClientes.ReadOnly = true;
-                dgvClientes.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
-                dgvClientes.EditMode = DataGridViewEditMode.EditProgrammatically;
-
-                BloquearControles(false);
-
-
-                MessageBox.Show("Cambios guardados correctamente.");
-
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("Error al actualizar: " + ex.Message);
+                catch (OperationCanceledException)
+                {
+                    MessageBox.Show("La operación de edición excedió el tiempo límite.", "Timeout", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show("Error al actualizar: " + ex.Message);
+                }
+                finally
+                {
+                    ToggleLoading(false, progressBarC);
+                }
             }
         }
         private void CargarEstadosHabitacion()
@@ -777,90 +844,84 @@ namespace Capa_Presentacion
 
 
 
+        // Capa_Presentacion.menu.cs (REEMPLAZAR btnRegistrarH_Click)
+
         private async void btnRegistrarH_Click(object sender, EventArgs e)
         {
-            ToggleLoading(true, progressBarH);
-            try
+            TimeSpan timeout = TimeSpan.FromSeconds(30);
+
+            // Combinamos el token de CANCELACIÓN MANUAL (_ctsHabitacion) con el token de TIMEOUT
+            using (var linkedCts = CancellationTokenSource.CreateLinkedTokenSource(_ctsHabitacion.Token, new CancellationTokenSource(timeout).Token))
             {
-                // Usamos una variable local para el Nombre, que usaremos si el control existe:
-                // Si el control está declarado, esto funcionará. 
-                string nombreHabitacion = txtNombreH.Text.Trim(); // Si txtNombreH existe, obtiene su valor.
-
-                if (string.IsNullOrWhiteSpace(txtNumeroHab.Text) ||
-                    cmbEstado.SelectedIndex == -1 ||
-                    cmbTipo.SelectedIndex == -1 ||
-                    string.IsNullOrWhiteSpace(txtPrecioN.Text) ||
-                    string.IsNullOrWhiteSpace(nombreHabitacion)) // Validación con la variable local
+                ToggleLoading(true, progressBarH);
+                try
                 {
-                    MessageBox.Show("Completa todos los campos obligatorios (Número, Tipo, Estado, Nombre y Precio por Noche).");
-                    return;
-                }
+                    // --- Validaciones de Entrada ---
+                    string nombreHabitacion = txtNombreH.Text.Trim();
 
-                // Validación de precio (se mantiene)
-                if (!decimal.TryParse(txtPrecioN.Text.Trim(), out decimal precio))
+                    if (string.IsNullOrWhiteSpace(txtNumeroHab.Text) ||
+                        cmbEstado.SelectedIndex == -1 ||
+                        cmbTipo.SelectedIndex == -1 ||
+                        string.IsNullOrWhiteSpace(txtPrecioN.Text) ||
+                        string.IsNullOrWhiteSpace(nombreHabitacion))
+                    {
+                        MessageBox.Show("Completa todos los campos obligatorios.");
+                        return;
+                    }
+
+                    if (!decimal.TryParse(txtPrecioN.Text.Trim(), out decimal precio) || precio <= 0)
+                    {
+                        MessageBox.Show("El precio por noche debe ser un valor numérico válido y mayor a cero.");
+                        return;
+                    }
+
+                    // --- Mapeo del Objeto ---
+                    int numero = int.Parse(txtNumeroHab.Text);
+                    int tipoInt = cmbTipo.SelectedIndex + 1;
+                    int estadoInt = cmbEstado.SelectedIndex;
+
+                    var tipoEnum = (TipoHabitacion)tipoInt;
+                    HabitacionBase habitacion;
+
+                    // (Lógica de instanciación de subclase de Habitación se mantiene igual)
+
+                    switch (tipoEnum)
+                    {
+                        case TipoHabitacion.Simple: habitacion = new Simple(); break;
+                        case TipoHabitacion.Doble: habitacion = new Doble(); break;
+                        case TipoHabitacion.Suite: habitacion = new Suite(); break;
+                        case TipoHabitacion.Presidencial: habitacion = new Presidencial(); break;
+                        default: throw new Exception("Tipo de habitación no válido.");
+                    }
+
+                    habitacion.Numero = numero;
+                    habitacion.Nombre = nombreHabitacion;
+                    habitacion.Estado = (EstadoHabitacion)estadoInt;
+                    habitacion.Descripcion = nombreHabitacion;
+                    habitacion.PrecioPorNoche = precio;
+
+                    // 2. Llamar al servicio de negocio, usando el token combinado
+                    await _habitacionService.CrearHabitacionAsync(habitacion, linkedCts.Token);
+
+                    MessageBox.Show("Habitación registrada correctamente.", "Éxito");
+
+                    // 3. Limpiar campos y recargar DGV
+                    LimpiarCamposHabitacion(); // Asumiendo que tienes un método LimpiarCamposHabitacion
+                    CargarHabitaciones();
+                    CargarIDs();
+                }
+                catch (OperationCanceledException) when (linkedCts.IsCancellationRequested)
                 {
-                    MessageBox.Show("El precio por noche debe ser un valor numérico válido.");
-                    return;
+                    // Captura si el usuario presionó btnCancelarH o si expiró el tiempo
                 }
-                if (precio <= 0)
+                catch (Exception ex)
                 {
-                    MessageBox.Show("El precio por noche debe ser mayor a cero.");
-                    return;
+                    MessageBox.Show("Error al registrar la habitación: " + ex.Message);
                 }
-
-                // 1. Obtener valores y mapear al objeto de negocio
-                int numero = int.Parse(txtNumeroHab.Text);
-                int tipoInt = cmbTipo.SelectedIndex + 1;
-                int estadoInt = cmbEstado.SelectedIndex;
-
-                var tipoEnum = (TipoHabitacion)tipoInt;
-                HabitacionBase habitacion;
-
-                // Crear la instancia de la subclase correcta (se mantiene)
-                switch (tipoEnum)
+                finally
                 {
-                    case TipoHabitacion.Simple:
-                        habitacion = new Simple(); break;
-                    case TipoHabitacion.Doble:
-                        habitacion = new Doble(); break;
-                    case TipoHabitacion.Suite:
-                        habitacion = new Suite(); break;
-                    case TipoHabitacion.Presidencial:
-                        habitacion = new Presidencial(); break;
-                    default:
-                        throw new Exception("Tipo de habitación no válido.");
+                    ToggleLoading(false, progressBarH);
                 }
-
-                habitacion.Numero = numero;
-                // ASIGNACIÓN CLAVE: Usamos el nombre local
-                habitacion.Nombre = nombreHabitacion;
-
-                habitacion.Estado = (EstadoHabitacion)estadoInt;
-                habitacion.Descripcion = nombreHabitacion; // Usamos Nombre como descripción
-                habitacion.PrecioPorNoche = precio;
-
-                // 2. Llamar al servicio de negocio (se mantiene)
-                await _habitacionService.CrearHabitacionAsync(habitacion, CancellationToken.None);
-
-                MessageBox.Show("Habitación registrada correctamente.");
-
-                // 3. Limpiar campos y recargar DGV
-                txtNumeroHab.Text = "";
-                cmbEstado.SelectedIndex = -1;
-                cmbTipo.SelectedIndex = -1;
-                txtPrecioN.Text = "";
-                txtNombreH.Text = ""; //Esta línea requiere que txtNombreH exista
-
-                // Recargar DGV
-                CargarHabitaciones();
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("Error al registrar la habitación: " + ex.Message);
-            }
-            finally
-            {
-                ToggleLoading(false, progressBarH);
             }
         }
 
@@ -1306,21 +1367,22 @@ namespace Capa_Presentacion
         }
 
 
-       
+
+
+
+
+        // Capa_Presentacion.menu.cs (REEMPLAZAR btnEliminarCliente_Click)
 
         private async void btnEliminarCliente_Click(object sender, EventArgs e)
         {
-            // 1. Verificar selección
             if (dgvClientes.SelectedRows.Count == 0)
             {
                 MessageBox.Show("Por favor, selecciona el cliente que deseas eliminar.", "Advertencia", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
 
-            // 2. Obtener el ID
-            int idCliente = Convert.ToInt32(dgvClientes.SelectedRows[0].Cells["IdCliente"].Value);
+            var idCliente = Convert.ToInt32(dgvClientes.SelectedRows[0].Cells["IdCliente"].Value);
 
-            // 3. Confirmación
             DialogResult confirmacion = MessageBox.Show(
                 $"¿Estás seguro de que deseas eliminar el cliente con ID {idCliente}? Esta acción puede fallar si tiene reservas o facturas asociadas.",
                 "Confirmar Eliminación",
@@ -1329,19 +1391,19 @@ namespace Capa_Presentacion
 
             if (confirmacion == DialogResult.Yes)
             {
-                // === APLICACIÓN DEL CANCELLATION TOKEN CON TIMEOUT (30 SEGUNDOS) ===
                 TimeSpan timeout = TimeSpan.FromSeconds(30);
-                using (var ctsGeneral = new CancellationTokenSource(timeout))
+                // Combina Cancelación Manual y Timeout
+                using (var linkedCts = CancellationTokenSource.CreateLinkedTokenSource(_ctsCliente.Token, new CancellationTokenSource(timeout).Token))
                 {
                     ToggleLoading(true, progressBarC);
                     try
                     {
-                        // 4. Llamar al servicio de negocio para eliminar, pasando el token temporal
-                        await _clienteServicios.EliminarClienteAsync(idCliente, ctsGeneral.Token);
+                        // Pasar el token combinado
+                        await _clienteServicios.EliminarClienteAsync(idCliente, linkedCts.Token);
 
                         MessageBox.Show($"Cliente ID {idCliente} eliminado correctamente.", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information);
 
-                        // 5. Actualizar la interfaz
+                        // Actualizar la interfaz
                         await CargarClientesAsync();
                         await CargarCedulas();
                         await CargarIdsClientes();
@@ -1350,14 +1412,12 @@ namespace Capa_Presentacion
                         await CargarReservasEnDGVAsync();
 
                     }
-                    catch (OperationCanceledException)
+                    catch (OperationCanceledException) when (linkedCts.IsCancellationRequested)
                     {
-                        // Captura si la eliminación superó los 30 segundos
-                        MessageBox.Show("La operación de eliminación excedió el tiempo límite de 30 segundos y fue cancelada.", "Timeout", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                        // No mostrar mensaje aquí, el botón de cancelación ya lo hizo.
                     }
                     catch (Microsoft.Data.SqlClient.SqlException sqlEx)
                     {
-                        // Manejar error de llave foránea (Error 547)
                         if (sqlEx.Number == 547)
                         {
                             MessageBox.Show("No se puede eliminar el cliente porque tiene reservas o facturas activas/asociadas.", "Error de Integridad", MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -1371,11 +1431,11 @@ namespace Capa_Presentacion
                     {
                         MessageBox.Show($"Error inesperado al eliminar el cliente: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     }
-                    finally 
-                    { 
+                    finally
+                    {
                         ToggleLoading(false, progressBarC);
                     }
-                } // El using garantiza que ctsGeneral.Dispose() se llama al final
+                }
             }
         }
 
@@ -1462,23 +1522,25 @@ namespace Capa_Presentacion
         /// <summary>
         /// Método genérico para ejecutar acciones en el servicio de reserva y actualizar la UI.
         /// </summary>
-        
+
+
+        // Capa_Presentacion.menu.cs (REEMPLAZAR ExecuteReservaActionAsync)
 
         private async Task ExecuteReservaActionAsync(Func<int, CancellationToken, Task> action, string successMessage)
         {
-            // Definimos el límite de 5 minutos (300 segundos) para esta operación.
+            // Usamos el token de la práctica (5 minutos)
             TimeSpan timeout = TimeSpan.FromMinutes(5);
 
-            // Usamos un CTS local que se cancelará automáticamente después del timeout.
-            using (var ctsTiempoLimite = new CancellationTokenSource(timeout))
+            // Combina Cancelación Manual y Timeout
+            using (var linkedCts = CancellationTokenSource.CreateLinkedTokenSource(_ctsReserva.Token, new CancellationTokenSource(timeout).Token))
             {
                 ToggleLoading(true, progressBarR);
                 try
                 {
                     int idReserva = GetSelectedReservaId();
 
-                    // Ejecuta la función del servicio, pasando el token con timeout.
-                    await action(idReserva, ctsTiempoLimite.Token);
+                    // Ejecuta la función del servicio, pasando el token combinado
+                    await action(idReserva, linkedCts.Token);
 
                     MessageBox.Show(successMessage, "Éxito");
 
@@ -1486,10 +1548,10 @@ namespace Capa_Presentacion
                     await CargarReservasEnDGVAsync();
                     CargarHabitaciones();
                 }
-                catch (OperationCanceledException)
+                catch (OperationCanceledException) when (linkedCts.IsCancellationRequested)
                 {
-                    // Captura si la cancelación fue forzada por el timeout.
-                    MessageBox.Show("La operación excedió el tiempo límite de 5 minutos y fue cancelada.", "Timeout", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    // Si la cancelación fue forzada por el timeout (linkedCts.Token) o por el usuario
+                    MessageBox.Show("La operación excedió el tiempo límite o fue cancelada por el usuario.", "Cancelación/Timeout", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 }
                 catch (InvalidOperationException ex)
                 {
@@ -1509,7 +1571,7 @@ namespace Capa_Presentacion
                 }
             }
         }
-        
+
 
         private async void btnCheckI_Click(object? sender, EventArgs e)
         {
@@ -1981,6 +2043,87 @@ namespace Capa_Presentacion
                 targetBar.Visible = false;
                 targetBar.Style = ProgressBarStyle.Blocks;
             }
+        }
+
+        // Capa_Presentacion.menu.cs (Añadir o reemplazar el método de formato de Clientes)
+
+        // Capa_Presentacion.menu.cs (Reemplazar ConfigurarDgvClientes)
+
+        private void ConfigurarDgvClientes()
+        {
+            // Limpiar todas las columnas existentes antes de redefinirlas.
+            // Esto previene duplicados si la función se llama varias veces, 
+            // y evita conflictos si el origen de datos anterior era un DataTable.
+            dgvClientes.Columns.Clear();
+
+            // Si usas AutoGenerateColumns = false, debes definir todas las columnas.
+            dgvClientes.AutoGenerateColumns = false;
+
+            // Definición de Columnas y DataPropertyName
+            // DataPropertyName debe coincidir *exactamente* con el nombre de la propiedad de la clase Cliente.
+            dgvClientes.Columns.Add(new DataGridViewTextBoxColumn { Name = "IdCliente", HeaderText = "ID Cliente", DataPropertyName = "IdCliente", ReadOnly = true });
+            dgvClientes.Columns.Add(new DataGridViewTextBoxColumn { Name = "Nombre", HeaderText = "Nombre", DataPropertyName = "Nombre" });
+            dgvClientes.Columns.Add(new DataGridViewTextBoxColumn { Name = "Documento", HeaderText = "Cédula/Documento", DataPropertyName = "Documento" });
+            dgvClientes.Columns.Add(new DataGridViewTextBoxColumn { Name = "Telefono", HeaderText = "Teléfono", DataPropertyName = "Telefono" });
+            dgvClientes.Columns.Add(new DataGridViewTextBoxColumn { Name = "Email", HeaderText = "Email", DataPropertyName = "Email" });
+            dgvClientes.Columns.Add(new DataGridViewTextBoxColumn { Name = "Nacionalidad", HeaderText = "Nacionalidad", DataPropertyName = "Nacionalidad" });
+
+            dgvClientes.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
+
+            // Restaurar los modos de selección/edición que definiste en el constructor si fuera necesario
+            dgvClientes.ReadOnly = true;
+            dgvClientes.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
+            // ... otras propiedades que quieres asegurar
+        }
+        // Capa_Presentacion.menu.cs (Añadir estos 4 métodos)
+
+        private void btnCancelarC_Click(object sender, EventArgs e)
+        {
+            // 1. Damos la orden de cancelar todas las tareas que usan este token
+            _ctsCliente.Cancel();
+            // 2. Creamos una nueva fuente de token, lista para la próxima operación
+            _ctsCliente = new CancellationTokenSource();
+            ToggleLoading(false, progressBarC);
+            MessageBox.Show("Operación de Clientes cancelada por el usuario.", "Cancelación");
+        }
+
+        private void btnCancelarH_Click(object sender, EventArgs e)
+        {
+            _ctsHabitacion.Cancel();
+            _ctsHabitacion = new CancellationTokenSource();
+            ToggleLoading(false, progressBarH);
+            MessageBox.Show("Operación de Habitaciones cancelada por el usuario.", "Cancelación");
+        }
+
+        private void btnCancelarR_Click(object sender, EventArgs e)
+        {
+            _ctsReserva.Cancel();
+            _ctsReserva = new CancellationTokenSource();
+            ToggleLoading(false, progressBarR);
+            MessageBox.Show("Operación de Reserva cancelada por el usuario.", "Cancelación");
+        }
+
+        private void btnCancelarF_Click(object sender, EventArgs e)
+        {
+            _ctsFactura.Cancel();
+            _ctsFactura = new CancellationTokenSource();
+            ToggleLoading(false, progressBarF);
+            MessageBox.Show("Operación de Factura cancelada por el usuario.", "Cancelación");
+        }
+
+        // Capa_Presentacion.menu.cs (Añadir a la clase menu)
+
+        /// <summary>
+        /// Limpia los campos de entrada en la pestaña de registro de Habitación.
+        /// </summary>
+        private void LimpiarCamposHabitacion()
+        {
+            txtNumeroHab.Text = "";
+            txtNombreH.Text = "";
+            txtPrecioN.Text = "";
+            cmbEstado.SelectedIndex = -1; // Deselecciona el estado
+            cmbTipo.SelectedIndex = -1; // Deselecciona el tipo
+            txtNumeroHab.Focus(); // Pone el foco en el primer campo
         }
 
 

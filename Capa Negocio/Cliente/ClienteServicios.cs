@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Microsoft.Data.SqlClient;
 using Capa_datos;
 using Capa_Negocio.Cliente;
+using System.Data;
 
 
 namespace Capa_Negocio.Cliente
@@ -23,37 +24,44 @@ namespace Capa_Negocio.Cliente
         /// <summary>
         /// Crea un nuevo cliente en la base de datos.
         /// </summary>
+        // CAPA DE NEGOCIO: Capa_Negocio.ClienteServicios.cs (Método CrearClienteAsync - Versión Robusta)
+
         public async Task CrearClienteAsync(Cliente cliente, CancellationToken token)
         {
-            // Simular un pequeño retraso de procesamiento de servidor.
             await Task.Delay(600, token);
 
             using SqlConnection conn = _conexion.CrearConexion();
             await conn.OpenAsync(token);
 
             string sql = @"
-                INSERT INTO Cliente
-                (Nombre, Documento, Telefono, Email, Nacionalidad)
-                VALUES (@Nombre, @Documento, @Telefono, @Email, @Nacionalidad);";
+        INSERT INTO Cliente
+        (Nombre, Documento, Telefono, Email, Nacionalidad)
+        VALUES (@Nombre, @Documento, @Telefono, @Email, @Nacionalidad);";
 
             using SqlCommand cmd = new SqlCommand(sql, conn);
 
-            // Como en la tabla todos los campos son NOT NULL,
-            // nos aseguramos de enviar siempre una cadena no nula.
-            cmd.Parameters.AddWithValue("@Nombre",
-                string.IsNullOrWhiteSpace(cliente.Nombre) ? string.Empty : cliente.Nombre);
+            // Usamos Add para mayor control sobre el tipo, aunque AddWithValue debería funcionar.
+            // DADO QUE LA COLUMNA ES NVARCHAR(100) NOT NULL, enviamos el valor o String.Empty.
 
-            cmd.Parameters.AddWithValue("@Documento",
-                string.IsNullOrWhiteSpace(cliente.Documento) ? string.Empty : cliente.Documento);
+            cmd.Parameters.Add(
+                "@Nombre", SqlDbType.NVarChar, 100).Value =
+                string.IsNullOrWhiteSpace(cliente.Nombre) ? string.Empty : cliente.Nombre.Trim();
 
-            cmd.Parameters.AddWithValue("@Telefono",
-                string.IsNullOrWhiteSpace(cliente.Telefono) ? string.Empty : cliente.Telefono);
+            cmd.Parameters.Add(
+                "@Documento", SqlDbType.NVarChar, 50).Value =
+                string.IsNullOrWhiteSpace(cliente.Documento) ? string.Empty : cliente.Documento.Trim();
 
-            cmd.Parameters.AddWithValue("@Email",
-                string.IsNullOrWhiteSpace(cliente.Email) ? string.Empty : cliente.Email);
+            cmd.Parameters.Add(
+                "@Telefono", SqlDbType.NVarChar, 20).Value =
+                string.IsNullOrWhiteSpace(cliente.Telefono) ? string.Empty : cliente.Telefono.Trim();
 
-            cmd.Parameters.AddWithValue("@Nacionalidad",
-                string.IsNullOrWhiteSpace(cliente.Nacionalidad) ? string.Empty : cliente.Nacionalidad);
+            cmd.Parameters.Add(
+                "@Email", SqlDbType.NVarChar, 100).Value =
+                string.IsNullOrWhiteSpace(cliente.Email) ? string.Empty : cliente.Email.Trim();
+
+            cmd.Parameters.Add(
+                "@Nacionalidad", SqlDbType.NVarChar, 100).Value =
+                string.IsNullOrWhiteSpace(cliente.Nacionalidad) ? string.Empty : cliente.Nacionalidad.Trim();
 
             await cmd.ExecuteNonQueryAsync(token);
         }
@@ -103,32 +111,53 @@ namespace Capa_Negocio.Cliente
         /// <summary>
         /// Obtiene todos los clientes registrados en la base de datos.
         /// </summary>
+        // Capa_Negocio.Cliente.ClienteServicios.cs (Reemplazar ObtenerTodosAsync)
+
+        // CAPA DE NEGOCIO: Capa_Negocio.ClienteServicios.cs (Método ObtenerTodosAsync corregido)
+
+        // CAPA DE NEGOCIO: Capa_Negocio.ClienteServicios.cs (Método ObtenerTodosAsync - Versión Robusta)
+
         public async Task<List<Cliente>> ObtenerTodosAsync(CancellationToken token)
         {
-            await Task.Delay(500, token);
+            await Task.Delay(500, token); // Retardo de simulación
 
             var lista = new List<Cliente>();
 
             using SqlConnection conn = _conexion.CrearConexion();
             await conn.OpenAsync(token);
 
+            // Mantenemos el SELECT explícito
             string sql = @"
-                SELECT IdCliente, Nombre, Documento, Telefono, Email, Nacionalidad
-                FROM Cliente;";
+        SELECT IdCliente, Nombre, Documento, Telefono, Email, Nacionalidad
+        FROM Cliente;";
 
             using SqlCommand cmd = new SqlCommand(sql, conn);
             using SqlDataReader reader = await cmd.ExecuteReaderAsync(token);
 
+            // === DEFINICIÓN DE ÍNDICES ROBUSTOS (MEJOR PRÁCTICA) ===
+            // Obtenemos las posiciones de las columnas por su nombre una sola vez.
+            int ordId = reader.GetOrdinal("IdCliente");
+            int ordNombre = reader.GetOrdinal("Nombre");
+            int ordDocumento = reader.GetOrdinal("Documento");
+            int ordTelefono = reader.GetOrdinal("Telefono");
+            int ordEmail = reader.GetOrdinal("Email");
+            int ordNacionalidad = reader.GetOrdinal("Nacionalidad");
+
+
             while (await reader.ReadAsync(token))
             {
+                // === Mapeo SEGURO usando los ordinales (índices obtenidos por nombre) ===
                 var cliente = new Cliente
                 {
-                    IdCliente = reader.GetInt32(0),
-                    Nombre = reader.GetString(1),
-                    Documento = reader.GetString(2),
-                    Telefono = reader.GetString(3),
-                    Email = reader.GetString(4),
-                    Nacionalidad = reader.GetString(5)
+                    IdCliente = reader.GetInt32(ordId), // Usamos la posición segura
+
+                    // Usamos IsDBNull para campos NVARCHAR que podrían ser NULL
+                    // aunque en tu esquema son NOT NULL, es buena práctica.
+                    Nombre = reader.IsDBNull(ordNombre) ? string.Empty : reader.GetString(ordNombre),
+                    Documento = reader.IsDBNull(ordDocumento) ? string.Empty : reader.GetString(ordDocumento),
+                    Telefono = reader.IsDBNull(ordTelefono) ? string.Empty : reader.GetString(ordTelefono),
+                    Email = reader.IsDBNull(ordEmail) ? string.Empty : reader.GetString(ordEmail),
+                    Nacionalidad = reader.IsDBNull(ordNacionalidad) ? string.Empty : reader.GetString(ordNacionalidad)
                 };
 
                 lista.Add(cliente);

@@ -74,6 +74,7 @@ namespace Capa_Presentacion
             txtNacionalidad = new MaterialSkin.Controls.MaterialMaskedTextBox();
             dgvClientes = new DataGridView();
             tabPage1 = new TabPage();
+            pictureBox1 = new PictureBox();
             materialTabControl1 = new MaterialSkin.Controls.MaterialTabControl();
             tabPage4 = new TabPage();
             progressBarR = new ProgressBar();
@@ -110,7 +111,10 @@ namespace Capa_Presentacion
             materialCard8 = new MaterialSkin.Controls.MaterialCard();
             dgvFactura = new DataGridView();
             fileSystemWatcher1 = new FileSystemWatcher();
-            pictureBox1 = new PictureBox();
+            btnCancelarC = new MaterialSkin.Controls.MaterialButton();
+            btnCancelarH = new MaterialSkin.Controls.MaterialButton();
+            btnCancelarR = new MaterialSkin.Controls.MaterialButton();
+            btnCancelarF = new MaterialSkin.Controls.MaterialButton();
             tabPage3.SuspendLayout();
             materialCard3.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)dgvHabitaciones).BeginInit();
@@ -120,6 +124,7 @@ namespace Capa_Presentacion
             materialCard1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)dgvClientes).BeginInit();
             tabPage1.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)pictureBox1).BeginInit();
             materialTabControl1.SuspendLayout();
             tabPage4.SuspendLayout();
             materialCard10.SuspendLayout();
@@ -132,11 +137,11 @@ namespace Capa_Presentacion
             materialCard8.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)dgvFactura).BeginInit();
             ((System.ComponentModel.ISupportInitialize)fileSystemWatcher1).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)pictureBox1).BeginInit();
             SuspendLayout();
             // 
             // tabPage3
             // 
+            tabPage3.Controls.Add(btnCancelarH);
             tabPage3.Controls.Add(progressBarH);
             tabPage3.Controls.Add(btnEliminarHab);
             tabPage3.Controls.Add(materialCard3);
@@ -555,6 +560,7 @@ namespace Capa_Presentacion
             // 
             // tabPage2
             // 
+            tabPage2.Controls.Add(btnCancelarC);
             tabPage2.Controls.Add(progressBarC);
             tabPage2.Controls.Add(btnEliminarCliente);
             tabPage2.Controls.Add(materialCard6);
@@ -1031,6 +1037,15 @@ namespace Capa_Presentacion
             tabPage1.Text = "Menu";
             tabPage1.UseVisualStyleBackColor = true;
             // 
+            // pictureBox1
+            // 
+            pictureBox1.Image = (Image)resources.GetObject("pictureBox1.Image");
+            pictureBox1.Location = new Point(564, 171);
+            pictureBox1.Name = "pictureBox1";
+            pictureBox1.Size = new Size(507, 494);
+            pictureBox1.TabIndex = 0;
+            pictureBox1.TabStop = false;
+            // 
             // materialTabControl1
             // 
             materialTabControl1.Controls.Add(tabPage1);
@@ -1050,6 +1065,7 @@ namespace Capa_Presentacion
             // 
             // tabPage4
             // 
+            tabPage4.Controls.Add(btnCancelarR);
             tabPage4.Controls.Add(progressBarR);
             tabPage4.Controls.Add(materialCard10);
             tabPage4.Controls.Add(materialCard7);
@@ -1458,6 +1474,7 @@ namespace Capa_Presentacion
             // 
             // tabPage5
             // 
+            tabPage5.Controls.Add(btnCancelarF);
             tabPage5.Controls.Add(progressBarF);
             tabPage5.Controls.Add(materialCard9);
             tabPage5.Controls.Add(materialCard8);
@@ -1579,14 +1596,81 @@ namespace Capa_Presentacion
             fileSystemWatcher1.EnableRaisingEvents = true;
             fileSystemWatcher1.SynchronizingObject = this;
             // 
-            // pictureBox1
+            // btnCancelarC
             // 
-            pictureBox1.Image = (Image)resources.GetObject("pictureBox1.Image");
-            pictureBox1.Location = new Point(564, 171);
-            pictureBox1.Name = "pictureBox1";
-            pictureBox1.Size = new Size(507, 494);
-            pictureBox1.TabIndex = 0;
-            pictureBox1.TabStop = false;
+            btnCancelarC.AutoSizeMode = AutoSizeMode.GrowAndShrink;
+            btnCancelarC.Density = MaterialSkin.Controls.MaterialButton.MaterialButtonDensity.Default;
+            btnCancelarC.Depth = 0;
+            btnCancelarC.HighEmphasis = true;
+            btnCancelarC.Icon = null;
+            btnCancelarC.Location = new Point(1255, 89);
+            btnCancelarC.Margin = new Padding(4, 6, 4, 6);
+            btnCancelarC.MouseState = MaterialSkin.MouseState.HOVER;
+            btnCancelarC.Name = "btnCancelarC";
+            btnCancelarC.NoAccentTextColor = Color.Empty;
+            btnCancelarC.Size = new Size(96, 36);
+            btnCancelarC.TabIndex = 24;
+            btnCancelarC.Text = "Cancelar";
+            btnCancelarC.Type = MaterialSkin.Controls.MaterialButton.MaterialButtonType.Contained;
+            btnCancelarC.UseAccentColor = false;
+            btnCancelarC.UseVisualStyleBackColor = true;
+            // 
+            // btnCancelarH
+            // 
+            btnCancelarH.AutoSizeMode = AutoSizeMode.GrowAndShrink;
+            btnCancelarH.Density = MaterialSkin.Controls.MaterialButton.MaterialButtonDensity.Default;
+            btnCancelarH.Depth = 0;
+            btnCancelarH.HighEmphasis = true;
+            btnCancelarH.Icon = null;
+            btnCancelarH.Location = new Point(1274, 508);
+            btnCancelarH.Margin = new Padding(4, 6, 4, 6);
+            btnCancelarH.MouseState = MaterialSkin.MouseState.HOVER;
+            btnCancelarH.Name = "btnCancelarH";
+            btnCancelarH.NoAccentTextColor = Color.Empty;
+            btnCancelarH.Size = new Size(96, 36);
+            btnCancelarH.TabIndex = 25;
+            btnCancelarH.Text = "Cancelar";
+            btnCancelarH.Type = MaterialSkin.Controls.MaterialButton.MaterialButtonType.Contained;
+            btnCancelarH.UseAccentColor = false;
+            btnCancelarH.UseVisualStyleBackColor = true;
+            // 
+            // btnCancelarR
+            // 
+            btnCancelarR.AutoSizeMode = AutoSizeMode.GrowAndShrink;
+            btnCancelarR.Density = MaterialSkin.Controls.MaterialButton.MaterialButtonDensity.Default;
+            btnCancelarR.Depth = 0;
+            btnCancelarR.HighEmphasis = true;
+            btnCancelarR.Icon = null;
+            btnCancelarR.Location = new Point(1313, 588);
+            btnCancelarR.Margin = new Padding(4, 6, 4, 6);
+            btnCancelarR.MouseState = MaterialSkin.MouseState.HOVER;
+            btnCancelarR.Name = "btnCancelarR";
+            btnCancelarR.NoAccentTextColor = Color.Empty;
+            btnCancelarR.Size = new Size(96, 36);
+            btnCancelarR.TabIndex = 25;
+            btnCancelarR.Text = "CANCELAR";
+            btnCancelarR.Type = MaterialSkin.Controls.MaterialButton.MaterialButtonType.Contained;
+            btnCancelarR.UseAccentColor = false;
+            btnCancelarR.UseVisualStyleBackColor = true;
+            // 
+            // btnCancelarF
+            // 
+            btnCancelarF.AutoSizeMode = AutoSizeMode.GrowAndShrink;
+            btnCancelarF.Density = MaterialSkin.Controls.MaterialButton.MaterialButtonDensity.Default;
+            btnCancelarF.Depth = 0;
+            btnCancelarF.HighEmphasis = true;
+            btnCancelarF.Icon = null;
+            btnCancelarF.Location = new Point(970, 585);
+            btnCancelarF.Margin = new Padding(4, 6, 4, 6);
+            btnCancelarF.MouseState = MaterialSkin.MouseState.HOVER;
+            btnCancelarF.Name = "btnCancelarF";
+            btnCancelarF.NoAccentTextColor = Color.Empty;
+            btnCancelarF.Size = new Size(96, 36);
+            btnCancelarF.TabIndex = 25;
+            btnCancelarF.Text = "CANCELAR";
+            btnCancelarF.Type = MaterialSkin.Controls.MaterialButton.MaterialButtonType.Contained;
+            btnCancelarF.UseAccentColor = false;
+            btnCancelarF.UseVisualStyleBackColor = true;
             // 
             // menu
             // 
@@ -1613,8 +1697,10 @@ namespace Capa_Presentacion
             materialCard1.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)dgvClientes).EndInit();
             tabPage1.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)pictureBox1).EndInit();
             materialTabControl1.ResumeLayout(false);
             tabPage4.ResumeLayout(false);
+            tabPage4.PerformLayout();
             materialCard10.ResumeLayout(false);
             materialCard10.PerformLayout();
             materialCard7.ResumeLayout(false);
@@ -1625,12 +1711,12 @@ namespace Capa_Presentacion
             materialCard4.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)dgvReserva).EndInit();
             tabPage5.ResumeLayout(false);
+            tabPage5.PerformLayout();
             materialCard9.ResumeLayout(false);
             materialCard9.PerformLayout();
             materialCard8.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)dgvFactura).EndInit();
             ((System.ComponentModel.ISupportInitialize)fileSystemWatcher1).EndInit();
-            ((System.ComponentModel.ISupportInitialize)pictureBox1).EndInit();
             ResumeLayout(false);
         }
 
@@ -1717,5 +1803,9 @@ namespace Capa_Presentacion
         private ProgressBar progressBarR;
         private ProgressBar progressBarF;
         private PictureBox pictureBox1;
+        private MaterialSkin.Controls.MaterialButton btnCancelarH;
+        private MaterialSkin.Controls.MaterialButton btnCancelarC;
+        private MaterialSkin.Controls.MaterialButton btnCancelarR;
+        private MaterialSkin.Controls.MaterialButton btnCancelarF;
     }
 }
