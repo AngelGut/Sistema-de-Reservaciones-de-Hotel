@@ -38,7 +38,7 @@ namespace Capa_Negocio.Factura
         public async Task<Factura> GenerarFacturaAsync(int idReserva, CancellationToken token)
         {
             // Simulamos procesamiento de servidor (mandato: Task.Delay)
-            await Task.Delay(700, token);
+            await Task.Delay(5000, token);
 
             // 1. Obtener la reserva desde la capa de reservas.
             var reserva = await _reservaService.ObtenerPorIdAsync(idReserva, token);
@@ -146,7 +146,7 @@ namespace Capa_Negocio.Factura
         public async Task<List<Factura>> ObtenerTodasAsync(CancellationToken token)
         {
             // Simular pequeña demora de servidor.
-            await Task.Delay(400, token);
+            await Task.Delay(5000, token);
 
             var lista = new List<Factura>();
 
@@ -195,7 +195,7 @@ namespace Capa_Negocio.Factura
         public async Task<Factura?> ObtenerPorIdReservaAsync(int idReserva, CancellationToken token)
         {
             // Usamos Task.Delay() para simular el tiempo de respuesta del servidor (100ms)
-            await Task.Delay(100, token);
+            await Task.Delay(5000, token);
 
             // 1. Intentar buscar en la cache (Opcional, requiere cache mapeada por IdReserva)
             // Para simplificar, buscamos directamente en la BD (más seguro por el UNIQUE constraint)

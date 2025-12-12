@@ -28,7 +28,7 @@ namespace Capa_Negocio.Cliente
 
         public async Task CrearClienteAsync(Cliente cliente, CancellationToken token)
         {
-            await Task.Delay(600, token);
+            await Task.Delay(8000, token);
 
             using SqlConnection conn = _conexion.CrearConexion();
             await conn.OpenAsync(token);
@@ -74,7 +74,7 @@ namespace Capa_Negocio.Cliente
         /// </summary>
         public async Task<Cliente?> ObtenerPorIdAsync(int idCliente, CancellationToken token)
         {
-            await Task.Delay(300, token);
+            await Task.Delay(8000, token);
 
             using SqlConnection conn = _conexion.CrearConexion();
             await conn.OpenAsync(token);
@@ -119,7 +119,7 @@ namespace Capa_Negocio.Cliente
 
         public async Task<List<Cliente>> ObtenerTodosAsync(CancellationToken token)
         {
-            await Task.Delay(500, token); // Retardo de simulación
+            await Task.Delay(8000, token); // Retardo de simulación
 
             var lista = new List<Cliente>();
 
@@ -174,7 +174,7 @@ namespace Capa_Negocio.Cliente
         /// </summary>
         public async Task ActualizarClienteAsync(Cliente cliente, CancellationToken token)
         {
-            await Task.Delay(500, token);
+            await Task.Delay(8000, token);
 
             using SqlConnection conn = _conexion.CrearConexion();
             await conn.OpenAsync(token);
@@ -218,7 +218,7 @@ namespace Capa_Negocio.Cliente
         /// </summary>
         public async Task EliminarClienteAsync(int idCliente, CancellationToken token)
         {
-            await Task.Delay(400, token);
+            await Task.Delay(8000, token);
 
             using SqlConnection conn = _conexion.CrearConexion();
             await conn.OpenAsync(token);

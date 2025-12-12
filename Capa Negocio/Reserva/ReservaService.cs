@@ -184,7 +184,7 @@ namespace Capa_Negocio.Reserva.Servicios
         /// </summary>
         public async Task CheckOutAsync(int idReserva, CancellationToken token)
         {
-            await Task.Delay(400, token);
+            await Task.Delay(5000, token);
 
             var reserva = await ObtenerPorIdAsync(idReserva, token);
             if (reserva is null)
@@ -316,7 +316,7 @@ namespace Capa_Negocio.Reserva.Servicios
         /// </summary>
         public async Task RevertirAReservadaAsync(int idReserva, CancellationToken token)
         {
-            await Task.Delay(500, token); // Simulación de espera
+            await Task.Delay(5000, token); // Simulación de espera
 
             var reserva = await ObtenerPorIdAsync(idReserva, token);
             if (reserva is null)
