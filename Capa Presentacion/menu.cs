@@ -200,7 +200,7 @@ namespace Capa_Presentacion
         // ----------------------------------------------------------
         // EVENTO CLICK DEL BOTÓN REGISTRAR
         // ----------------------------------------------------------
-        // Capa_Presentacion.menu.cs (Modificar btnRegistrar_Click)
+        
 
         private async void btnRegistrar_Click(object sender, EventArgs e)
         {
@@ -210,9 +210,9 @@ namespace Capa_Presentacion
                 ToggleLoading(true, progressBarC);
                 try
                 {
-                    // ... (validaciones existentes) ...
+                    //(validaciones existentes)
 
-                    var cliente = new Cliente { /* ... */ };
+                    var cliente = new Cliente { };
 
                     // Guardar, pasando el token temporal
                     await _clienteServicios.CrearClienteAsync(cliente, ctsLocal.Token); // Pasa el token
@@ -221,7 +221,7 @@ namespace Capa_Presentacion
 
                     LimpiarCampos();
 
-                    // ... (Actualizaciones de UI existentes, deben usar _cts.Token si no tienen timeout)
+                    
                     await CargarClientesAsync();
                     await CargarCedulas();
                     await CargarIdsClientes();
@@ -263,13 +263,13 @@ namespace Capa_Presentacion
                 }
             }
 
-            // ✔ Evita que quede mostrando un valor viejo
+            //Evita que quede mostrando un valor viejo
             cmbCedula.SelectedIndex = -1;
             cmbCedula.Text = "";
         }
 
 
-        // Capa_Presentacion.menu.cs
+        
 
         private async Task CargarIdsClientes()
         {
@@ -298,10 +298,10 @@ namespace Capa_Presentacion
             }
 
             // 4. Seleccionar "Todas" (índice 0)
-            // Esto solo funciona si cmbID.DropDownStyle está en DropDownList (que ya lo tienes configurado).
+            
             cmbID.SelectedIndex = 0;
         }
-        // Capa_Presentacion.menu.cs
+        
 
         private async void btnBusqueda_Click(object sender, EventArgs e)
         {
@@ -341,7 +341,7 @@ namespace Capa_Presentacion
                     if (!(idCliente == "Todas" || string.IsNullOrWhiteSpace(idCliente)))
                     {
                         query += " AND IdCliente = @IdCliente";
-                        // Asumiendo que el ID es un INT, asegúrate de que el valor sea correcto
+                        
                         parametros.Add(new SqlParameter("@IdCliente", idCliente));
                     }
 
@@ -448,7 +448,7 @@ namespace Capa_Presentacion
             // Aseguramos explícitamente el DGV y el botón
             dgvClientes.Enabled = true;
 
-            // El botón Editar se deshabilita si estamos bloqueando (modo edición)
+            
 
         }
 
@@ -515,7 +515,7 @@ namespace Capa_Presentacion
             // 5. PONER EL FOCO Y ABRIR EDICIÓN AUTOMÁTICAMENTE
             dgvClientes.Focus();
 
-            // Identificamos la columna 'Nombre' (o la columna 1) para empezar a editar ahí
+            
             if (dgvClientes.CurrentRow != null)
             {
                 // Nos aseguramos de ir a la celda de Nombre
@@ -525,8 +525,7 @@ namespace Capa_Presentacion
                 dgvClientes.BeginEdit(true);
             }
 
-            // Mensaje opcional (a veces es mejor quitarlo para que el usuario escriba directo)
-            // MessageBox.Show("Modo edición activado..."); 
+            
         }
 
 
@@ -538,7 +537,7 @@ namespace Capa_Presentacion
                 e.Handled = true;
                 e.SuppressKeyPress = true;
 
-                dgvClientes.EndEdit(); // <-- dispara CellEndEdit
+                dgvClientes.EndEdit(); //dispara CellEndEdit
             }
         }
 
@@ -659,7 +658,7 @@ namespace Capa_Presentacion
                         da.Fill(tabla);
 
                         // --------------------------------------------
-                        // Convertir NUMEROS → TEXTO (Tipo y Estado)
+                        // Convertir NUMEROS a TEXTO (Tipo y Estado)
                         // --------------------------------------------
                         tabla.Columns.Add("TipoTexto", typeof(string));
                         tabla.Columns.Add("EstadoTexto", typeof(string));
@@ -695,7 +694,7 @@ namespace Capa_Presentacion
                         // RENOMBRAR Y OCULTAR COLUMNAS (Añadir comprobación)
                         // --------------------------------------------
 
-                        // dgvHabitaciones.Columns.Contains("NombreDeColumna") es la clave
+                        
 
                         if (dgvHabitaciones.Columns.Contains("IdHabitacion"))
                             dgvHabitaciones.Columns["IdHabitacion"].HeaderText = "ID";
@@ -738,7 +737,7 @@ namespace Capa_Presentacion
                 MessageBox.Show($"Error al cargar las habitaciones: {ex.Message}", "Error de Base de Datos/UI");
             }
         }
-        // Capa_Presentacion.menu.cs (Añade este método a la clase menu)
+        
 
         private void DgvHabitaciones_CellFormatting(object sender, DataGridViewCellFormattingEventArgs e)
         {
@@ -791,7 +790,7 @@ namespace Capa_Presentacion
                     cmbEstado.SelectedIndex == -1 ||
                     cmbTipo.SelectedIndex == -1 ||
                     string.IsNullOrWhiteSpace(txtPrecioN.Text) ||
-                    string.IsNullOrWhiteSpace(nombreHabitacion)) // <<--- Validación con la variable local
+                    string.IsNullOrWhiteSpace(nombreHabitacion)) // Validación con la variable local
                 {
                     MessageBox.Show("Completa todos los campos obligatorios (Número, Tipo, Estado, Nombre y Precio por Noche).");
                     return;
@@ -850,7 +849,7 @@ namespace Capa_Presentacion
                 cmbEstado.SelectedIndex = -1;
                 cmbTipo.SelectedIndex = -1;
                 txtPrecioN.Text = "";
-                txtNombreH.Text = ""; // <--- Esta línea requiere que txtNombreH exista
+                txtNombreH.Text = ""; //Esta línea requiere que txtNombreH exista
 
                 // Recargar DGV
                 CargarHabitaciones();
@@ -979,8 +978,7 @@ namespace Capa_Presentacion
             }
         }
 
-        // ...
-        // Capa_Presentacion.menu.cs
+        
 
         private void btnBuscarH_Click(object sender, EventArgs e)
         {
@@ -1089,8 +1087,7 @@ namespace Capa_Presentacion
         {
             if (dgvHabitaciones.Columns.Count == 0) return;
 
-            // Si se cargó con SELECT *, puede que no existan las columnas de texto, 
-            // pero sí la columna de la BD. 
+             
 
             // Ocultar columnas que NO quieres (si existen)
             if (dgvHabitaciones.Columns.Contains("Descripcion"))
@@ -1170,7 +1167,7 @@ namespace Capa_Presentacion
        
 
 
-        // Capa_Presentacion.menu.cs
+        
 
         private async void btnRegistrarR_Click(object sender, EventArgs e)
         {
@@ -1184,7 +1181,7 @@ namespace Capa_Presentacion
                     return;
                 }
 
-                // Asumiendo que DateEntrada y DateSalida existen:
+                
                 DateTime fechaEntrada = dateEntrada.Value.Date; // Solo la fecha
                 DateTime fechaSalida = dateSalida.Value.Date;   // Solo la fecha
 
@@ -1212,8 +1209,7 @@ namespace Capa_Presentacion
                     // El campo FechaCreacion es manejado automáticamente por la BD o por el constructor de Reserva.
                     // El EstadoReserva se establece en 0 (Reservada) en la Capa de Negocio.
 
-                    // Si tienes un TextBox para notas (ej: txtNotasR):
-                    // Notas = txtNotasR.Text.Trim()
+                    
                     Notas = "" // O usa un TextBox si existe
                 };
 
@@ -1310,7 +1306,7 @@ namespace Capa_Presentacion
         }
 
 
-        // Capa_Presentacion.menu.cs
+       
 
         private async void btnEliminarCliente_Click(object sender, EventArgs e)
         {
@@ -1466,7 +1462,7 @@ namespace Capa_Presentacion
         /// <summary>
         /// Método genérico para ejecutar acciones en el servicio de reserva y actualizar la UI.
         /// </summary>
-        // Capa_Presentacion.menu.cs (Reemplazar ExecuteReservaActionAsync)
+        
 
         private async Task ExecuteReservaActionAsync(Func<int, CancellationToken, Task> action, string successMessage)
         {
@@ -1513,7 +1509,7 @@ namespace Capa_Presentacion
                 }
             }
         }
-        // Capa_Presentacion.menu.cs
+        
 
         private async void btnCheckI_Click(object? sender, EventArgs e)
         {
@@ -1536,7 +1532,7 @@ namespace Capa_Presentacion
             await ExecuteReservaActionAsync(_reservaService.RevertirAReservadaAsync, "Reserva revertida a estado 'Reservada' con éxito.");
         }
 
-        // Capa_Presentacion.menu.cs
+        
 
         private async Task CargarIdsReservas()
         {
@@ -1579,11 +1575,7 @@ namespace Capa_Presentacion
             }
             cbmBuscarIDC.SelectedIndex = 0; // Selecciona "Todos" por defecto
         }
-        // Capa_Presentacion.menu.cs
-
-        // Capa_Presentacion.menu.cs
-
-        // Capa_Presentacion.menu.cs (Reemplazar btnBuscarR_Click)
+        
 
         private async void btnBuscarR_Click(object sender, EventArgs e)
         {
@@ -1706,7 +1698,7 @@ namespace Capa_Presentacion
             // 2. Recargar el DGV con todas las reservas activas (vista por defecto)
             await CargarReservasEnDGVAsync();
         }
-        // Capa_Presentacion.menu.cs
+        
 
         private void FormatearDgvReservasBusqueda(DataGridView dgv)
         {
@@ -1815,7 +1807,7 @@ namespace Capa_Presentacion
             dgvFactura.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
         }
 
-        // Capa_Presentacion.menu.cs
+        
 
         private async void btnBuscarF_Click(object sender, EventArgs e)
         {
@@ -1870,7 +1862,7 @@ namespace Capa_Presentacion
                 ToggleLoading(false, progressBarF);
             }
         }
-        // Capa_Presentacion.menu.cs
+        
 
         private async void btnFactura_Click(object sender, EventArgs e)
         {
@@ -1907,7 +1899,7 @@ namespace Capa_Presentacion
             MessageBox.Show(mensaje, $"Factura No. {idFactura} - Detalle", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
 
-        // Capa_Presentacion.menu.cs (Reemplaza tu método BtnGenerarFactura_Click)
+        
 
         private async void BtnGenerarFactura_Click(object sender, EventArgs e)
         {
@@ -1969,14 +1961,11 @@ namespace Capa_Presentacion
             }
         }
 
-        // Capa_Presentacion.menu.cs (Añadir a la clase menu)
-
-        // Capa_Presentacion.menu.cs (Añadir a la clase menu)
+        
 
         private void ToggleLoading(bool isLoading, System.Windows.Forms.ProgressBar targetBar)
         {
-            // Deshabilitar/Habilitar los DataGridViews principales
-            // (Opcional: Si los DGV están en diferentes TabPages, puedes deshabilitar solo los controles del TabPage activo)
+            
             dgvClientes.Enabled = !isLoading;
             dgvHabitaciones.Enabled = !isLoading;
             dgvReserva.Enabled = !isLoading;
